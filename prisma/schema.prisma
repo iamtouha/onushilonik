@@ -1,32 +1,27 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
     provider = "prisma-client-js"
+    previewFeatures = ["referentialIntegrity"]
 }
 
 datasource db {
-    provider = "sqlite"
-    url      = env("DATABASE_URL")
+    provider = "mysql"
+    url = env("DATABASE_URL")
+    shadowDatabaseUrl = env("SHADOW_URL")
+    referentialIntegrity = "prisma"
 }
 
-model Example {
-    id String @id @default(cuid())
-}
-
-// Necessary for Next auth
 model Account {
     id                String  @id @default(cuid())
     userId            String
     type              String
     provider          String
     providerAccountId String
-    refresh_token     String? //@db.Text
-    access_token      String? //@db.Text
+    refresh_token     String? @db.Text
+    access_token      String? @db.Text
     expires_at        Int?
     token_type        String?
     scope             String?
-    id_token          String? //@db.Text
+    id_token          String? @db.Text
     session_state     String?
     user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -47,15 +42,163 @@ model User {
     email         String?   @unique
     emailVerified DateTime?
     image         String?
-    isAdmin       Boolean   @default(false)
+    role          USER_ROLE @default(USER)
+    subscription  Subscription?
     accounts      Account[]
     sessions      Session[]
+    answers       Answer[]
+    comments      Comment[]
+    createdAt     DateTime  @default(now())
+    updatedAt     DateTime  @updatedAt
+}
+
+enum USER_ROLE {
+    SUPER_ADMIN
+    ADMIN
+    USER
+}
+
+model Subscription {
+    id              String   @id @default(cuid())
+    userId          String   @unique
+    user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+    status          SUBSCRIPTION_STATUS @default(INACTIVE)
+    expires         DateTime?
+    payments        Payment[]
+    createdAt       DateTime @default(now())
+    updatedAt       DateTime @updatedAt
+}
+
+enum SUBSCRIPTION_STATUS {
+    ACTIVE
+    INACTIVE
+}
+
+model Payment {
+    id              String   @id @default(cuid())
+    subscriptionId  String
+    subscription    Subscription @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+    status          PAYMENT_STATUS @default(PENDING)
+    method          PAYMENT_METHOD
+    amount          Int
+    currency        String
+    createdAt       DateTime @default(now())
+    updatedAt       DateTime @updatedAt
+}
+
+enum PAYMENT_METHOD {
+    BKASH
+    ROCKET
+    NAGAD
+}
+
+enum PAYMENT_STATUS {
+    PENDING
+    SUCCESS
+    FAILED
 }
 
 model VerificationToken {
-    identifier String
-    token      String   @unique
-    expires    DateTime
+    identifier      String
+    token           String   @unique
+    expires         DateTime
 
     @@unique([identifier, token])
 }
+
+model Subject {
+    id              String   @id @default(cuid())
+    code            String   @unique
+    title           String
+    createdAt       DateTime @default(now())
+    updatedAt       DateTime @updatedAt
+    chapters        Chapter[]
+}
+
+model Chapter {
+    id              String   @id @default(cuid())
+    code            String   @unique
+    title           String
+    createdAt       DateTime @default(now())
+    updatedAt       DateTime @updatedAt
+    subject         Subject  @relation(fields: [subjectId], references: [id])
+    subjectId       String
+    questions       Question[]
+}
+
+model Note {
+    id              String   @id @default(cuid())
+    title           String
+    content         String   @db.Text
+    createdAt       DateTime @default(now())
+    updatedAt       DateTime @updatedAt
+    questions       Question[]
+}
+
+model Comment {
+    id              String   @id @default(cuid())
+    content         String   @db.Text
+    createdAt       DateTime @default(now())
+    updatedAt       DateTime @updatedAt
+    question        Question @relation(fields: [questionId], references: [id])
+    questionId      String
+    user            User     @relation(fields: [userId], references: [id])
+    userId          String
+}
+
+model Question {
+    id              String   @id @default(cuid())
+    code            String   @unique
+    stem            String   @db.Text
+    createdAt       DateTime @default(now())
+    updatedAt       DateTime @updatedAt
+    chapter         Chapter  @relation(fields: [chapterId], references: [id])
+    chapterId       String
+    optionA         String
+    optionB         String
+    optionC         String
+    optionD         String
+    correctOption   OPTION
+    answers         Answer[]
+    questionSets    QuestionSet[]
+    comments        Comment[]
+    note            Note?    @relation(fields: [noteId], references: [id])
+    noteId          String?
+}
+
+model Answer {
+    id              String   @id @default(cuid())
+    option          OPTION
+    question        Question @relation(fields: [questionId], references: [id])
+    questionId      String
+    user            User     @relation(fields: [userId], references: [id])
+    userId          String
+    createdAt       DateTime @default(now())
+    questionSet     QuestionSet @relation(fields: [questionSetId], references: [id])
+    questionSetId   String
+}
+
+enum OPTION {
+    A
+    B
+    C
+    D
+}
+
+model QuestionSet {
+    id              String   @id @default(cuid())
+    code            String   @unique
+    title           String
+    type            SET_TYPE
+    createdAt       DateTime @default(now())
+    updatedAt       DateTime @updatedAt
+    questions       Question[]
+    answers         Answer[]
+}
+
+enum SET_TYPE {
+    MODEL_TEST
+    PREVIOUS_YEAR_QUESTION
+    QUESTION_BANK
+}
+

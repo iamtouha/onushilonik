@@ -25,44 +25,11 @@ import LaunchIcon from "@mui/icons-material/Launch";
 
 import AdminNavGuard from "@/components/AdminNavGuard";
 
-const routes = [
-  { title: "Dashboard", href: "/dashboard" },
-  { title: "Categories", href: "/dashboard/categories" },
-  { title: "Products", href: "/dashboard/products" },
-  { title: "Photos", href: "/dashboard/photos" },
-  { title: "Orders", href: "/dashboard/orders" },
-  { title: "Customers", href: "/dashboard/customers" },
-];
+type Props = { children: React.ReactNode };
 
-const DrawerContent = () => {
-  return (
-    <Box>
-      <Box>
-        <List>
-          {routes.map((route) => (
-            <ListItem key={route.href}>
-              <NextLink href={route.href} passHref>
-                <ListItemButton component="a">
-                  <ListItemText primary={route.title} />
-                </ListItemButton>
-              </NextLink>
-            </ListItem>
-          ))}
-        </List>
-      </Box>
-    </Box>
-  );
-};
-
-type Props = { children: React.ReactNode; window?: () => Window };
-
-function DashboardLayout(props: Props) {
-  const { window, children } = props;
-  const title = "Dashboard";
-  const [mobileOpen, setMobileOpen] = useState(false);
+function DashboardLayout({ children }: Props) {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
-  const router = useRouter();
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
@@ -72,31 +39,14 @@ function DashboardLayout(props: Props) {
   };
   const { data: session } = useSession();
 
-  const handleDrawerToggle = () => {
-    setMobileOpen(!mobileOpen);
-  };
-
-  const container =
-    window !== undefined ? () => window().document.body : undefined;
-
   return (
     <AdminNavGuard>
       <AppBar position="fixed" color="default">
         <Toolbar>
-          <Typography variant="h5"> {title} </Typography>
-          <Box sx={{ display: { xs: "none", md: "block" }, ml: 4 }}>
-            {routes.map((route) => (
-              <NextLink key={route.href} href={route.href} passHref>
-                <Button
-                  component="a"
-                  disabled={router.pathname === route.href}
-                  sx={{ textTransform: "none" }}
-                >
-                  {route.title}
-                </Button>
-              </NextLink>
-            ))}
-          </Box>
+          <Typography variant="h5" color="primary">
+            অনুশীলনিক
+          </Typography>
+
           <Box sx={{ ml: "auto", mr: 0 }} />
           <NextLink href={"/"} passHref>
             <Button
@@ -156,78 +106,10 @@ function DashboardLayout(props: Props) {
               </NextLink>
             </Menu>
           </Box>
-          <IconButton
-            color="inherit"
-            aria-label="open drawer"
-            edge="start"
-            onClick={handleDrawerToggle}
-            sx={{ mr: 2, display: { md: "none" } }}
-          >
-            <MenuIcon />
-          </IconButton>
         </Toolbar>
       </AppBar>
       <Toolbar />
-      <Box component="nav">
-        <Drawer
-          container={container}
-          anchor="right"
-          variant="temporary"
-          open={mobileOpen}
-          onClose={handleDrawerToggle}
-          ModalProps={{
-            keepMounted: true,
-          }}
-          sx={{
-            display: { xs: "block", md: "none" },
-            "& .MuiDrawer-paper": {
-              boxSizing: "border-box",
-              width: 250,
-            },
-          }}
-        >
-          <ListItem>
-            <IconButton sx={{ ml: "auto" }} onClick={handleDrawerToggle}>
-              <CloseIcon />
-            </IconButton>
-          </ListItem>
-          <Divider />
-          <DrawerContent />
-          <Divider />
-          <List>
-            <ListItem sx={{ display: { md: "none" } }}>
-              <ListItemAvatar>
-                {session?.user?.image ? (
-                  <Avatar
-                    src={session.user.image}
-                    sx={{
-                      width: "40px",
-                      height: "40px",
-                      borderRadius: "50%",
-                    }}
-                  />
-                ) : (
-                  <Avatar {...stringAvatar(session?.user?.name ?? "Admin")} />
-                )}
-              </ListItemAvatar>
-              <ListItemText
-                primary={session?.user?.name ?? "Admin"}
-                secondary={session?.user?.email ?? ""}
-              ></ListItemText>
-            </ListItem>
-            <ListItem>
-              <ListItemButton
-                onClick={() => {
-                  signOut();
-                }}
-              >
-                <LogoutIcon sx={{ mr: 1 }} />
-                Sign Out
-              </ListItemButton>
-            </ListItem>
-          </List>
-        </Drawer>
-      </Box>
+
       <Box component={"main"}>{children}</Box>
     </AdminNavGuard>
   );
