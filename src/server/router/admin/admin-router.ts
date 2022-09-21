@@ -1,6 +1,6 @@
 import { USER_ROLE } from "@prisma/client";
 import * as trpc from "@trpc/server";
-import { createRouter } from "./context";
+import { createRouter } from "../context";
 
 export function createAdminRouter() {
   return createRouter().middleware(({ ctx, next }) => {

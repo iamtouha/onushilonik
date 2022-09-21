@@ -37,19 +37,30 @@ model Session {
 }
 
 model User {
-    id            String    @id @default(cuid())
-    name          String?
-    email         String?   @unique
-    emailVerified DateTime?
-    image         String?
-    role          USER_ROLE @default(USER)
-    subscription  Subscription?
-    accounts      Account[]
-    sessions      Session[]
-    answers       Answer[]
-    comments      Comment[]
-    createdAt     DateTime  @default(now())
-    updatedAt     DateTime  @updatedAt
+    id              String    @id @default(cuid())
+    name            String?
+    email           String?   @unique
+    emailVerified   DateTime?
+    image           String?
+    role            USER_ROLE @default(USER)
+    subscription    Subscription? @relation("subscriber")
+    accounts        Account[]
+    sessions        Session[]
+    answerSheets    AnswerSheet[]
+    comments        Comment[]
+    subscriptionsUpdated Subscription[] @relation("sub_updater")
+    subjectsCreated Subject[] @relation("subject_creator")
+    subjectsUpdated Subject[] @relation("subject_updater")
+    chaptersCreated Chapter[] @relation("chapter_creator")
+    chaptersUpdated Chapter[] @relation("chapter_updater")
+    questionsCreated Question[] @relation("question_creator")
+    questionsUpdated Question[] @relation("question_updater")
+    setsCreated     QuestionSet[] @relation("set_creator")
+    setsUpdated     QuestionSet[] @relation("set_updater")
+    notesCreated    Note[] @relation("note_creator")
+    notesUpdated    Note[] @relation("note_updater")
+    createdAt       DateTime  @default(now())
+    updatedAt       DateTime  @updatedAt
 }
 
 enum USER_ROLE {
@@ -61,12 +72,15 @@ enum USER_ROLE {
 model Subscription {
     id              String   @id @default(cuid())
     userId          String   @unique
-    user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+    user            User     @relation("subscriber",fields: [userId], references: [id], onDelete: Cascade)
+    phoneNumber     String?
     status          SUBSCRIPTION_STATUS @default(INACTIVE)
     expires         DateTime?
     payments        Payment[]
     createdAt       DateTime @default(now())
     updatedAt       DateTime @updatedAt
+    updatedBy       User?    @relation("sub_updater", fields: [updatedById], references: [id])
+    updatedById     String?
 }
 
 enum SUBSCRIPTION_STATUS {
@@ -110,48 +124,37 @@ model Subject {
     id              String   @id @default(cuid())
     code            String   @unique
     title           String
+    published       Boolean  @default(true)
+    chapters        Chapter[]
     createdAt       DateTime @default(now())
     updatedAt       DateTime @updatedAt
-    chapters        Chapter[]
+    createdBy       User?    @relation("subject_creator", fields: [createdById], references: [id], onDelete:NoAction )
+    createdById     String?
+    updatedBy       User?    @relation("subject_updater", fields: [updatedById], references: [id], onDelete:NoAction )
+    updatedById     String?
 }
 
 model Chapter {
     id              String   @id @default(cuid())
     code            String   @unique
     title           String
-    createdAt       DateTime @default(now())
-    updatedAt       DateTime @updatedAt
+    published       Boolean  @default(true)
     subject         Subject  @relation(fields: [subjectId], references: [id])
     subjectId       String
     questions       Question[]
-}
-
-model Note {
-    id              String   @id @default(cuid())
-    title           String
-    content         String   @db.Text
     createdAt       DateTime @default(now())
     updatedAt       DateTime @updatedAt
-    questions       Question[]
+    createdBy       User?    @relation("chapter_creator", fields: [createdById], references: [id], onDelete:NoAction )
+    createdById     String?
+    updatedBy       User?    @relation("chapter_updater", fields: [updatedById], references: [id], onDelete:NoAction )
+    updatedById     String?
 }
 
-model Comment {
-    id              String   @id @default(cuid())
-    content         String   @db.Text
-    createdAt       DateTime @default(now())
-    updatedAt       DateTime @updatedAt
-    question        Question @relation(fields: [questionId], references: [id])
-    questionId      String
-    user            User     @relation(fields: [userId], references: [id])
-    userId          String
-}
 
 model Question {
     id              String   @id @default(cuid())
     code            String   @unique
     stem            String   @db.Text
-    createdAt       DateTime @default(now())
-    updatedAt       DateTime @updatedAt
     chapter         Chapter  @relation(fields: [chapterId], references: [id])
     chapterId       String
     optionA         String
@@ -164,25 +167,12 @@ model Question {
     comments        Comment[]
     note            Note?    @relation(fields: [noteId], references: [id])
     noteId          String?
-}
-
-model Answer {
-    id              String   @id @default(cuid())
-    option          OPTION
-    question        Question @relation(fields: [questionId], references: [id])
-    questionId      String
-    user            User     @relation(fields: [userId], references: [id])
-    userId          String
     createdAt       DateTime @default(now())
-    questionSet     QuestionSet @relation(fields: [questionSetId], references: [id])
-    questionSetId   String
-}
-
-enum OPTION {
-    A
-    B
-    C
-    D
+    updatedAt       DateTime @updatedAt
+    createdBy       User?    @relation("question_creator", fields: [createdById], references: [id], onDelete:NoAction )
+    createdById     String?
+    updatedBy       User?    @relation("question_updater", fields: [updatedById], references: [id], onDelete:NoAction )
+    updatedById     String?
 }
 
 model QuestionSet {
@@ -190,15 +180,74 @@ model QuestionSet {
     code            String   @unique
     title           String
     type            SET_TYPE
+    questions       Question[]
+    answerSheets    AnswerSheet[]
     createdAt       DateTime @default(now())
     updatedAt       DateTime @updatedAt
-    questions       Question[]
-    answers         Answer[]
+    createdBy       User?    @relation("set_creator", fields: [createdById], references: [id], onDelete:NoAction )
+    createdById     String?
+    updatedBy       User?    @relation("set_updater", fields: [updatedById], references: [id], onDelete:NoAction )
+    updatedById     String?
 }
 
 enum SET_TYPE {
     MODEL_TEST
     PREVIOUS_YEAR_QUESTION
     QUESTION_BANK
+}
+
+model Note {
+    id              String   @id @default(cuid())
+    title           String
+    published       Boolean  @default(true)
+    content         String   @db.Text
+    questions       Question[]
+    createdAt       DateTime @default(now())
+    updatedAt       DateTime @updatedAt
+    createdBy       User?    @relation("note_creator", fields: [createdById], references: [id], onDelete:NoAction )
+    createdById     String?
+    updatedBy       User?    @relation("note_updater", fields: [updatedById], references: [id], onDelete:NoAction )
+    updatedById     String?
+}
+
+model Comment {
+    id              String   @id @default(cuid())
+    content         String   @db.Text
+    question        Question @relation(fields: [questionId], references: [id])
+    questionId      String
+    user            User     @relation(fields: [userId], references: [id])
+    userId          String
+    createdAt       DateTime @default(now())
+    updatedAt       DateTime @updatedAt
+}
+
+
+model AnswerSheet {
+    id              String   @id @default(cuid())
+    code            String   @unique
+    user            User     @relation(fields: [userId], references: [id])
+    userId          String
+    questionSet     QuestionSet @relation(fields: [questionSetId], references: [id])
+    questionSetId   String
+    answers         Answer[]
+    createdAt       DateTime @default(now())
+    updatedAt       DateTime @updatedAt
+}
+
+model Answer {
+    id              String   @id @default(cuid())
+    option          OPTION
+    question        Question @relation(fields: [questionId], references: [id])
+    answerSheet     AnswerSheet @relation(fields: [answerSheetId], references: [id])
+    answerSheetId   String
+    questionId      String
+    createdAt       DateTime @default(now())
+}
+
+enum OPTION {
+    A
+    B
+    C
+    D
 }
 

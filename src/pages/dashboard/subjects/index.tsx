@@ -1,24 +1,27 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import Head from "next/head";
 import NextLink from "next/link";
 import { useRouter } from "next/router";
-import type { ColumnFilter, ColumnSort } from "@tanstack/react-table";
 import MaterialReactTable, { MRT_ColumnDef } from "material-react-table";
 import Container from "@mui/material/Container";
-import DashboardLayout from "@/layouts/DashboardLayout";
+import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import Breadcrumbs from "@mui/material/Breadcrumbs";
 import IconButton from "@mui/material/IconButton";
 import HomeIcon from "@mui/icons-material/Home";
-import type { NextPageWithLayout } from "@/pages/_app";
+import { NextPageWithLayout } from "@/pages/_app";
+import DashboardLayout from "@/layouts/DashboardLayout";
 import Link from "@/components/Link";
 import { trpc } from "@/utils/trpc";
-import { User, USER_ROLE } from "@prisma/client";
+import { Subject } from "@prisma/client";
 import { format } from "date-fns";
 
-type fieldValue = string | undefined;
+type ColumnFilter = { id: string; value: unknown };
+type ColumnSort = { id: string; desc: boolean };
+type SubjectWithCount = Subject & { _count: { chapters: number } };
 
-const Users: NextPageWithLayout = () => {
+const Subjects: NextPageWithLayout = () => {
   const router = useRouter();
   const [enabled, setEnabled] = useState(false);
   const [columnFilters, setColumnFilters] = useState<ColumnFilter[]>([]);
@@ -32,28 +35,20 @@ const Users: NextPageWithLayout = () => {
 
   const { data, isError, isLoading, isFetching } = trpc.useQuery(
     [
-      "admin.users.getAll",
+      "admin.subjects.get",
       {
         page: pagination.pageIndex,
-        size: pagination.pageSize,
+        pageSize: pagination.pageSize,
         sortBy: sorting[0]?.id as any,
         sortDesc: sorting[0]?.desc,
-        name: columnFilters.find((f) => f.id === "name")?.value as fieldValue,
-        email: columnFilters.find((f) => f.id === "email")?.value as fieldValue,
-        role: columnFilters.find((f) => f.id === "role")?.value as USER_ROLE,
+        title: columnFilters.find((f) => f.id === "title")?.value as string,
+        code: columnFilters.find((f) => f.id === "email")?.value as string,
       },
     ],
     { enabled, refetchOnWindowFocus: false }
   );
 
-  useEffect(() => {
-    setEnabled(true);
-  }, []);
-
-  const navigateToUser = (id: string) => {
-    router.push(`/dashboard/users/${id}`);
-  };
-  const columns = useMemo<MRT_ColumnDef<User>[]>(() => {
+  const columns = useMemo<MRT_ColumnDef<SubjectWithCount>[]>(() => {
     return [
       {
         accessorKey: "id",
@@ -61,35 +56,42 @@ const Users: NextPageWithLayout = () => {
         enableColumnFilter: false,
         enableSorting: false,
       },
-      { accessorKey: "email", header: "Email" },
-      { accessorKey: "name", header: "Name" },
+      { accessorKey: "code", header: "Code" },
+      { accessorKey: "title", header: "Title" },
       {
-        accessorKey: "role",
-        header: "Role",
-        filterSelectOptions: [
-          USER_ROLE.ADMIN,
-          USER_ROLE.SUPER_ADMIN,
-          USER_ROLE.USER,
-        ],
-        Cell: ({ cell }) =>
-          (cell.getValue() as USER_ROLE).split("_").join(" ").toLowerCase(),
-        filterVariant: "select",
+        accessorKey: "_count.chapters",
+        header: "Total Chapters",
+        enableColumnFilter: false,
+        enableSorting: false,
+      },
+      {
+        accessorKey: "published",
+        header: "Publish status",
+        Cell: ({ cell }) => (cell.getValue() ? "Published" : "Not published"),
+        enableColumnFilter: false,
       },
       {
         accessorKey: "createdAt",
-        header: "Joined on",
+        header: "Added at",
         Cell: ({ cell }) =>
           format(cell.getValue() as Date, "dd/MM/yyyy hh:mm a"),
         enableColumnFilter: false,
       },
     ];
   }, []);
-  console.log(data);
+
+  useEffect(() => {
+    setEnabled(true);
+  }, []);
+
+  const navigateToSubject = (id: string) => {
+    router.push(`/dashboard/subjects/${id}`);
+  };
 
   return (
     <>
       <Head>
-        <title>Users | Onushilonik</title>
+        <title>Subjects | Onushilonik</title>
       </Head>
       <Container sx={{ mt: 2 }}>
         <Breadcrumbs sx={{ mb: 1, ml: -1 }} aria-label="breadcrumb">
@@ -102,14 +104,22 @@ const Users: NextPageWithLayout = () => {
             Dashboard
           </Link>
 
-          <Typography color="inherit">Users</Typography>
+          <Typography color="inherit">Subjects</Typography>
         </Breadcrumbs>
-        <Typography gutterBottom variant="h4" sx={{ mb: 2 }}>
-          Users
-        </Typography>
+        <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
+          <Typography gutterBottom variant="h4" sx={{ mb: 2 }}>
+            Subjects
+          </Typography>
+          <Box sx={{ ml: "auto", mr: 0 }} />
+          <NextLink href={"/dashboard/subjects/add"} passHref>
+            <Button variant="contained" color="primary" component="a">
+              Add Subject
+            </Button>
+          </NextLink>
+        </Box>
         <MaterialReactTable
           columns={columns}
-          data={data?.users ?? []}
+          data={data?.subjects ?? []}
           enableGlobalFilter={false}
           manualFiltering
           manualPagination
@@ -120,7 +130,6 @@ const Users: NextPageWithLayout = () => {
           onSortingChange={setSorting}
           initialState={{
             columnVisibility: { id: false },
-            density: "compact",
           }}
           state={{
             sorting,
@@ -140,7 +149,7 @@ const Users: NextPageWithLayout = () => {
           }
           muiTableBodyCellProps={{ sx: { cursor: "pointer" } }}
           muiTableBodyRowProps={({ row }) => ({
-            onClick: () => navigateToUser(row.original.id),
+            onClick: () => navigateToSubject(row.original.id),
           })}
         />
       </Container>
@@ -148,6 +157,6 @@ const Users: NextPageWithLayout = () => {
   );
 };
 
-Users.getLayout = (page) => <DashboardLayout>{page}</DashboardLayout>;
+Subjects.getLayout = (page) => <DashboardLayout>{page}</DashboardLayout>;
 
-export default Users;
+export default Subjects;

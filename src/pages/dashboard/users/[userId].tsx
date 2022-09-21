@@ -35,14 +35,14 @@ const User: NextPageWithLayout = () => {
     isLoading,
     isError,
     error,
-  } = trpc.useQuery(["users.getOne", router.query.userId as string], {
+  } = trpc.useQuery(["admin.users.getOne", router.query.userId as string], {
     enabled: !!router.query.userId,
     refetchOnWindowFocus: false,
     onSuccess: (data) => {
       if (data) setRole(data.role);
     },
   });
-  const updateRoleMutation = trpc.useMutation("users.updateRole", {
+  const updateRoleMutation = trpc.useMutation("admin.users.updateRole", {
     onSuccess: () => {
       toast.success("Role updated successfully");
     },
@@ -87,7 +87,7 @@ const User: NextPageWithLayout = () => {
         {user ? (
           <Box>
             <Box sx={{ display: "flex", gap: 2 }}>
-              <FormControl fullWidth sx={{ maxWidth: 200 }}>
+              <FormControl variant="standard" fullWidth sx={{ maxWidth: 200 }}>
                 <InputLabel id="user-role-select">User Role</InputLabel>
                 <Select
                   label="User Role"
