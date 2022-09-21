@@ -32,7 +32,10 @@ function AdminNavGuard({ children }: Props) {
       </Box>
     );
   }
-  if (session.role === ROLE.ADMIN || session.role === ROLE.SUPER_ADMIN) {
+  if (
+    session.user?.role === ROLE.ADMIN ||
+    session.user?.role === ROLE.SUPER_ADMIN
+  ) {
     return <>{children}</>;
   }
   return (

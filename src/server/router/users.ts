@@ -1,4 +1,5 @@
 import { USER_ROLE } from "@prisma/client";
+import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { createAdminRouter } from "./admin-router";
 
@@ -43,6 +44,26 @@ export const usersRouter = createAdminRouter()
   .query("getOne", {
     input: z.string(),
     async resolve({ ctx, input }) {
-      return ctx.prisma.user.findUnique({ where: { id: input } });
+      const user = await ctx.prisma.user.findUnique({ where: { id: input } });
+      if (!user) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "User not found!" });
+      }
+      return user;
+    },
+  })
+  .mutation("updateRole", {
+    input: z.object({
+      id: z.string(),
+      role: z.nativeEnum(USER_ROLE),
+    }),
+    async resolve({ ctx, input }) {
+      if (ctx.session.user.role !== USER_ROLE.SUPER_ADMIN) {
+        throw new TRPCError({ code: "FORBIDDEN", message: "Forbidden!" });
+      }
+      const user = await ctx.prisma.user.update({
+        where: { id: input.id },
+        data: { role: input.role },
+      });
+      return user;
     },
   });

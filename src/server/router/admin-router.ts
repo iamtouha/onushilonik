@@ -9,8 +9,8 @@ export function createAdminRouter() {
       throw new trpc.TRPCError({ code: "UNAUTHORIZED" });
     }
     if (
-      session.role !== USER_ROLE.ADMIN &&
-      session.role !== USER_ROLE.SUPER_ADMIN
+      session.user.role !== USER_ROLE.ADMIN &&
+      session.user.role !== USER_ROLE.SUPER_ADMIN
     ) {
       throw new trpc.TRPCError({ code: "FORBIDDEN" });
     }

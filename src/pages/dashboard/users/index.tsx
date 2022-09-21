@@ -9,9 +9,7 @@ import DashboardLayout from "@/layouts/DashboardLayout";
 import Typography from "@mui/material/Typography";
 import Breadcrumbs from "@mui/material/Breadcrumbs";
 import IconButton from "@mui/material/IconButton";
-import Button from "@mui/material/Button";
 import HomeIcon from "@mui/icons-material/Home";
-import EditIcon from "@mui/icons-material/Edit";
 import type { NextPageWithLayout } from "@/pages/_app";
 import Link from "@/components/Link";
 import { trpc } from "@/utils/trpc";
@@ -45,7 +43,7 @@ const Users: NextPageWithLayout = () => {
         role: columnFilters.find((f) => f.id === "role")?.value as USER_ROLE,
       },
     ],
-    { enabled }
+    { enabled, refetchOnWindowFocus: false }
   );
 
   useEffect(() => {
@@ -68,6 +66,8 @@ const Users: NextPageWithLayout = () => {
           USER_ROLE.SUPER_ADMIN,
           USER_ROLE.USER,
         ],
+        Cell: ({ cell }) =>
+          (cell.getValue() as USER_ROLE).split("_").join(" ").toLowerCase(),
         filterVariant: "select",
       },
       {
@@ -114,6 +114,7 @@ const Users: NextPageWithLayout = () => {
           onSortingChange={setSorting}
           initialState={{
             columnVisibility: { id: false },
+            density: "compact",
           }}
           state={{
             sorting,

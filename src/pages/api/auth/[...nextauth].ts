@@ -5,13 +5,14 @@ import DiscordProvider from "next-auth/providers/discord";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import { prisma } from "@/server/db/client";
 import { env } from "@/env/server.mjs";
+import { USER_ROLE } from "@prisma/client";
 
 export const authOptions: NextAuthOptions = {
   callbacks: {
     session({ session, user }) {
       if (session.user) {
         session.user.id = user.id;
-        session.role = user.role;
+        session.user.role = user.role as USER_ROLE;
       }
       return session;
     },
