@@ -1,9 +1,7 @@
-import { USER_ROLE } from "@prisma/client";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { Prisma } from "@prisma/client";
 import { createAdminRouter } from "./admin-router";
-import { resolve } from "path";
 
 export const subjectsRouter = createAdminRouter()
   .query("get", {

@@ -42,7 +42,7 @@ const Subjects: NextPageWithLayout = () => {
         sortBy: sorting[0]?.id as any,
         sortDesc: sorting[0]?.desc,
         title: columnFilters.find((f) => f.id === "title")?.value as string,
-        code: columnFilters.find((f) => f.id === "email")?.value as string,
+        code: columnFilters.find((f) => f.id === "code")?.value as string,
       },
     ],
     { enabled, refetchOnWindowFocus: false }

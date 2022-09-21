@@ -1,9 +1,7 @@
-import { USER_ROLE } from "@prisma/client";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { Prisma } from "@prisma/client";
 import { createAdminRouter } from "./admin-router";
-import { resolve } from "path";
 
 export const chaptersRouter = createAdminRouter()
   .query("get", {
@@ -36,7 +34,10 @@ export const chaptersRouter = createAdminRouter()
           orderBy,
           skip: page * pageSize,
           take: pageSize,
-          include: { _count: true },
+          include: {
+            _count: true,
+            subject: { select: { title: true, id: true } },
+          },
         }),
       ]);
 

@@ -7,6 +7,11 @@ import * as yup from "yup";
 import { toast } from "react-toastify";
 import Container from "@mui/material/Container";
 import Grid from "@mui/material/Unstable_Grid2";
+import InputLabel from "@mui/material/InputLabel";
+import MenuItem from "@mui/material/MenuItem";
+import FormControl from "@mui/material/FormControl";
+import FormHelperText from "@mui/material/FormHelperText";
+import Select from "@mui/material/Select";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Alert from "@mui/material/Alert";
 import LinearProgress from "@mui/material/LinearProgress";
@@ -30,45 +35,48 @@ import { trpc } from "@/utils/trpc";
 import { Android12Switch } from "@/components/CustomComponents";
 import { format } from "date-fns";
 
-interface SubjectForm {
+interface ChapterForm {
   title: string;
   code: string;
   published: boolean;
+  subjectId: string;
 }
 
 const validationSchema = yup.object().shape({
   title: yup.string().min(2).max(100).required("Title is required"),
   code: yup.string().min(2).max(100).required("Code is required"),
+  subjectId: yup.string().required("Subject is required"),
   published: yup.boolean(),
 });
 
-const Subject: NextPageWithLayout = () => {
+const Chapter: NextPageWithLayout = () => {
   const router = useRouter();
+  const { data: subjects } = trpc.useQuery(["admin.subjects.list"]);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const {
-    data: subject,
+    data: chapter,
     isLoading,
     isError,
     error,
   } = trpc.useQuery(
-    ["admin.subjects.getOne", router.query.subjectId as string],
+    ["admin.chapters.getOne", router.query.chapterId as string],
     {
-      enabled: !!router.query.subjectId,
+      enabled: !!router.query.chapterId,
       refetchOnWindowFocus: false,
     }
   );
-  const updateSubjectMutation = trpc.useMutation("admin.subjects.update", {
+  const updateChapterMutation = trpc.useMutation("admin.chapters.update", {
     onSuccess: (data) => {
       if (data) {
         toast.success(`${data.title} updated!`);
-        router.push("/dashboard/subjects");
+        router.push("/dashboard/chapters");
       }
     },
     onError: (error) => {
       console.log(error.message);
 
       if (error.data?.code === "CONFLICT") {
-        toast.error("Subject with this code already exists");
+        toast.error("Chapter with this code already exists");
         return;
       }
       if (error.data?.code === "BAD_REQUEST") {
@@ -78,50 +86,52 @@ const Subject: NextPageWithLayout = () => {
       toast.error("Something went wrong");
     },
   });
-  const deleteSubjectMutation = trpc.useMutation("admin.subjects.delete", {
+  const deleteChapterMutation = trpc.useMutation("admin.chapters.delete", {
     onSuccess: (data) => {
       setConfirmDelete(false);
       if (data) {
         toast.success(`${data.title} deleted!`);
-        router.push("/dashboard/subjects");
+        router.push("/dashboard/chapters");
       }
     },
     onError: (error) => {
       setConfirmDelete(false);
       console.log(error.message);
-      toast.error("Could not delete subject");
+      toast.error("Could not delete chapter");
     },
   });
-  const formik = useFormik<SubjectForm>({
+  const formik = useFormik<ChapterForm>({
     initialValues: {
-      title: subject?.title ?? "",
-      code: subject?.code ?? "",
-      published: subject?.published ?? true,
+      title: chapter?.title ?? "",
+      code: chapter?.code ?? "",
+      published: chapter?.published ?? true,
+      subjectId: chapter?.subjectId ?? "",
     },
     enableReinitialize: true,
     validationSchema,
     onSubmit: async (values) => {
-      if (!subject) return;
-      const { title, code, published } = subject;
+      if (!chapter) return;
+      const { title, code, published, subjectId } = chapter;
       if (
-        JSON.stringify(values) === JSON.stringify({ title, code, published })
+        JSON.stringify(values) ===
+        JSON.stringify({ title, code, published, subjectId })
       ) {
         toast.info("No changes made");
         return;
       }
-      updateSubjectMutation.mutate({ ...values, id: subject.id });
+      updateChapterMutation.mutate({ ...values, id: chapter.id });
     },
   });
 
-  const deleteSubject = () => {
-    if (!subject) return;
-    deleteSubjectMutation.mutate(subject.id);
+  const deleteChapter = () => {
+    if (!chapter) return;
+    deleteChapterMutation.mutate(chapter.id);
   };
 
   return (
     <>
       <Head>
-        <title>{subject?.title} | Onushilonik</title>
+        <title>{chapter?.title} | Onushilonik</title>
       </Head>
       <Container sx={{ mt: 2 }}>
         <Breadcrumbs sx={{ mb: 1, ml: -1 }} aria-label="breadcrumb">
@@ -133,10 +143,10 @@ const Subject: NextPageWithLayout = () => {
           <Link href="/dashboard" underline="hover" color="inherit">
             Dashboard
           </Link>
-          <Link href="/dashboard/subjects" underline="hover" color="inherit">
-            Subjects
+          <Link href="/dashboard/chapters" underline="hover" color="inherit">
+            Chapters
           </Link>
-          <Typography color="inherit">{subject?.title ?? "Subject"}</Typography>
+          <Typography color="inherit">{chapter?.title ?? "Chapter"}</Typography>
         </Breadcrumbs>
         {isLoading && <LinearProgress sx={{ mt: 1 }} />}
         {isError && (
@@ -145,19 +155,50 @@ const Subject: NextPageWithLayout = () => {
           </Alert>
         )}
         <Typography gutterBottom variant="h4" sx={{ mb: 2 }}>
-          {subject?.title}
+          {chapter?.title}
         </Typography>
 
-        {subject && (
+        {chapter && (
           <>
             <Box
               component="form"
               onSubmit={formik.handleSubmit}
               sx={{ maxWidth: 600, mt: 4 }}
             >
+              <Grid container spacing={2}>
+                <Grid xs={12} md={6}>
+                  <FormControl
+                    sx={{ mb: 2 }}
+                    fullWidth
+                    error={
+                      formik.touched.subjectId && !!formik.errors.subjectId
+                    }
+                  >
+                    <InputLabel id="demo-simple-select-label">
+                      Select Subject
+                    </InputLabel>
+                    <Select
+                      labelId="demo-simple-select-label"
+                      name="subjectId"
+                      value={formik.values.subjectId}
+                      label="Select Subject"
+                      onChange={formik.handleChange}
+                    >
+                      {subjects?.map((subject) => (
+                        <MenuItem key={subject.id} value={subject.id}>
+                          {subject.title}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                    {formik.touched.subjectId && (
+                      <FormHelperText>{formik.errors.subjectId}</FormHelperText>
+                    )}
+                  </FormControl>
+                </Grid>
+              </Grid>
               <TextField
                 name="title"
-                label="Subject Title"
+                label="Chapter Title"
                 value={formik.values.title}
                 onChange={formik.handleChange}
                 fullWidth
@@ -167,7 +208,7 @@ const Subject: NextPageWithLayout = () => {
                 helperText={formik.touched.title && formik.errors.title}
               />
               <TextField
-                label="Subject Code"
+                label="Chapter Code"
                 name="code"
                 value={formik.values.code}
                 onChange={formik.handleChange}
@@ -187,19 +228,19 @@ const Subject: NextPageWithLayout = () => {
                   label="Publish"
                 />
               </Box>
-              {updateSubjectMutation.isError && (
+              {updateChapterMutation.isError && (
                 <Alert severity="error">
-                  {updateSubjectMutation.error?.message}
+                  {updateChapterMutation.error?.message}
                 </Alert>
               )}
 
               <LoadingButton
-                loading={updateSubjectMutation.isLoading}
+                loading={updateChapterMutation.isLoading}
                 variant="contained"
                 type="submit"
                 size="large"
               >
-                Update Subject
+                Update Chapter
               </LoadingButton>
               <LoadingButton
                 sx={{ ml: 2 }}
@@ -216,14 +257,14 @@ const Subject: NextPageWithLayout = () => {
               color={"GrayText"}
               gutterBottom
             >
-              Created at {format(subject.createdAt, "hh:mm a, dd/MM/yyyy")} by{" "}
-              {subject.createdBy?.name ?? "Unknown"}
+              Created at {format(chapter.createdAt, "hh:mm a, dd/MM/yyyy")} by{" "}
+              {chapter.createdBy?.name ?? "Unknown"}
             </Typography>
-            {subject.updatedBy && (
+            {chapter.updatedBy && (
               <Typography variant="body2" color={"GrayText"} gutterBottom>
                 Last updated at{" "}
-                {format(subject.updatedAt, "hh:mm a, dd/MM/yyyy")} by{" "}
-                {subject.updatedBy.name ?? "Unknown"}
+                {format(chapter.updatedAt, "hh:mm a, dd/MM/yyyy")} by{" "}
+                {chapter.updatedBy.name ?? "Unknown"}
               </Typography>
             )}
           </>
@@ -232,13 +273,13 @@ const Subject: NextPageWithLayout = () => {
       <Dialog
         open={confirmDelete}
         onClose={() => setConfirmDelete(false)}
-        aria-labelledby="delete subject"
-        aria-describedby="confirm delete subject"
+        aria-labelledby="delete chapter"
+        aria-describedby="confirm delete chapter"
       >
-        <DialogTitle>{`Delete "${subject?.title}"?`}</DialogTitle>
+        <DialogTitle>{`Delete "${chapter?.title}"?`}</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Are you sure you want to delete this subject? This action cannot be
+            Are you sure you want to delete this chapter? This action cannot be
             undone.
           </DialogContentText>
         </DialogContent>
@@ -246,8 +287,8 @@ const Subject: NextPageWithLayout = () => {
           <Button onClick={() => setConfirmDelete(false)}>Cancel</Button>
           <LoadingButton
             color="error"
-            onClick={deleteSubject}
-            loading={deleteSubjectMutation.isLoading}
+            onClick={deleteChapter}
+            loading={deleteChapterMutation.isLoading}
             variant="contained"
           >
             Delete
@@ -258,6 +299,6 @@ const Subject: NextPageWithLayout = () => {
   );
 };
 
-Subject.getLayout = (page) => <DashboardLayout>{page}</DashboardLayout>;
+Chapter.getLayout = (page) => <DashboardLayout>{page}</DashboardLayout>;
 
-export default Subject;
+export default Chapter;
