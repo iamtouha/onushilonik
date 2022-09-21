@@ -44,6 +44,25 @@ export const subjectsRouter = createAdminRouter()
       };
     },
   })
+  .query("getOne", {
+    input: z.string(),
+    async resolve({ ctx, input }) {
+      const subject = await ctx.prisma.subject.findUnique({
+        where: { id: input },
+        include: {
+          createdBy: { select: { name: true } },
+          updatedBy: { select: { name: true } },
+        },
+      });
+      if (!subject) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "No subject found with this ID",
+        });
+      }
+      return subject;
+    },
+  })
   .mutation("add", {
     input: z.object({
       title: z.string().min(3).max(100),
@@ -76,5 +95,50 @@ export const subjectsRouter = createAdminRouter()
           message: "Something went wrong",
         });
       }
+    },
+  })
+  .mutation("update", {
+    input: z.object({
+      id: z.string(),
+      title: z.string().min(3).max(100),
+      code: z.string().min(3).max(100),
+      published: z.boolean(),
+    }),
+    async resolve({ ctx, input }) {
+      const { id, title, code, published } = input;
+      try {
+        const subject = await ctx.prisma.subject.update({
+          where: { id },
+          data: {
+            title,
+            code,
+            published,
+            updatedById: ctx.session?.user.id,
+          },
+        });
+        return subject;
+      } catch (e) {
+        if (e instanceof Prisma.PrismaClientKnownRequestError) {
+          if (e.code === "P2002") {
+            throw new TRPCError({
+              code: "CONFLICT",
+              message: "Code already exists",
+            });
+          }
+        }
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Something went wrong",
+        });
+      }
+    },
+  })
+  .mutation("delete", {
+    input: z.string(),
+    async resolve({ ctx, input }) {
+      const subject = await ctx.prisma.subject.delete({
+        where: { id: input },
+      });
+      return subject;
     },
   });

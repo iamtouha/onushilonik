@@ -134,7 +134,7 @@ function DefaultLayout(props: Props) {
                   }}
                 />
               ) : (
-                <Avatar {...stringAvatar(session?.user?.name ?? "Admin")} />
+                <Avatar {...stringAvatar(session?.user?.name ?? "User")} />
               )}
             </IconButton>
             <Menu
@@ -156,7 +156,7 @@ function DefaultLayout(props: Props) {
               </NextLink>
 
               <Divider />
-              {(session.role as string)?.includes?.("ADMIN") && (
+              {session?.user?.role.includes("ADMIN") && (
                 <NextLink href="/dashboard" passHref>
                   <MenuItem component="a" sx={{ mt: 1 }}>
                     <SpeedIcon sx={{ mr: 1 }} />
@@ -226,20 +226,20 @@ function DefaultLayout(props: Props) {
                       />
                     ) : (
                       <Avatar
-                        {...stringAvatar(session?.user?.name ?? "Admin")}
+                        {...stringAvatar(session?.user?.name ?? "User")}
                       />
                     )}
                   </ListItemAvatar>
                 </>
 
                 <ListItemText
-                  primary={session?.user?.name ?? "Admin"}
+                  primary={session?.user?.name ?? "User"}
                   secondary={session?.user?.email ?? ""}
                 ></ListItemText>
               </ListItem>
             </NextLink>
 
-            {(session.role as string)?.includes?.("ADMIN") && (
+            {session?.user?.role.includes("ADMIN") && (
               <ListItem sx={{ mt: 0 }}>
                 <NextLink href="/account" passHref>
                   <ListItemButton component="a">
