@@ -1,6 +1,8 @@
 import React from "react";
 import Head from "next/head";
 import Container from "@mui/material/Container";
+import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
 import DashboardLayout from "@/layouts/DashboardLayout";
 import { NextPageWithLayout } from "@/pages/_app";
 import Typography from "@mui/material/Typography";
@@ -30,9 +32,17 @@ const Chapters: NextPageWithLayout = () => {
 
           <Typography color="inherit">Chapters</Typography>
         </Breadcrumbs>
-        <Typography gutterBottom variant="h4" sx={{ mb: 2 }}>
-          Chapters
-        </Typography>
+        <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
+          <Typography gutterBottom variant="h4" sx={{ mb: 2 }}>
+            Chapters
+          </Typography>
+          <Box sx={{ ml: "auto", mr: 0 }} />
+          <NextLink href={"/dashboard/chapters/add"} passHref>
+            <Button variant="contained" color="primary" component="a">
+              Add Chapter
+            </Button>
+          </NextLink>
+        </Box>
       </Container>
     </>
   );

@@ -37,8 +37,8 @@ interface SubjectForm {
 }
 
 const validationSchema = yup.object().shape({
-  title: yup.string().min(3).max(100).required("Title is required"),
-  code: yup.string().min(3).max(100).required("Code is required"),
+  title: yup.string().min(2).max(100).required("Title is required"),
+  code: yup.string().min(2).max(100).required("Code is required"),
   published: yup.boolean(),
 });
 

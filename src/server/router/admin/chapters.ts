@@ -5,13 +5,14 @@ import { Prisma } from "@prisma/client";
 import { createAdminRouter } from "./admin-router";
 import { resolve } from "path";
 
-export const subjectsRouter = createAdminRouter()
+export const chaptersRouter = createAdminRouter()
   .query("get", {
     input: z.object({
       page: z.number().int().min(0),
       pageSize: z.number().int(),
       title: z.string().optional(),
       code: z.string().optional(),
+      subjectTitle: z.string().optional(),
       sortBy: z.enum(["createdAt", "title", "code", "published"]).optional(),
       sortDesc: z.boolean().optional(),
     }),
@@ -20,6 +21,7 @@ export const subjectsRouter = createAdminRouter()
       const where = {
         title: { contains: title },
         code: { contains: code },
+        subject: { title: { contains: input.subjectTitle } },
       };
       const orderBy = sortBy
         ? {
@@ -27,9 +29,9 @@ export const subjectsRouter = createAdminRouter()
           }
         : undefined;
 
-      const [count, subjects] = await ctx.prisma.$transaction([
-        ctx.prisma.subject.count({ where }),
-        ctx.prisma.subject.findMany({
+      const [count, chapters] = await ctx.prisma.$transaction([
+        ctx.prisma.chapter.count({ where }),
+        ctx.prisma.chapter.findMany({
           where,
           orderBy,
           skip: page * pageSize,
@@ -39,7 +41,7 @@ export const subjectsRouter = createAdminRouter()
       ]);
 
       return {
-        subjects,
+        chapters,
         count,
       };
     },
@@ -47,28 +49,28 @@ export const subjectsRouter = createAdminRouter()
   .query("getOne", {
     input: z.string(),
     async resolve({ ctx, input }) {
-      const subject = await ctx.prisma.subject.findUnique({
+      const chapter = await ctx.prisma.chapter.findUnique({
         where: { id: input },
         include: {
           createdBy: { select: { name: true } },
           updatedBy: { select: { name: true } },
         },
       });
-      if (!subject) {
+      if (!chapter) {
         throw new TRPCError({
           code: "NOT_FOUND",
-          message: "No subject found with this ID",
+          message: "No chapter found with this ID",
         });
       }
-      return subject;
+      return chapter;
     },
   })
   .query("list", {
     async resolve({ ctx }) {
-      const subjects = await ctx.prisma.subject.findMany({
+      const chapters = await ctx.prisma.chapter.findMany({
         select: { id: true, title: true },
       });
-      return subjects;
+      return chapters;
     },
   })
   .mutation("add", {
@@ -76,19 +78,21 @@ export const subjectsRouter = createAdminRouter()
       title: z.string().min(2).max(100),
       code: z.string().min(2).max(100),
       published: z.boolean(),
+      subjectId: z.string(),
     }),
     async resolve({ ctx, input }) {
-      const { title, code, published } = input;
+      const { title, code, published, subjectId } = input;
       try {
-        const subject = await ctx.prisma.subject.create({
+        const chapter = await ctx.prisma.chapter.create({
           data: {
+            subjectId,
             title,
             code,
             published,
             createdById: ctx.session?.user.id,
           },
         });
-        return subject;
+        return chapter;
       } catch (e) {
         if (e instanceof Prisma.PrismaClientKnownRequestError) {
           if (e.code === "P2002") {
@@ -110,21 +114,23 @@ export const subjectsRouter = createAdminRouter()
       id: z.string(),
       title: z.string().min(2).max(100),
       code: z.string().min(2).max(100),
+      subjectId: z.string(),
       published: z.boolean(),
     }),
     async resolve({ ctx, input }) {
-      const { id, title, code, published } = input;
+      const { id, title, code, published, subjectId } = input;
       try {
-        const subject = await ctx.prisma.subject.update({
+        const chapter = await ctx.prisma.chapter.update({
           where: { id },
           data: {
+            subjectId,
             title,
             code,
             published,
             updatedById: ctx.session?.user.id,
           },
         });
-        return subject;
+        return chapter;
       } catch (e) {
         if (e instanceof Prisma.PrismaClientKnownRequestError) {
           if (e.code === "P2002") {
@@ -144,9 +150,9 @@ export const subjectsRouter = createAdminRouter()
   .mutation("delete", {
     input: z.string(),
     async resolve({ ctx, input }) {
-      const subject = await ctx.prisma.subject.delete({
+      const chapter = await ctx.prisma.chapter.delete({
         where: { id: input },
       });
-      return subject;
+      return chapter;
     },
   });

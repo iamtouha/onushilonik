@@ -6,6 +6,12 @@ import { useFormik } from "formik";
 import * as yup from "yup";
 import { toast } from "react-toastify";
 import Container from "@mui/material/Container";
+import Grid from "@mui/material/Unstable_Grid2";
+import InputLabel from "@mui/material/InputLabel";
+import MenuItem from "@mui/material/MenuItem";
+import FormControl from "@mui/material/FormControl";
+import FormHelperText from "@mui/material/FormHelperText";
+import Select from "@mui/material/Select";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Typography from "@mui/material/Typography";
 import TextField from "@mui/material/TextField";
@@ -20,20 +26,23 @@ import DashboardLayout from "@/layouts/DashboardLayout";
 import { trpc } from "@/utils/trpc";
 import { Android12Switch } from "@/components/CustomComponents";
 
-interface SubjectForm {
+interface ChapterForm {
   title: string;
   code: string;
+  subjectId: string;
   published: boolean;
 }
 
 const validationSchema = yup.object().shape({
-  title: yup.string().min(2).max(100).required("Title is required"),
-  code: yup.string().min(2).max(100).required("Code is required"),
+  title: yup.string().min(2).max(100).required("Subject Title is required"),
+  code: yup.string().min(2).max(100).required("Subject Code is required"),
+  subjectId: yup.string().required("Subject is required"),
   published: yup.boolean(),
 });
 
-const AddSubject: NextPageWithLayout = () => {
-  const addSubjectMutation = trpc.useMutation("admin.subjects.add", {
+const AddChapter: NextPageWithLayout = () => {
+  const { data: subjects } = trpc.useQuery(["admin.subjects.list"]);
+  const addChapterMutation = trpc.useMutation("admin.chapters.add", {
     onSuccess: (data) => {
       if (data) {
         toast.success(`${data.title} added!`);
@@ -43,7 +52,7 @@ const AddSubject: NextPageWithLayout = () => {
       console.log(error.message);
 
       if (error.data?.code === "CONFLICT") {
-        toast.error("Subject with this code already exists");
+        toast.error("Chapter with this code already exists");
         return;
       }
       if (error.data?.code === "BAD_REQUEST") {
@@ -53,15 +62,16 @@ const AddSubject: NextPageWithLayout = () => {
       toast.error("Something went wrong");
     },
   });
-  const formik = useFormik<SubjectForm>({
+  const formik = useFormik<ChapterForm>({
     initialValues: {
       title: "",
       code: "",
       published: true,
+      subjectId: "",
     },
     validationSchema,
     onSubmit: async (values, { resetForm }) => {
-      await addSubjectMutation
+      await addChapterMutation
         .mutateAsync(values)
         .then(() => resetForm())
         .catch(() => {});
@@ -71,7 +81,7 @@ const AddSubject: NextPageWithLayout = () => {
   return (
     <>
       <Head>
-        <title>Add Subject | Onushilonik</title>
+        <title>Add Chapter | Onushilonik</title>
       </Head>
       <Container sx={{ mt: 2 }}>
         <Breadcrumbs sx={{ mb: 1, ml: -1 }} aria-label="breadcrumb">
@@ -83,38 +93,66 @@ const AddSubject: NextPageWithLayout = () => {
           <Link href="/dashboard" underline="hover" color="inherit">
             Dashboard
           </Link>
-          <Link href="/dashboard/subjects" underline="hover" color="inherit">
-            Subjects
+          <Link href="/dashboard/chapters" underline="hover" color="inherit">
+            Chapters
           </Link>
-          <Typography color="inherit">Add Subject</Typography>
+          <Typography color="inherit">Add Chapter</Typography>
         </Breadcrumbs>
-        <Typography gutterBottom variant="h4" sx={{ mb: 6 }}>
-          Add Subject
+        <Typography gutterBottom variant="h4" sx={{ mb: 4 }}>
+          Add Chapter
         </Typography>
         <Box
           component="form"
           onSubmit={formik.handleSubmit}
           sx={{ maxWidth: 600 }}
         >
+          <Grid container spacing={2}>
+            <Grid xs={12} md={6}>
+              <FormControl
+                sx={{ mb: 2 }}
+                fullWidth
+                error={formik.touched.subjectId && !!formik.errors.subjectId}
+              >
+                <InputLabel id="demo-simple-select-label">
+                  Select Subject
+                </InputLabel>
+                <Select
+                  labelId="demo-simple-select-label"
+                  name="subjectId"
+                  value={formik.values.subjectId}
+                  label="Select Subject"
+                  onChange={formik.handleChange}
+                >
+                  {subjects?.map((subject) => (
+                    <MenuItem key={subject.id} value={subject.id}>
+                      {subject.title}
+                    </MenuItem>
+                  ))}
+                </Select>
+                {formik.touched.subjectId && (
+                  <FormHelperText>{formik.errors.subjectId}</FormHelperText>
+                )}
+              </FormControl>
+            </Grid>
+          </Grid>
+
           <TextField
             name="title"
-            label="Subject Title"
+            label="Chapter Title"
             value={formik.values.title}
             onChange={formik.handleChange}
             fullWidth
             sx={{ mb: 2 }}
-            inputProps={{ minLength: 3, maxLength: 100 }}
             error={formik.touched.title && !!formik.errors.title}
             helperText={formik.touched.title && formik.errors.title}
           />
           <TextField
-            label="Subject Code"
+            label="Chapter Code"
             name="code"
             value={formik.values.code}
             onChange={formik.handleChange}
             fullWidth
             sx={{ mb: 2 }}
-            inputProps={{ minLength: 3, maxLength: 100 }}
             error={formik.touched.code && !!formik.errors.code}
             helperText={formik.touched.code && formik.errors.code}
           />
@@ -128,12 +166,12 @@ const AddSubject: NextPageWithLayout = () => {
           </Box>
 
           <LoadingButton
-            loading={addSubjectMutation.isLoading}
+            loading={addChapterMutation.isLoading}
             variant="contained"
             type="submit"
             size="large"
           >
-            Add Subject
+            Add Chapter
           </LoadingButton>
         </Box>
       </Container>
@@ -141,6 +179,6 @@ const AddSubject: NextPageWithLayout = () => {
   );
 };
 
-AddSubject.getLayout = (page) => <DashboardLayout>{page}</DashboardLayout>;
+AddChapter.getLayout = (page) => <DashboardLayout>{page}</DashboardLayout>;
 
-export default AddSubject;
+export default AddChapter;
