@@ -15,6 +15,7 @@ import SupervisedUserCircleIcon from "@mui/icons-material/SupervisedUserCircle";
 import BookIcon from "@mui/icons-material/Book";
 import MenuBookIcon from "@mui/icons-material/MenuBook";
 import QuizIcon from "@mui/icons-material/Quiz";
+import ListAltIcon from "@mui/icons-material/ListAlt";
 import StickyNote2Icon from "@mui/icons-material/StickyNote2";
 import { NextPageWithLayout } from "../_app";
 import DashboardLayout from "@/layouts/DashboardLayout";
@@ -24,6 +25,11 @@ const routes = [
   { name: "Chapters", href: "/dashboard/chapters", icon: MenuBookIcon },
   { name: "Questions", href: "/dashboard/questions", icon: QuizIcon },
   { name: "Short Notes", href: "/dashboard/notes", icon: StickyNote2Icon },
+  {
+    name: "Question Sets",
+    href: "/dashboard/question-sets",
+    icon: ListAltIcon,
+  },
   { name: "Users", href: "/dashboard/users", icon: SupervisedUserCircleIcon },
 ];
 
@@ -31,7 +37,7 @@ const DashboardHome: NextPageWithLayout = () => {
   return (
     <>
       <Head>
-        <title>Admin Dashboard | Onushilonik Dashboard</title>
+        <title>Home | Onushilonik Dashboard</title>
       </Head>
       <Container sx={{ mt: 2 }}>
         <Breadcrumbs sx={{ mb: 1, ml: -1 }} aria-label="breadcrumb">
