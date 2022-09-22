@@ -57,11 +57,14 @@ const AddNote: NextPageWithLayout = () => {
   const [chapterId, setChapterId] = useState<string>("");
   const [content, setContent] = useState<string>("");
 
-  const { data: subjects } = trpc.useQuery(["admin.subjects.list"]);
+  const { data: subjects } = trpc.useQuery(["admin.subjects.list"], {
+    refetchOnWindowFocus: false,
+  });
   const { data: chapters } = trpc.useQuery(["admin.chapters.list", subjectId], {
     enabled: !!subjectId,
     refetchOnWindowFocus: false,
   });
+
   const addNoteMutation = trpc.useMutation("admin.notes.add", {
     onSuccess: (data) => {
       if (data) {

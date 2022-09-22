@@ -20,10 +20,16 @@ export const questionsRouter = createAdminRouter()
       const where = {
         stem: { contains: stem },
         code: { contains: code },
-        chapter: {
-          title: { contains: input.chapterTitle },
-          subject: { title: { contains: input.subjectTitle } },
-        },
+        AND: [
+          {
+            chapter: { title: { contains: input.chapterTitle ?? "" } },
+          },
+          {
+            chapter: {
+              subject: { title: { contains: input.subjectTitle ?? "" } },
+            },
+          },
+        ],
       };
       const orderBy = sortBy
         ? {
@@ -78,12 +84,12 @@ export const questionsRouter = createAdminRouter()
   })
   .query("list", {
     input: z.string().optional(),
-    async resolve({ ctx, input: subjectId }) {
-      const chapters = await ctx.prisma.chapter.findMany({
-        where: subjectId ? { subjectId } : {},
-        select: { id: true, title: true },
+    async resolve({ ctx, input: chapterId }) {
+      const questions = await ctx.prisma.question.findMany({
+        where: chapterId ? { chapterId } : {},
+        select: { id: true, code: true },
       });
-      return chapters;
+      return questions;
     },
   })
   .mutation("add", {

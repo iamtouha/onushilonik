@@ -36,6 +36,7 @@ interface QuestionForm {
   optionC: string;
   optionD: string;
   correctOption: OPTION;
+  noteId?: string;
 }
 
 const validationSchema = yup.object().shape({
@@ -50,16 +51,24 @@ const validationSchema = yup.object().shape({
     .oneOf([OPTION.A, OPTION.B, OPTION.C, OPTION.D])
     .required("Correct Option is required"),
   published: yup.boolean(),
+  noteId: yup.string().optional(),
 });
 
 const AddQuestion: NextPageWithLayout = () => {
   const [subjectId, setSubjectId] = useState<string>("");
   const [chapterId, setChapterId] = useState<string>("");
-  const { data: subjects } = trpc.useQuery(["admin.subjects.list"]);
+  const { data: subjects } = trpc.useQuery(["admin.subjects.list"], {
+    refetchOnWindowFocus: false,
+  });
   const { data: chapters } = trpc.useQuery(["admin.chapters.list", subjectId], {
     enabled: !!subjectId,
     refetchOnWindowFocus: false,
   });
+  const { data: notes } = trpc.useQuery(["admin.notes.list", chapterId], {
+    enabled: !!chapterId,
+    refetchOnWindowFocus: false,
+  });
+
   const addQuestionMutation = trpc.useMutation("admin.questions.add", {
     onSuccess: (data) => {
       if (data) {
@@ -90,6 +99,7 @@ const AddQuestion: NextPageWithLayout = () => {
       optionC: "",
       optionD: "",
       correctOption: OPTION.A,
+      noteId: undefined,
     },
     validationSchema,
     onSubmit: async (values, { resetForm }) => {
@@ -275,6 +285,27 @@ const AddQuestion: NextPageWithLayout = () => {
                   {Object.values(OPTION).map((option) => (
                     <MenuItem value={option} key={option}>
                       {`Option ${option}`}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid xs={12} md={6}>
+              <FormControl sx={{ mb: 2 }} fullWidth>
+                <InputLabel id="option-note-label">Select Note</InputLabel>
+                <Select
+                  labelId="option-note-label"
+                  name="noteId"
+                  label="Correct Option"
+                  value={formik.values.noteId}
+                  onChange={formik.handleChange}
+                >
+                  <MenuItem value="" disabled>
+                    Select an option
+                  </MenuItem>
+                  {notes?.map((option) => (
+                    <MenuItem value={option.id} key={option.code}>
+                      {`${option.code}`}
                     </MenuItem>
                   ))}
                 </Select>

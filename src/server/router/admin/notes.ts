@@ -20,10 +20,16 @@ export const notesRouter = createAdminRouter()
       const where = {
         title: { contains: title },
         code: { contains: code },
-        chapter: {
-          title: { contains: input.chapterTitle },
-          subject: { title: { contains: input.subjectTitle } },
-        },
+        AND: [
+          {
+            chapter: { title: { contains: input.chapterTitle ?? "" } },
+          },
+          {
+            chapter: {
+              subject: { title: { contains: input.subjectTitle ?? "" } },
+            },
+          },
+        ],
       };
       const orderBy = sortBy
         ? {
@@ -38,7 +44,13 @@ export const notesRouter = createAdminRouter()
           orderBy,
           skip: page * pageSize,
           take: pageSize,
-          include: {
+          select: {
+            id: true,
+            title: true,
+            code: true,
+            published: true,
+            createdAt: true,
+            updatedAt: true,
             chapter: {
               select: {
                 title: true,
@@ -78,12 +90,12 @@ export const notesRouter = createAdminRouter()
   })
   .query("list", {
     input: z.string().optional(),
-    async resolve({ ctx, input: subjectId }) {
-      const chapters = await ctx.prisma.chapter.findMany({
-        where: subjectId ? { subjectId } : {},
-        select: { id: true, title: true },
+    async resolve({ ctx, input: chapterId }) {
+      const notes = await ctx.prisma.note.findMany({
+        where: chapterId ? { chapterId } : {},
+        select: { id: true, code: true },
       });
-      return chapters;
+      return notes;
     },
   })
   .mutation("add", {

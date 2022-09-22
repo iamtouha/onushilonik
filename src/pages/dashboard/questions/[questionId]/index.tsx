@@ -16,13 +16,13 @@ import Select from "@mui/material/Select";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Typography from "@mui/material/Typography";
 import TextField from "@mui/material/TextField";
-import Alert from "@mui/material/Alert";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
+import Alert from "@mui/material/Alert";
 import LinearProgress from "@mui/material/LinearProgress";
 import Breadcrumbs from "@mui/material/Breadcrumbs";
 import IconButton from "@mui/material/IconButton";
@@ -44,6 +44,7 @@ interface QuestionForm {
   optionC: string;
   optionD: string;
   correctOption: OPTION;
+  noteId?: string;
 }
 
 const validationSchema = yup.object().shape({
@@ -58,6 +59,7 @@ const validationSchema = yup.object().shape({
     .oneOf([OPTION.A, OPTION.B, OPTION.C, OPTION.D])
     .required("Correct Option is required"),
   published: yup.boolean(),
+  noteId: yup.string().optional(),
 });
 
 const AddQuestion: NextPageWithLayout = () => {
@@ -83,7 +85,7 @@ const AddQuestion: NextPageWithLayout = () => {
       },
     }
   );
-  const deleteChapterMutation = trpc.useMutation("admin.questions.delete", {
+  const deleteQuestionMutation = trpc.useMutation("admin.questions.delete", {
     onSuccess: (data) => {
       setConfirmDelete(false);
       if (data) {
@@ -94,15 +96,20 @@ const AddQuestion: NextPageWithLayout = () => {
     onError: (error) => {
       setConfirmDelete(false);
       console.log(error.message);
-      toast.error("Could not delete chapter");
+      toast.error("Could not delete question");
     },
   });
-  const { data: subjects } = trpc.useQuery(["admin.subjects.list"]);
+  const { data: subjects } = trpc.useQuery(["admin.subjects.list"], {
+    refetchOnWindowFocus: false,
+  });
   const { data: chapters } = trpc.useQuery(["admin.chapters.list", subjectId], {
     enabled: !!subjectId,
     refetchOnWindowFocus: false,
   });
-
+  const { data: notes } = trpc.useQuery(["admin.notes.list", chapterId], {
+    enabled: !!chapterId,
+    refetchOnWindowFocus: false,
+  });
   const updateQuestionMutation = trpc.useMutation("admin.questions.update", {
     onSuccess: (data) => {
       if (data) {
@@ -134,6 +141,7 @@ const AddQuestion: NextPageWithLayout = () => {
       optionC: question?.optionC || "",
       optionD: question?.optionD || "",
       correctOption: question?.correctOption || OPTION.A,
+      noteId: question?.noteId || undefined,
     },
     enableReinitialize: true,
     validationSchema,
@@ -147,9 +155,9 @@ const AddQuestion: NextPageWithLayout = () => {
     },
   });
 
-  const deleteChapter = () => {
+  const deleteQuestion = () => {
     if (!question) return;
-    deleteChapterMutation.mutate(question.id);
+    deleteQuestionMutation.mutate(question.id);
   };
 
   return (
@@ -337,6 +345,27 @@ const AddQuestion: NextPageWithLayout = () => {
                     </Select>
                   </FormControl>
                 </Grid>
+                <Grid xs={12} md={6}>
+                  <FormControl sx={{ mb: 2 }} fullWidth>
+                    <InputLabel id="option-note-label">Select Note</InputLabel>
+                    <Select
+                      labelId="option-note-label"
+                      name="noteId"
+                      label="Correct Option"
+                      value={formik.values.noteId}
+                      onChange={formik.handleChange}
+                    >
+                      <MenuItem value="" disabled>
+                        Select an option
+                      </MenuItem>
+                      {notes?.map((option) => (
+                        <MenuItem value={option.id} key={option.code}>
+                          {`${option.code}`}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                </Grid>
               </Grid>
               <Box sx={{ mb: 2 }}>
                 <FormControlLabel
@@ -403,8 +432,8 @@ const AddQuestion: NextPageWithLayout = () => {
           <Button onClick={() => setConfirmDelete(false)}>Cancel</Button>
           <LoadingButton
             color="error"
-            onClick={deleteChapter}
-            loading={deleteChapterMutation.isLoading}
+            onClick={deleteQuestion}
+            loading={deleteQuestionMutation.isLoading}
             variant="contained"
           >
             Delete

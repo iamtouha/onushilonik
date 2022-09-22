@@ -14,14 +14,24 @@ import { NextPageWithLayout } from "@/pages/_app";
 import DashboardLayout from "@/layouts/DashboardLayout";
 import Link from "@/components/Link";
 import { trpc } from "@/utils/trpc";
-import { Subject } from "@prisma/client";
 import { format } from "date-fns";
 
 type ColumnFilter = { id: string; value: unknown };
 type ColumnSort = { id: string; desc: boolean };
-type SubjectWithCount = Subject & { _count: { chapters: number } };
+type NoteWithChapter = {
+  id: string;
+  title: string;
+  code: string;
+  published: boolean;
+  createdAt: Date;
+  chapter: {
+    id: string;
+    title: string;
+    subject: { id: string; title: string };
+  };
+};
 
-const Subjects: NextPageWithLayout = () => {
+const Notes: NextPageWithLayout = () => {
   const router = useRouter();
   const [enabled, setEnabled] = useState(false);
   const [columnFilters, setColumnFilters] = useState<ColumnFilter[]>([]);
@@ -35,7 +45,7 @@ const Subjects: NextPageWithLayout = () => {
 
   const { data, isError, isLoading, isFetching } = trpc.useQuery(
     [
-      "admin.subjects.get",
+      "admin.notes.get",
       {
         page: pagination.pageIndex,
         pageSize: pagination.pageSize,
@@ -43,12 +53,17 @@ const Subjects: NextPageWithLayout = () => {
         sortDesc: sorting[0]?.desc,
         title: columnFilters.find((f) => f.id === "title")?.value as string,
         code: columnFilters.find((f) => f.id === "code")?.value as string,
+        subjectTitle: columnFilters.find((f) => f.id === "chapter.title")
+          ?.value as string,
+        chapterTitle: columnFilters.find(
+          (f) => f.id === "chapter.subject.title"
+        )?.value as string,
       },
     ],
     { enabled, refetchOnWindowFocus: false }
   );
 
-  const columns = useMemo<MRT_ColumnDef<SubjectWithCount>[]>(() => {
+  const columns = useMemo<MRT_ColumnDef<NoteWithChapter>[]>(() => {
     return [
       {
         accessorKey: "id",
@@ -57,11 +72,15 @@ const Subjects: NextPageWithLayout = () => {
         enableSorting: false,
       },
       { accessorKey: "code", header: "Code" },
-      { accessorKey: "title", header: "Title" },
+      { accessorKey: "title", header: "Note Title" },
       {
-        accessorKey: "_count.chapters",
-        header: "Total Chapters",
-        enableColumnFilter: false,
+        accessorKey: "chapter.title",
+        header: "Chapter",
+        enableSorting: false,
+      },
+      {
+        accessorKey: "chapter.subject.title",
+        header: "Subject",
         enableSorting: false,
       },
       {
@@ -85,13 +104,13 @@ const Subjects: NextPageWithLayout = () => {
   }, []);
 
   const navigateToSubject = (id: string) => {
-    router.push(`/dashboard/subjects/${id}`);
+    router.push(`/dashboard/notes/${id}`);
   };
 
   return (
     <>
       <Head>
-        <title>Subjects | Onushilonik Dashboard</title>
+        <title>Notes | Onushilonik Dashboard</title>
       </Head>
       <Container sx={{ mt: 2 }}>
         <Breadcrumbs sx={{ mb: 1, ml: -1 }} aria-label="breadcrumb">
@@ -103,23 +122,22 @@ const Subjects: NextPageWithLayout = () => {
           <Link href="/dashboard" underline="hover" color="inherit">
             Dashboard
           </Link>
-
-          <Typography color="inherit">Subjects</Typography>
+          <Typography color="inherit">Notes</Typography>
         </Breadcrumbs>
         <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
           <Typography gutterBottom variant="h4" sx={{ mb: 2 }}>
-            Subjects
+            Notes
           </Typography>
           <Box sx={{ ml: "auto", mr: 0 }} />
-          <NextLink href={"/dashboard/subjects/add"} passHref>
+          <NextLink href={"/dashboard/notes/add"} passHref>
             <Button variant="contained" color="primary" component="a">
-              Add Subject
+              Add New Note
             </Button>
           </NextLink>
         </Box>
         <MaterialReactTable
           columns={columns}
-          data={data?.subjects ?? []}
+          data={data?.notes ?? []}
           enableGlobalFilter={false}
           manualFiltering
           manualPagination
@@ -130,6 +148,7 @@ const Subjects: NextPageWithLayout = () => {
           onSortingChange={setSorting}
           initialState={{
             columnVisibility: { id: false },
+            density: "compact",
           }}
           state={{
             sorting,
@@ -157,6 +176,6 @@ const Subjects: NextPageWithLayout = () => {
   );
 };
 
-Subjects.getLayout = (page) => <DashboardLayout>{page}</DashboardLayout>;
+Notes.getLayout = (page) => <DashboardLayout>{page}</DashboardLayout>;
 
-export default Subjects;
+export default Notes;
