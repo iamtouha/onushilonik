@@ -1,5 +1,5 @@
 import Box from "@mui/material/Box";
-import { signOut, useSession } from "next-auth/react";
+import { useSession } from "next-auth/react";
 import type { ReactNode } from "react";
 import CircularProgress from "@mui/material/CircularProgress";
 import EngineeringIcon from "@mui/icons-material/Engineering";

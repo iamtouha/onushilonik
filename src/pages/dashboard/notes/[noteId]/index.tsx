@@ -145,7 +145,7 @@ const AddNote: NextPageWithLayout = () => {
       await updateNoteMutation
         .mutateAsync({ ...values, chapterId, id: note.id })
         .then(() => resetForm())
-        .catch(() => {});
+        .catch((error) => console.error(error.message));
     },
   });
 

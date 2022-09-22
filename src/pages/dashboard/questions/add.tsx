@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import Head from "next/head";
 import NextLink from "next/link";
-import { useRouter } from "next/router";
 import { useFormik } from "formik";
 import * as yup from "yup";
 import { toast } from "react-toastify";
@@ -10,7 +9,6 @@ import Grid from "@mui/material/Unstable_Grid2";
 import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
-import FormHelperText from "@mui/material/FormHelperText";
 import Select from "@mui/material/Select";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Typography from "@mui/material/Typography";
@@ -112,7 +110,7 @@ const AddQuestion: NextPageWithLayout = () => {
       await addQuestionMutation
         .mutateAsync({ ...values, chapterId })
         .then(() => resetForm())
-        .catch(() => {});
+        .catch((error) => console.error(error.message));
     },
   });
 

@@ -42,7 +42,7 @@ const Chapters: NextPageWithLayout = () => {
       {
         page: pagination.pageIndex,
         pageSize: pagination.pageSize,
-        sortBy: sorting[0]?.id as any,
+        sortBy: sorting[0]?.id as "createdAt" | "title" | "code" | "published",
         sortDesc: sorting[0]?.desc,
         title: columnFilters.find((f) => f.id === "title")?.value as string,
         code: columnFilters.find((f) => f.id === "code")?.value as string,

@@ -1,6 +1,6 @@
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
-import { OPTION, Prisma } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 import { createAdminRouter } from "./admin-router";
 
 export const notesRouter = createAdminRouter()

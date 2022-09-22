@@ -1,12 +1,10 @@
 import { type ReactNode } from "react";
 import Box from "@mui/material/Box";
-import { useSession } from "next-auth/react";
 import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
 import NextLink from "next/link";
-import { signIn } from "next-auth/react";
 type Props = { children: ReactNode };
 
 function HomepageLayout(props: Props) {

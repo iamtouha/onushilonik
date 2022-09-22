@@ -1,7 +1,6 @@
 import React from "react";
 import Head from "next/head";
 import NextLink from "next/link";
-import { useRouter } from "next/router";
 import { useFormik } from "formik";
 import * as yup from "yup";
 import { toast } from "react-toastify";
@@ -64,7 +63,7 @@ const AddSubject: NextPageWithLayout = () => {
       await addSubjectMutation
         .mutateAsync(values)
         .then(() => resetForm())
-        .catch(() => {});
+        .catch((error) => console.error(error.message));
     },
   });
 

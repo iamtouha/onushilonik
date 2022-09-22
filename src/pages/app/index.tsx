@@ -11,7 +11,9 @@ const HomePage: NextPage = () => {
         <title>Home | Onushilonik</title>
       </Head>
 
-      <Container></Container>
+      <Container>
+        <Box></Box>
+      </Container>
     </>
   );
 };

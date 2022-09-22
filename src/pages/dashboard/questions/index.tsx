@@ -45,7 +45,7 @@ const Questions: NextPageWithLayout = () => {
       {
         page: pagination.pageIndex,
         pageSize: pagination.pageSize,
-        sortBy: sorting[0]?.id as any,
+        sortBy: sorting[0]?.id as "createdAt" | "code" | "stem" | "published",
         sortDesc: sorting[0]?.desc,
         stem: columnFilters.find((f) => f.id === "stem")?.value as string,
         code: columnFilters.find((f) => f.id === "code")?.value as string,

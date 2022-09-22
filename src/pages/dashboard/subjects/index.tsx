@@ -39,7 +39,7 @@ const Subjects: NextPageWithLayout = () => {
       {
         page: pagination.pageIndex,
         pageSize: pagination.pageSize,
-        sortBy: sorting[0]?.id as any,
+        sortBy: sorting[0]?.id as "createdAt" | "code" | "title" | "published",
         sortDesc: sorting[0]?.desc,
         title: columnFilters.find((f) => f.id === "title")?.value as string,
         code: columnFilters.find((f) => f.id === "code")?.value as string,

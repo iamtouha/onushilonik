@@ -189,7 +189,7 @@ const AddQuestion: NextPageWithLayout = () => {
         {question && (
           <>
             <Typography gutterBottom variant="h4" sx={{ mb: 2 }}>
-              Question "{question?.code}"
+              {`Question "${question?.code}"`}
             </Typography>
 
             <Box
