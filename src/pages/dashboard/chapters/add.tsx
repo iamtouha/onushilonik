@@ -34,8 +34,8 @@ interface ChapterForm {
 }
 
 const validationSchema = yup.object().shape({
-  title: yup.string().min(2).max(100).required("Subject Title is required"),
-  code: yup.string().min(2).max(100).required("Subject Code is required"),
+  title: yup.string().min(2).max(100).required("Chapter Title is required"),
+  code: yup.string().min(2).max(100).required("Chapter Code is required"),
   subjectId: yup.string().required("Subject is required"),
   published: yup.boolean(),
 });
@@ -81,7 +81,7 @@ const AddChapter: NextPageWithLayout = () => {
   return (
     <>
       <Head>
-        <title>Add Chapter | Onushilonik</title>
+        <title>Add Chapter | Onushilonik Dashboard</title>
       </Head>
       <Container sx={{ mt: 2 }}>
         <Breadcrumbs sx={{ mb: 1, ml: -1 }} aria-label="breadcrumb">

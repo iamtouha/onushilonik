@@ -55,7 +55,7 @@ const User: NextPageWithLayout = () => {
   return (
     <>
       <Head>
-        <title>{user?.name ?? "user"} | Onushilonik</title>
+        <title>{user?.name ?? "user"} | Onushilonik Dashboard</title>
       </Head>
       <Container sx={{ mt: 2 }}>
         <Breadcrumbs sx={{ mb: 1, ml: -1 }} aria-label="breadcrumb">

@@ -67,8 +67,10 @@ export const chaptersRouter = createAdminRouter()
     },
   })
   .query("list", {
-    async resolve({ ctx }) {
+    input: z.string().optional(),
+    async resolve({ ctx, input: subjectId }) {
       const chapters = await ctx.prisma.chapter.findMany({
+        where: subjectId ? { subjectId } : {},
         select: { id: true, title: true },
       });
       return chapters;

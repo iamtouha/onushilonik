@@ -101,7 +101,7 @@ const Chapters: NextPageWithLayout = () => {
   return (
     <>
       <Head>
-        <title>Chapters | Onushilonik</title>
+        <title>Chapters | Onushilonik Dashboard</title>
       </Head>
       <Container sx={{ mt: 2 }}>
         <Breadcrumbs sx={{ mb: 1, ml: -1 }} aria-label="breadcrumb">
@@ -113,7 +113,6 @@ const Chapters: NextPageWithLayout = () => {
           <Link href="/dashboard" underline="hover" color="inherit">
             Dashboard
           </Link>
-
           <Typography color="inherit">Chapters</Typography>
         </Breadcrumbs>
         <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
@@ -123,7 +122,7 @@ const Chapters: NextPageWithLayout = () => {
           <Box sx={{ ml: "auto", mr: 0 }} />
           <NextLink href={"/dashboard/chapters/add"} passHref>
             <Button variant="contained" color="primary" component="a">
-              Add Subject
+              Add Chapter
             </Button>
           </NextLink>
         </Box>

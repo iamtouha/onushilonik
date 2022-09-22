@@ -121,7 +121,7 @@ const Subject: NextPageWithLayout = () => {
   return (
     <>
       <Head>
-        <title>{subject?.title} | Onushilonik</title>
+        <title>{subject?.title} | Onushilonik Dashboard</title>
       </Head>
       <Container sx={{ mt: 2 }}>
         <Breadcrumbs sx={{ mb: 1, ml: -1 }} aria-label="breadcrumb">

@@ -31,7 +31,7 @@ const DashboardHome: NextPageWithLayout = () => {
   return (
     <>
       <Head>
-        <title>Admin Dashboard | Onushilonik</title>
+        <title>Admin Dashboard | Onushilonik Dashboard</title>
       </Head>
       <Container sx={{ mt: 2 }}>
         <Breadcrumbs sx={{ mb: 1, ml: -1 }} aria-label="breadcrumb">

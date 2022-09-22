@@ -131,7 +131,7 @@ const Chapter: NextPageWithLayout = () => {
   return (
     <>
       <Head>
-        <title>{chapter?.title} | Onushilonik</title>
+        <title>{chapter?.title} | Onushilonik Dashboard</title>
       </Head>
       <Container sx={{ mt: 2 }}>
         <Breadcrumbs sx={{ mb: 1, ml: -1 }} aria-label="breadcrumb">
