@@ -142,6 +142,7 @@ model Chapter {
     subject         Subject  @relation(fields: [subjectId], references: [id])
     subjectId       String
     questions       Question[]
+    notes           Note[]
     createdAt       DateTime @default(now())
     updatedAt       DateTime @updatedAt
     createdBy       User?    @relation("chapter_creator", fields: [createdById], references: [id], onDelete:NoAction )
@@ -200,6 +201,9 @@ enum SET_TYPE {
 model Note {
     id              String   @id @default(cuid())
     title           String
+    code            String   @unique
+    chapter         Chapter  @relation(fields: [chapterId], references: [id])
+    chapterId       String
     published       Boolean  @default(true)
     content         String   @db.Text
     questions       Question[]

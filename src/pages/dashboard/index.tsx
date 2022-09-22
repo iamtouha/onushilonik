@@ -20,11 +20,11 @@ import { NextPageWithLayout } from "../_app";
 import DashboardLayout from "@/layouts/DashboardLayout";
 
 const routes = [
-  { name: "Users", href: "/dashboard/users", icon: SupervisedUserCircleIcon },
   { name: "Subjects", href: "/dashboard/subjects", icon: BookIcon },
   { name: "Chapters", href: "/dashboard/chapters", icon: MenuBookIcon },
   { name: "Questions", href: "/dashboard/questions", icon: QuizIcon },
   { name: "Short Notes", href: "/dashboard/notes", icon: StickyNote2Icon },
+  { name: "Users", href: "/dashboard/users", icon: SupervisedUserCircleIcon },
 ];
 
 const DashboardHome: NextPageWithLayout = () => {

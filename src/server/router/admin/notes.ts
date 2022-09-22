@@ -3,22 +3,22 @@ import { z } from "zod";
 import { OPTION, Prisma } from "@prisma/client";
 import { createAdminRouter } from "./admin-router";
 
-export const questionsRouter = createAdminRouter()
+export const notesRouter = createAdminRouter()
   .query("get", {
     input: z.object({
       page: z.number().int().min(0),
       pageSize: z.number().int(),
-      stem: z.string().optional(),
+      title: z.string().optional(),
       code: z.string().optional(),
       subjectTitle: z.string().optional(),
       chapterTitle: z.string().optional(),
-      sortBy: z.enum(["createdAt", "code", "stem", "published"]).optional(),
+      sortBy: z.enum(["createdAt", "code", "title", "published"]).optional(),
       sortDesc: z.boolean().optional(),
     }),
     async resolve({ ctx, input }) {
-      const { page, pageSize, stem, code, sortBy, sortDesc } = input;
+      const { page, pageSize, title, code, sortBy, sortDesc } = input;
       const where = {
-        stem: { contains: stem },
+        title: { contains: title },
         code: { contains: code },
         chapter: {
           title: { contains: input.chapterTitle },
@@ -31,9 +31,9 @@ export const questionsRouter = createAdminRouter()
           }
         : undefined;
 
-      const [total, questions] = await ctx.prisma.$transaction([
-        ctx.prisma.question.count({ where }),
-        ctx.prisma.question.findMany({
+      const [total, notes] = await ctx.prisma.$transaction([
+        ctx.prisma.note.count({ where }),
+        ctx.prisma.note.findMany({
           where,
           orderBy,
           skip: page * pageSize,
@@ -51,7 +51,7 @@ export const questionsRouter = createAdminRouter()
       ]);
 
       return {
-        questions,
+        notes,
         count: total,
       };
     },
@@ -59,7 +59,7 @@ export const questionsRouter = createAdminRouter()
   .query("getOne", {
     input: z.string(),
     async resolve({ ctx, input }) {
-      const question = await ctx.prisma.question.findUnique({
+      const note = await ctx.prisma.note.findUnique({
         where: { id: input },
         include: {
           chapter: { select: { id: true, subjectId: true } },
@@ -67,13 +67,13 @@ export const questionsRouter = createAdminRouter()
           updatedBy: { select: { name: true } },
         },
       });
-      if (!question) {
+      if (!note) {
         throw new TRPCError({
           code: "NOT_FOUND",
-          message: "No question found with this ID",
+          message: "No note found with this ID",
         });
       }
-      return question;
+      return note;
     },
   })
   .query("list", {
@@ -88,35 +88,25 @@ export const questionsRouter = createAdminRouter()
   })
   .mutation("add", {
     input: z.object({
-      stem: z.string().min(2).max(1024),
+      title: z.string(),
+      content: z.string().min(2).max(1024),
       code: z.string().min(2).max(100),
-      optionA: z.string().trim().min(1).max(100),
-      optionB: z.string().trim().min(1).max(100),
-      optionC: z.string().trim().min(1).max(100),
-      optionD: z.string().trim().min(1).max(100),
-      correctOption: z.nativeEnum(OPTION),
-      noteId: z.string().nullish(),
       published: z.boolean(),
       chapterId: z.string(),
     }),
     async resolve({ ctx, input }) {
       try {
-        const question = await ctx.prisma.question.create({
+        const note = await ctx.prisma.note.create({
           data: {
             chapterId: input.chapterId,
-            stem: input.stem,
+            content: input.content,
             code: input.code,
-            optionA: input.optionA,
-            optionB: input.optionB,
-            optionC: input.optionC,
-            optionD: input.optionD,
-            correctOption: input.correctOption,
+            title: input.title,
             published: input.published,
-            noteId: input.noteId || null,
             createdById: ctx.session?.user.id,
           },
         });
-        return question;
+        return note;
       } catch (e) {
         if (e instanceof Prisma.PrismaClientKnownRequestError) {
           if (e.code === "P2002") {
@@ -136,36 +126,26 @@ export const questionsRouter = createAdminRouter()
   .mutation("update", {
     input: z.object({
       id: z.string(),
-      stem: z.string().min(2).max(1024),
+      title: z.string(),
+      content: z.string().min(2).max(1024),
       code: z.string().min(2).max(100),
-      optionA: z.string().trim().min(1).max(100),
-      optionB: z.string().trim().min(1).max(100),
-      optionC: z.string().trim().min(1).max(100),
-      optionD: z.string().trim().min(1).max(100),
-      correctOption: z.nativeEnum(OPTION),
-      noteId: z.string().nullish(),
       published: z.boolean(),
       chapterId: z.string(),
     }),
     async resolve({ ctx, input }) {
       try {
-        const question = await ctx.prisma.question.update({
+        const note = await ctx.prisma.note.update({
           where: { id: input.id },
           data: {
             chapterId: input.chapterId,
-            stem: input.stem,
+            content: input.content,
             code: input.code,
-            optionA: input.optionA,
-            optionB: input.optionB,
-            optionC: input.optionC,
-            optionD: input.optionD,
-            noteId: input.noteId || null,
-            correctOption: input.correctOption,
+            title: input.title,
             published: input.published,
             updatedById: ctx.session?.user.id,
           },
         });
-        return question;
+        return note;
       } catch (e) {
         if (e instanceof Prisma.PrismaClientKnownRequestError) {
           if (e.code === "P2002") {
@@ -185,9 +165,9 @@ export const questionsRouter = createAdminRouter()
   .mutation("delete", {
     input: z.string(),
     async resolve({ ctx, input }) {
-      const question = await ctx.prisma.question.delete({
+      const note = await ctx.prisma.note.delete({
         where: { id: input },
       });
-      return question;
+      return note;
     },
   });
