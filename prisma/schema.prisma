@@ -162,6 +162,7 @@ model Question {
     optionC         String
     optionD         String
     correctOption   OPTION
+    published       Boolean  @default(true)
     answers         Answer[]
     questionSets    QuestionSet[]
     comments        Comment[]

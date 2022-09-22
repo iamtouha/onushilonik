@@ -1,0 +1,179 @@
+import { TRPCError } from "@trpc/server";
+import { z } from "zod";
+import { OPTION, Prisma } from "@prisma/client";
+import { createAdminRouter } from "./admin-router";
+
+export const questionsRouter = createAdminRouter()
+  .query("get", {
+    input: z.object({
+      page: z.number().int().min(0),
+      pageSize: z.number().int(),
+      stem: z.string().optional(),
+      code: z.string().optional(),
+      subjectTitle: z.string().optional(),
+      chapterTitle: z.string().optional(),
+      sortBy: z.enum(["createdAt", "code", "published"]).optional(),
+      sortDesc: z.boolean().optional(),
+    }),
+    async resolve({ ctx, input }) {
+      const { page, pageSize, stem, code, sortBy, sortDesc } = input;
+      const where = {
+        stem: { contains: stem },
+        code: { contains: code },
+        chapter: {
+          title: { contains: input.chapterTitle },
+          subject: { title: { contains: input.subjectTitle } },
+        },
+      };
+      const orderBy = sortBy
+        ? {
+            [sortBy]: sortDesc ? "desc" : "asc",
+          }
+        : undefined;
+
+      const [total, chapters] = await ctx.prisma.$transaction([
+        ctx.prisma.question.count({ where }),
+        ctx.prisma.question.findMany({
+          where,
+          orderBy,
+          skip: page * pageSize,
+          take: pageSize,
+          include: {
+            chapter: {
+              select: {
+                title: true,
+                id: true,
+                subject: { select: { title: true, id: true } },
+              },
+            },
+          },
+        }),
+      ]);
+
+      return {
+        chapters,
+        count: total,
+      };
+    },
+  })
+  .query("getOne", {
+    input: z.string(),
+    async resolve({ ctx, input }) {
+      const chapter = await ctx.prisma.chapter.findUnique({
+        where: { id: input },
+        include: {
+          createdBy: { select: { name: true } },
+          updatedBy: { select: { name: true } },
+        },
+      });
+      if (!chapter) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "No chapter found with this ID",
+        });
+      }
+      return chapter;
+    },
+  })
+  .query("list", {
+    input: z.string().optional(),
+    async resolve({ ctx, input: subjectId }) {
+      const chapters = await ctx.prisma.chapter.findMany({
+        where: subjectId ? { subjectId } : {},
+        select: { id: true, title: true },
+      });
+      return chapters;
+    },
+  })
+  .mutation("add", {
+    input: z.object({
+      stem: z.string().min(2).max(1024),
+      code: z.string().min(2).max(100),
+      optionA: z.string().trim().min(1).max(100),
+      optionB: z.string().trim().min(1).max(100),
+      optionC: z.string().trim().min(1).max(100),
+      optionD: z.string().trim().min(1).max(100),
+      correctOption: z.nativeEnum(OPTION),
+      published: z.boolean(),
+      chapterId: z.string(),
+    }),
+    async resolve({ ctx, input }) {
+      try {
+        const question = await ctx.prisma.question.create({
+          data: {
+            chapterId: input.chapterId,
+            stem: input.stem,
+            code: input.code,
+            optionA: input.optionA,
+            optionB: input.optionB,
+            optionC: input.optionC,
+            optionD: input.optionD,
+            correctOption: input.correctOption,
+            published: input.published,
+            createdById: ctx.session?.user.id,
+          },
+        });
+        return question;
+      } catch (e) {
+        if (e instanceof Prisma.PrismaClientKnownRequestError) {
+          if (e.code === "P2002") {
+            throw new TRPCError({
+              code: "CONFLICT",
+              message: "Code already exists",
+            });
+          }
+        }
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Something went wrong",
+        });
+      }
+    },
+  })
+  .mutation("update", {
+    input: z.object({
+      id: z.string(),
+      title: z.string().min(2).max(100),
+      code: z.string().min(2).max(100),
+      subjectId: z.string(),
+      published: z.boolean(),
+    }),
+    async resolve({ ctx, input }) {
+      const { id, title, code, published, subjectId } = input;
+      try {
+        const chapter = await ctx.prisma.chapter.update({
+          where: { id },
+          data: {
+            subjectId,
+            title,
+            code,
+            published,
+            updatedById: ctx.session?.user.id,
+          },
+        });
+        return chapter;
+      } catch (e) {
+        if (e instanceof Prisma.PrismaClientKnownRequestError) {
+          if (e.code === "P2002") {
+            throw new TRPCError({
+              code: "CONFLICT",
+              message: "Code already exists",
+            });
+          }
+        }
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Something went wrong",
+        });
+      }
+    },
+  })
+  .mutation("delete", {
+    input: z.string(),
+    async resolve({ ctx, input }) {
+      const chapter = await ctx.prisma.chapter.delete({
+        where: { id: input },
+      });
+      return chapter;
+    },
+  });
