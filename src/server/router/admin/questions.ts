@@ -146,7 +146,8 @@ export const questionsRouter = createAdminRouter()
     }),
     async resolve({ ctx, input }) {
       try {
-        const question = await ctx.prisma.question.create({
+        const question = await ctx.prisma.question.update({
+          where: { id: input.id },
           data: {
             chapterId: input.chapterId,
             stem: input.stem,

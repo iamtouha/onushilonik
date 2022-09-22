@@ -4,7 +4,9 @@ import NextLink from "next/link";
 import { useRouter } from "next/router";
 import { useFormik } from "formik";
 import * as yup from "yup";
+import { format } from "date-fns";
 import { toast } from "react-toastify";
+import { OPTION } from "@prisma/client";
 import Container from "@mui/material/Container";
 import Grid from "@mui/material/Unstable_Grid2";
 import InputLabel from "@mui/material/InputLabel";
@@ -32,7 +34,6 @@ import Link from "@/components/Link";
 import DashboardLayout from "@/layouts/DashboardLayout";
 import { trpc } from "@/utils/trpc";
 import { Android12Switch } from "@/components/CustomComponents";
-import { OPTION } from "@prisma/client";
 
 interface QuestionForm {
   code: string;
@@ -106,6 +107,7 @@ const AddQuestion: NextPageWithLayout = () => {
     onSuccess: (data) => {
       if (data) {
         toast.success(`${data.code} added!`);
+        router.push("/dashboard/questions");
       }
     },
     onError: (error) => {
@@ -135,17 +137,13 @@ const AddQuestion: NextPageWithLayout = () => {
     },
     enableReinitialize: true,
     validationSchema,
-    onSubmit: async (values, { resetForm }) => {
+    onSubmit: async (values) => {
       if (!question) return;
       if (!chapterId.length) {
         toast.warn("Select a chapter");
         return;
       }
-
-      await updateQuestionMutation
-        .mutateAsync({ ...values, chapterId, id: question.id })
-        .then(() => resetForm())
-        .catch(() => {});
+      updateQuestionMutation.mutate({ ...values, chapterId, id: question.id });
     },
   });
 
@@ -180,187 +178,213 @@ const AddQuestion: NextPageWithLayout = () => {
             <Typography variant="body1">{error?.message}</Typography>
           </Alert>
         )}
-        <Typography gutterBottom variant="h4" sx={{ mb: 2 }}>
-          Question "{question?.code}"
-        </Typography>
-        <Box
-          component="form"
-          onSubmit={formik.handleSubmit}
-          sx={{ maxWidth: 600, pb: 10 }}
-        >
-          <Grid container spacing={2}>
-            <Grid xs={12} md={6}>
-              <FormControl sx={{ mb: 2 }} fullWidth>
-                <InputLabel id="subject-select-label">
-                  Select Subject
-                </InputLabel>
-                <Select
-                  labelId="subject-select-label"
-                  name="subjectId"
-                  value={subjectId}
-                  label="Select Subject"
-                  onChange={(e) => setSubjectId(e.target.value as string)}
-                >
-                  <MenuItem value="" disabled>
-                    Select an option
-                  </MenuItem>
-                  {subjects?.map((subject) => (
-                    <MenuItem key={subject.id} value={subject.id}>
-                      {subject.title}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Grid>
-            <Grid xs={12} md={6}>
-              {chapters && (
-                <FormControl sx={{ mb: 2 }} fullWidth>
-                  <InputLabel id="chapter-select-label">
-                    Select Chapter
-                  </InputLabel>
-                  <Select
-                    labelId="chapter-select-label"
-                    name="chapterId"
-                    value={chapterId}
-                    label="Select Chapter"
-                    onChange={(e) => setChapterId(e.target.value as string)}
-                  >
-                    <MenuItem value="" disabled>
-                      Select an option
-                    </MenuItem>
-                    {chapters?.map((chapter) => (
-                      <MenuItem key={chapter.id} value={chapter.id}>
-                        {chapter.title}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              )}
-            </Grid>
-          </Grid>
-          <TextField
-            label="Question Code"
-            name="code"
-            value={formik.values.code}
-            onChange={formik.handleChange}
-            fullWidth
-            sx={{ mb: 2 }}
-            error={formik.touched.code && !!formik.errors.code}
-            helperText={formik.touched.code && formik.errors.code}
-          />
-          <TextField
-            name="stem"
-            label="Question"
-            value={formik.values.stem}
-            multiline
-            rows={3}
-            onChange={formik.handleChange}
-            fullWidth
-            sx={{ mb: 2 }}
-            error={formik.touched.stem && !!formik.errors.stem}
-            helperText={formik.touched.stem && formik.errors.stem}
-          />
-          <Grid container spacing={2}>
-            <Grid xs={12} md={6}>
-              <TextField
-                name="optionA"
-                label="Option A"
-                value={formik.values.optionA}
-                onChange={formik.handleChange}
-                fullWidth
-                sx={{ mb: 2 }}
-                error={formik.touched.optionA && !!formik.errors.optionA}
-                helperText={formik.touched.optionA && formik.errors.optionA}
-              />
-            </Grid>
-            <Grid xs={12} md={6}>
-              <TextField
-                name="optionB"
-                label="Option B"
-                value={formik.values.optionB}
-                onChange={formik.handleChange}
-                fullWidth
-                sx={{ mb: 2 }}
-                error={formik.touched.optionB && !!formik.errors.optionB}
-                helperText={formik.touched.optionB && formik.errors.optionB}
-              />
-            </Grid>
-          </Grid>
-          <Grid container spacing={2}>
-            <Grid xs={12} md={6}>
-              <TextField
-                name="optionC"
-                label="Option C"
-                value={formik.values.optionC}
-                onChange={formik.handleChange}
-                fullWidth
-                sx={{ mb: 2 }}
-                error={formik.touched.optionC && !!formik.errors.optionC}
-                helperText={formik.touched.optionC && formik.errors.optionC}
-              />
-            </Grid>
-            <Grid xs={12} md={6}>
-              <TextField
-                name="optionD"
-                label="Option D"
-                value={formik.values.optionD}
-                onChange={formik.handleChange}
-                fullWidth
-                sx={{ mb: 2 }}
-                error={formik.touched.optionD && !!formik.errors.optionD}
-                helperText={formik.touched.optionD && formik.errors.optionD}
-              />
-            </Grid>
-          </Grid>
-          <Grid container spacing={2}>
-            <Grid xs={12} md={6}>
-              <FormControl sx={{ mb: 2 }} fullWidth>
-                <InputLabel id="option-select-label">Correct Option</InputLabel>
-                <Select
-                  labelId="option-select-label"
-                  name="correctOption"
-                  label="Correct Option"
-                  value={formik.values.correctOption}
-                  onChange={formik.handleChange}
-                >
-                  <MenuItem value="" disabled>
-                    Select an option
-                  </MenuItem>
-                  {Object.values(OPTION).map((option) => (
-                    <MenuItem value={option} key={option}>
-                      {`Option ${option}`}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Grid>
-          </Grid>
-          <Box sx={{ mb: 2 }}>
-            <FormControlLabel
-              control={<Android12Switch checked={formik.values.published} />}
-              name="published"
-              onChange={formik.handleChange}
-              label="Publish"
-            />
-          </Box>
+        {question && (
+          <>
+            <Typography gutterBottom variant="h4" sx={{ mb: 2 }}>
+              Question "{question?.code}"
+            </Typography>
 
-          <LoadingButton
-            loading={updateQuestionMutation.isLoading}
-            variant="contained"
-            type="submit"
-            size="large"
-          >
-            Update Question
-          </LoadingButton>
-          <Button
-            sx={{ ml: 2 }}
-            size="large"
-            color="error"
-            onClick={() => setConfirmDelete(true)}
-          >
-            {"Delete"}
-          </Button>
-        </Box>
+            <Box
+              component="form"
+              onSubmit={formik.handleSubmit}
+              sx={{ maxWidth: 600 }}
+            >
+              <Grid container spacing={2}>
+                <Grid xs={12} md={6}>
+                  <FormControl sx={{ mb: 2 }} fullWidth>
+                    <InputLabel id="subject-select-label">
+                      Select Subject
+                    </InputLabel>
+                    <Select
+                      labelId="subject-select-label"
+                      name="subjectId"
+                      value={subjectId}
+                      label="Select Subject"
+                      onChange={(e) => setSubjectId(e.target.value as string)}
+                    >
+                      <MenuItem value="" disabled>
+                        Select an option
+                      </MenuItem>
+                      {subjects?.map((subject) => (
+                        <MenuItem key={subject.id} value={subject.id}>
+                          {subject.title}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                </Grid>
+                <Grid xs={12} md={6}>
+                  {chapters && (
+                    <FormControl sx={{ mb: 2 }} fullWidth>
+                      <InputLabel id="chapter-select-label">
+                        Select Chapter
+                      </InputLabel>
+                      <Select
+                        labelId="chapter-select-label"
+                        name="chapterId"
+                        value={chapterId}
+                        label="Select Chapter"
+                        onChange={(e) => setChapterId(e.target.value as string)}
+                      >
+                        <MenuItem value="" disabled>
+                          Select an option
+                        </MenuItem>
+                        {chapters?.map((chapter) => (
+                          <MenuItem key={chapter.id} value={chapter.id}>
+                            {chapter.title}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                  )}
+                </Grid>
+              </Grid>
+              <TextField
+                label="Question Code"
+                name="code"
+                value={formik.values.code}
+                onChange={formik.handleChange}
+                fullWidth
+                sx={{ mb: 2 }}
+                error={formik.touched.code && !!formik.errors.code}
+                helperText={formik.touched.code && formik.errors.code}
+              />
+              <TextField
+                name="stem"
+                label="Question"
+                value={formik.values.stem}
+                multiline
+                rows={3}
+                onChange={formik.handleChange}
+                fullWidth
+                sx={{ mb: 2 }}
+                error={formik.touched.stem && !!formik.errors.stem}
+                helperText={formik.touched.stem && formik.errors.stem}
+              />
+              <Grid container spacing={2}>
+                <Grid xs={12} md={6}>
+                  <TextField
+                    name="optionA"
+                    label="Option A"
+                    value={formik.values.optionA}
+                    onChange={formik.handleChange}
+                    fullWidth
+                    sx={{ mb: 2 }}
+                    error={formik.touched.optionA && !!formik.errors.optionA}
+                    helperText={formik.touched.optionA && formik.errors.optionA}
+                  />
+                </Grid>
+                <Grid xs={12} md={6}>
+                  <TextField
+                    name="optionB"
+                    label="Option B"
+                    value={formik.values.optionB}
+                    onChange={formik.handleChange}
+                    fullWidth
+                    sx={{ mb: 2 }}
+                    error={formik.touched.optionB && !!formik.errors.optionB}
+                    helperText={formik.touched.optionB && formik.errors.optionB}
+                  />
+                </Grid>
+              </Grid>
+              <Grid container spacing={2}>
+                <Grid xs={12} md={6}>
+                  <TextField
+                    name="optionC"
+                    label="Option C"
+                    value={formik.values.optionC}
+                    onChange={formik.handleChange}
+                    fullWidth
+                    sx={{ mb: 2 }}
+                    error={formik.touched.optionC && !!formik.errors.optionC}
+                    helperText={formik.touched.optionC && formik.errors.optionC}
+                  />
+                </Grid>
+                <Grid xs={12} md={6}>
+                  <TextField
+                    name="optionD"
+                    label="Option D"
+                    value={formik.values.optionD}
+                    onChange={formik.handleChange}
+                    fullWidth
+                    sx={{ mb: 2 }}
+                    error={formik.touched.optionD && !!formik.errors.optionD}
+                    helperText={formik.touched.optionD && formik.errors.optionD}
+                  />
+                </Grid>
+              </Grid>
+              <Grid container spacing={2}>
+                <Grid xs={12} md={6}>
+                  <FormControl sx={{ mb: 2 }} fullWidth>
+                    <InputLabel id="option-select-label">
+                      Correct Option
+                    </InputLabel>
+                    <Select
+                      labelId="option-select-label"
+                      name="correctOption"
+                      label="Correct Option"
+                      value={formik.values.correctOption}
+                      onChange={formik.handleChange}
+                    >
+                      <MenuItem value="" disabled>
+                        Select an option
+                      </MenuItem>
+                      {Object.values(OPTION).map((option) => (
+                        <MenuItem value={option} key={option}>
+                          {`Option ${option}`}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                </Grid>
+              </Grid>
+              <Box sx={{ mb: 2 }}>
+                <FormControlLabel
+                  control={
+                    <Android12Switch checked={formik.values.published} />
+                  }
+                  name="published"
+                  onChange={formik.handleChange}
+                  label="Publish"
+                />
+              </Box>
+
+              <LoadingButton
+                loading={updateQuestionMutation.isLoading}
+                variant="contained"
+                type="submit"
+                size="large"
+              >
+                Update Question
+              </LoadingButton>
+              <Button
+                sx={{ ml: 2 }}
+                size="large"
+                color="error"
+                onClick={() => setConfirmDelete(true)}
+              >
+                {"Delete"}
+              </Button>
+            </Box>
+            <Typography
+              sx={{ mt: 4 }}
+              variant="body2"
+              color={"GrayText"}
+              gutterBottom
+            >
+              Created at {format(question.createdAt, "hh:mm a, dd/MM/yyyy")} by{" "}
+              {question.createdBy?.name ?? "Unknown"}
+            </Typography>
+            {question.updatedBy && (
+              <Typography variant="body2" color={"GrayText"} gutterBottom>
+                Last updated at{" "}
+                {format(question.updatedAt, "hh:mm a, dd/MM/yyyy")} by{" "}
+                {question.updatedBy.name ?? "Unknown"}
+              </Typography>
+            )}
+            <Box sx={{ pb: 10 }} />
+          </>
+        )}
       </Container>
       <Dialog
         open={confirmDelete}
