@@ -10,11 +10,18 @@ import Grid from "@mui/material/Unstable_Grid2";
 import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
-import FormHelperText from "@mui/material/FormHelperText";
 import Select from "@mui/material/Select";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Typography from "@mui/material/Typography";
 import TextField from "@mui/material/TextField";
+import Alert from "@mui/material/Alert";
+import Button from "@mui/material/Button";
+import Dialog from "@mui/material/Dialog";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
+import DialogContentText from "@mui/material/DialogContentText";
+import DialogTitle from "@mui/material/DialogTitle";
+import LinearProgress from "@mui/material/LinearProgress";
 import Breadcrumbs from "@mui/material/Breadcrumbs";
 import IconButton from "@mui/material/IconButton";
 import LoadingButton from "@mui/lab/LoadingButton";
@@ -53,14 +60,49 @@ const validationSchema = yup.object().shape({
 });
 
 const AddQuestion: NextPageWithLayout = () => {
+  const router = useRouter();
   const [subjectId, setSubjectId] = useState<string>("");
   const [chapterId, setChapterId] = useState<string>("");
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const {
+    data: question,
+    isLoading,
+    isError,
+    error,
+  } = trpc.useQuery(
+    ["admin.questions.getOne", router.query.questionId as string],
+    {
+      enabled: !!router.query.questionId,
+      refetchOnWindowFocus: false,
+      onSuccess(data) {
+        if (data) {
+          setSubjectId(data.chapter.subjectId);
+          setChapterId(data.chapter.id);
+        }
+      },
+    }
+  );
+  const deleteChapterMutation = trpc.useMutation("admin.questions.delete", {
+    onSuccess: (data) => {
+      setConfirmDelete(false);
+      if (data) {
+        toast.success(`"${data.code}" deleted!`);
+        router.push("/dashboard/questions");
+      }
+    },
+    onError: (error) => {
+      setConfirmDelete(false);
+      console.log(error.message);
+      toast.error("Could not delete chapter");
+    },
+  });
   const { data: subjects } = trpc.useQuery(["admin.subjects.list"]);
   const { data: chapters } = trpc.useQuery(["admin.chapters.list", subjectId], {
     enabled: !!subjectId,
     refetchOnWindowFocus: false,
   });
-  const addQuestionMutation = trpc.useMutation("admin.questions.add", {
+
+  const updateQuestionMutation = trpc.useMutation("admin.questions.update", {
     onSuccess: (data) => {
       if (data) {
         toast.success(`${data.code} added!`);
@@ -82,29 +124,35 @@ const AddQuestion: NextPageWithLayout = () => {
   });
   const formik = useFormik<QuestionForm>({
     initialValues: {
-      stem: "",
-      code: "",
-      published: true,
-      optionA: "",
-      optionB: "",
-      optionC: "",
-      optionD: "",
-      correctOption: OPTION.A,
+      stem: question?.stem || "",
+      code: question?.code || "",
+      published: question?.published || false,
+      optionA: question?.optionA || "",
+      optionB: question?.optionB || "",
+      optionC: question?.optionC || "",
+      optionD: question?.optionD || "",
+      correctOption: question?.correctOption || OPTION.A,
     },
+    enableReinitialize: true,
     validationSchema,
     onSubmit: async (values, { resetForm }) => {
-      console.log(values);
+      if (!question) return;
       if (!chapterId.length) {
         toast.warn("Select a chapter");
         return;
       }
 
-      await addQuestionMutation
-        .mutateAsync({ ...values, chapterId })
+      await updateQuestionMutation
+        .mutateAsync({ ...values, chapterId, id: question.id })
         .then(() => resetForm())
         .catch(() => {});
     },
   });
+
+  const deleteChapter = () => {
+    if (!question) return;
+    deleteChapterMutation.mutate(question.id);
+  };
 
   return (
     <>
@@ -124,10 +172,16 @@ const AddQuestion: NextPageWithLayout = () => {
           <Link href="/dashboard/questions" underline="hover" color="inherit">
             Questions
           </Link>
-          <Typography color="inherit">Add Question</Typography>
+          <Typography color="inherit">{question?.code}</Typography>
         </Breadcrumbs>
-        <Typography gutterBottom variant="h4" sx={{ mb: 4 }}>
-          Add Question
+        {isLoading && <LinearProgress sx={{ mt: 1 }} />}
+        {isError && (
+          <Alert severity="error">
+            <Typography variant="body1">{error?.message}</Typography>
+          </Alert>
+        )}
+        <Typography gutterBottom variant="h4" sx={{ mb: 2 }}>
+          Question "{question?.code}"
         </Typography>
         <Box
           component="form"
@@ -291,15 +345,48 @@ const AddQuestion: NextPageWithLayout = () => {
           </Box>
 
           <LoadingButton
-            loading={addQuestionMutation.isLoading}
+            loading={updateQuestionMutation.isLoading}
             variant="contained"
             type="submit"
             size="large"
           >
-            Add Question
+            Update Question
           </LoadingButton>
+          <Button
+            sx={{ ml: 2 }}
+            size="large"
+            color="error"
+            onClick={() => setConfirmDelete(true)}
+          >
+            {"Delete"}
+          </Button>
         </Box>
       </Container>
+      <Dialog
+        open={confirmDelete}
+        onClose={() => setConfirmDelete(false)}
+        aria-labelledby="delete chapter"
+        aria-describedby="confirm delete chapter"
+      >
+        <DialogTitle>{`Delete Question "${question?.code}"?`}</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Are you sure you want to delete this question? This action cannot be
+            undone.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setConfirmDelete(false)}>Cancel</Button>
+          <LoadingButton
+            color="error"
+            onClick={deleteChapter}
+            loading={deleteChapterMutation.isLoading}
+            variant="contained"
+          >
+            Delete
+          </LoadingButton>
+        </DialogActions>
+      </Dialog>
     </>
   );
 };

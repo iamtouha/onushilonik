@@ -12,7 +12,7 @@ export const questionsRouter = createAdminRouter()
       code: z.string().optional(),
       subjectTitle: z.string().optional(),
       chapterTitle: z.string().optional(),
-      sortBy: z.enum(["createdAt", "code", "published"]).optional(),
+      sortBy: z.enum(["createdAt", "code", "stem", "published"]).optional(),
       sortDesc: z.boolean().optional(),
     }),
     async resolve({ ctx, input }) {
@@ -31,7 +31,7 @@ export const questionsRouter = createAdminRouter()
           }
         : undefined;
 
-      const [total, chapters] = await ctx.prisma.$transaction([
+      const [total, questions] = await ctx.prisma.$transaction([
         ctx.prisma.question.count({ where }),
         ctx.prisma.question.findMany({
           where,
@@ -51,7 +51,7 @@ export const questionsRouter = createAdminRouter()
       ]);
 
       return {
-        chapters,
+        questions,
         count: total,
       };
     },
@@ -59,20 +59,21 @@ export const questionsRouter = createAdminRouter()
   .query("getOne", {
     input: z.string(),
     async resolve({ ctx, input }) {
-      const chapter = await ctx.prisma.chapter.findUnique({
+      const question = await ctx.prisma.question.findUnique({
         where: { id: input },
         include: {
+          chapter: { select: { id: true, subjectId: true } },
           createdBy: { select: { name: true } },
           updatedBy: { select: { name: true } },
         },
       });
-      if (!chapter) {
+      if (!question) {
         throw new TRPCError({
           code: "NOT_FOUND",
-          message: "No chapter found with this ID",
+          message: "No question found with this ID",
         });
       }
-      return chapter;
+      return question;
     },
   })
   .query("list", {
@@ -133,25 +134,33 @@ export const questionsRouter = createAdminRouter()
   .mutation("update", {
     input: z.object({
       id: z.string(),
-      title: z.string().min(2).max(100),
+      stem: z.string().min(2).max(1024),
       code: z.string().min(2).max(100),
-      subjectId: z.string(),
+      optionA: z.string().trim().min(1).max(100),
+      optionB: z.string().trim().min(1).max(100),
+      optionC: z.string().trim().min(1).max(100),
+      optionD: z.string().trim().min(1).max(100),
+      correctOption: z.nativeEnum(OPTION),
       published: z.boolean(),
+      chapterId: z.string(),
     }),
     async resolve({ ctx, input }) {
-      const { id, title, code, published, subjectId } = input;
       try {
-        const chapter = await ctx.prisma.chapter.update({
-          where: { id },
+        const question = await ctx.prisma.question.create({
           data: {
-            subjectId,
-            title,
-            code,
-            published,
+            chapterId: input.chapterId,
+            stem: input.stem,
+            code: input.code,
+            optionA: input.optionA,
+            optionB: input.optionB,
+            optionC: input.optionC,
+            optionD: input.optionD,
+            correctOption: input.correctOption,
+            published: input.published,
             updatedById: ctx.session?.user.id,
           },
         });
-        return chapter;
+        return question;
       } catch (e) {
         if (e instanceof Prisma.PrismaClientKnownRequestError) {
           if (e.code === "P2002") {
@@ -171,9 +180,9 @@ export const questionsRouter = createAdminRouter()
   .mutation("delete", {
     input: z.string(),
     async resolve({ ctx, input }) {
-      const chapter = await ctx.prisma.chapter.delete({
+      const question = await ctx.prisma.question.delete({
         where: { id: input },
       });
-      return chapter;
+      return question;
     },
   });

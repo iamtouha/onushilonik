@@ -14,14 +14,17 @@ import { NextPageWithLayout } from "@/pages/_app";
 import DashboardLayout from "@/layouts/DashboardLayout";
 import Link from "@/components/Link";
 import { trpc } from "@/utils/trpc";
-import { Chapter } from "@prisma/client";
+import { Question } from "@prisma/client";
 import { format } from "date-fns";
 
 type ColumnFilter = { id: string; value: unknown };
 type ColumnSort = { id: string; desc: boolean };
-type ChaptertWithCount = Chapter & {
-  _count: { questions: number };
-  subject: { id: string; title: string };
+type QuestionWithChapter = Question & {
+  chapter: {
+    id: string;
+    title: string;
+    subject: { id: string; title: string };
+  };
 };
 
 const Questions: NextPageWithLayout = () => {
@@ -38,22 +41,25 @@ const Questions: NextPageWithLayout = () => {
 
   const { data, isError, isLoading, isFetching } = trpc.useQuery(
     [
-      "admin.chapters.get",
+      "admin.questions.get",
       {
         page: pagination.pageIndex,
         pageSize: pagination.pageSize,
         sortBy: sorting[0]?.id as any,
         sortDesc: sorting[0]?.desc,
-        title: columnFilters.find((f) => f.id === "title")?.value as string,
+        stem: columnFilters.find((f) => f.id === "stem")?.value as string,
         code: columnFilters.find((f) => f.id === "code")?.value as string,
-        subjectTitle: columnFilters.find((f) => f.id === "subject.title")
+        subjectTitle: columnFilters.find((f) => f.id === "chapter.title")
           ?.value as string,
+        chapterTitle: columnFilters.find(
+          (f) => f.id === "chapter.subject.title"
+        )?.value as string,
       },
     ],
     { enabled, refetchOnWindowFocus: false }
   );
 
-  const columns = useMemo<MRT_ColumnDef<ChaptertWithCount>[]>(() => {
+  const columns = useMemo<MRT_ColumnDef<QuestionWithChapter>[]>(() => {
     return [
       {
         accessorKey: "id",
@@ -62,16 +68,15 @@ const Questions: NextPageWithLayout = () => {
         enableSorting: false,
       },
       { accessorKey: "code", header: "Code" },
-      { accessorKey: "title", header: "Title" },
+      { accessorKey: "stem", header: "Question" },
       {
-        accessorKey: "subject.title",
-        header: "Subject",
+        accessorKey: "chapter.title",
+        header: "Chapter",
         enableSorting: false,
       },
       {
-        accessorKey: "_count.questions",
-        header: "Total Questions",
-        enableColumnFilter: false,
+        accessorKey: "chapter.subject.title",
+        header: "Subject",
         enableSorting: false,
       },
       {
@@ -95,7 +100,7 @@ const Questions: NextPageWithLayout = () => {
   }, []);
 
   const navigateToSubject = (id: string) => {
-    router.push(`/dashboard/chapters/${id}`);
+    router.push(`/dashboard/questions/${id}`);
   };
 
   return (
@@ -120,15 +125,15 @@ const Questions: NextPageWithLayout = () => {
             Questions
           </Typography>
           <Box sx={{ ml: "auto", mr: 0 }} />
-          <NextLink href={"/dashboard/chapters/add"} passHref>
+          <NextLink href={"/dashboard/questions/add"} passHref>
             <Button variant="contained" color="primary" component="a">
-              Add Chapter
+              Add New Question
             </Button>
           </NextLink>
         </Box>
         <MaterialReactTable
           columns={columns}
-          data={data?.chapters ?? []}
+          data={data?.questions ?? []}
           enableGlobalFilter={false}
           manualFiltering
           manualPagination
@@ -139,6 +144,7 @@ const Questions: NextPageWithLayout = () => {
           onSortingChange={setSorting}
           initialState={{
             columnVisibility: { id: false },
+            density: "compact",
           }}
           state={{
             sorting,
