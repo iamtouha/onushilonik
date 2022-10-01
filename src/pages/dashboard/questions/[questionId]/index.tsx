@@ -49,7 +49,7 @@ interface QuestionForm {
 
 const validationSchema = yup.object().shape({
   code: yup.string().min(2).max(100).required("Question Code is required"),
-  stem: yup.string().min(2).max(100).required("Stem is required"),
+  stem: yup.string().min(2).max(1024).required("Stem is required"),
   optionA: yup.string().min(1).max(100).required("Option A cannot be empty"),
   optionB: yup.string().min(1).max(100).required("Option B cannot be empty"),
   optionC: yup.string().min(1).max(100).required("Option C cannot be empty"),

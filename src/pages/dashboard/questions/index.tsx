@@ -67,8 +67,25 @@ const Questions: NextPageWithLayout = () => {
         enableColumnFilter: false,
         enableSorting: false,
       },
-      { accessorKey: "code", header: "Code" },
-      { accessorKey: "stem", header: "Question" },
+      { accessorKey: "code", header: "Code", maxSize: 100 },
+      {
+        accessorKey: "stem",
+        header: "Question",
+        Cell: ({ cell }) => (
+          <span
+            title={cell.getValue<string>()}
+            style={{
+              maxWidth: 300,
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
+              display: "block",
+            }}
+          >
+            {cell.getValue<string>()}
+          </span>
+        ),
+      },
       {
         accessorKey: "chapter.title",
         header: "Chapter",
@@ -81,7 +98,8 @@ const Questions: NextPageWithLayout = () => {
       },
       {
         accessorKey: "published",
-        header: "Publish status",
+        header: "Status",
+        maxSize: 100,
         Cell: ({ cell }) => (cell.getValue() ? "Published" : "Not published"),
         enableColumnFilter: false,
       },

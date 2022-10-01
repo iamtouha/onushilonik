@@ -5,7 +5,7 @@ import { useFormik } from "formik";
 import * as yup from "yup";
 import { toast } from "react-toastify";
 import Container from "@mui/material/Container";
-import Grid from "@mui/material/Unstable_Grid2";
+import Grid from "@mui/material/Grid";
 import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
@@ -43,6 +43,7 @@ interface QuestionSetForm {
   type: SET_TYPE;
   published: boolean;
 }
+type Qs = { code: string; stem: string; id: string };
 
 const validationSchema = yup.object().shape({
   code: yup.string().min(2).max(100).required("Set Code is required"),
@@ -58,9 +59,7 @@ const NewQuestionSet: NextPageWithLayout = () => {
   const [subjectId, setSubjectId] = useState<string>("");
   const [chapterId, setChapterId] = useState<string>("");
   const [selectedQuestions, setSelectedQuestions] = useState<string[]>([]);
-  const [allQuestions, setAllQuestions] = useState<
-    Array<{ code: string; stem: string }>
-  >([]);
+  const [allQuestions, setAllQuestions] = useState<Qs[]>([]);
   const { data: subjects } = trpc.useQuery(["admin.subjects.list"], {
     refetchOnWindowFocus: false,
   });
@@ -92,6 +91,9 @@ const NewQuestionSet: NextPageWithLayout = () => {
   const addSetMutation = trpc.useMutation("admin.sets.add", {
     onSuccess: (data) => {
       if (data) {
+        formik.resetForm();
+        setSubjectId("");
+        setAllQuestions([]);
         toast.success(`${data.code} added!`);
       }
     },
@@ -115,15 +117,11 @@ const NewQuestionSet: NextPageWithLayout = () => {
       type: SET_TYPE.MODEL_TEST,
     },
     validationSchema,
-    onSubmit: async (values, { resetForm }) => {
-      if (!chapterId.length) {
-        toast.warn("Select a chapter");
-        return;
-      }
-      await addSetMutation
-        .mutateAsync({ ...values, questions: selectedQuestions })
-        .then(() => resetForm())
-        .catch((error) => console.error(error.message));
+    onSubmit: async (values) => {
+      addSetMutation.mutate({
+        ...values,
+        questions: allQuestions.map((q) => q.id),
+      });
     },
   });
 
@@ -133,7 +131,7 @@ const NewQuestionSet: NextPageWithLayout = () => {
       const newPrev = prev.filter((qs) => !selectedQuestions.includes(qs.code));
       const newQuestions = questions
         .filter((qs) => selectedQuestions.includes(qs.code))
-        .map((qs) => ({ code: qs.code, stem: qs.stem }));
+        .map((qs) => ({ code: qs.code, stem: qs.stem, id: qs.id }));
 
       return [...newPrev, ...newQuestions];
     });
@@ -181,11 +179,11 @@ const NewQuestionSet: NextPageWithLayout = () => {
         <Typography gutterBottom variant="h4" sx={{ mb: 4 }}>
           New Question Set
         </Typography>
-        <Grid container>
-          <Grid xs={12} md={6} sx={{ pb: 10 }}>
+        <Grid container spacing={4} sx={{ pb: 6 }}>
+          <Grid item xs={12} md={6}>
             <Box component="form" onSubmit={formik.handleSubmit}>
               <Grid container spacing={2}>
-                <Grid xs={12} md={6}>
+                <Grid item xs={12} md={6}>
                   <FormControl sx={{ mb: 2 }} fullWidth>
                     <InputLabel id="option-select-label">
                       Question Set Type
@@ -208,7 +206,7 @@ const NewQuestionSet: NextPageWithLayout = () => {
                     </Select>
                   </FormControl>
                 </Grid>
-                <Grid xs={12} md={6}>
+                <Grid item xs={12} md={6}>
                   <TextField
                     label="Set Code"
                     name="code"
@@ -243,7 +241,7 @@ const NewQuestionSet: NextPageWithLayout = () => {
                 />
               </Box>
               <Grid container spacing={2}>
-                <Grid xs={12} md={6}>
+                <Grid item xs={12} md={6}>
                   <FormControl sx={{ mb: 2 }} fullWidth>
                     <InputLabel id="subject-select-label">
                       Select Subject
@@ -266,7 +264,7 @@ const NewQuestionSet: NextPageWithLayout = () => {
                     </Select>
                   </FormControl>
                 </Grid>
-                <Grid xs={12} md={6}>
+                <Grid item xs={12} md={6}>
                   <FormControl disabled={!chapters} sx={{ mb: 2 }} fullWidth>
                     <InputLabel id="chapter-select-label">
                       Select Chapter
@@ -319,8 +317,8 @@ const NewQuestionSet: NextPageWithLayout = () => {
               </LoadingButton>
             </Box>
           </Grid>
-          <Grid xs={12} md={6} sx={{ px: 2, height: "100%" }}>
-            <Paper sx={{ overflowY: "auto", height: 480 }}>
+          <Grid item xs={12} md={6} sx={{ height: "100%" }}>
+            <Paper sx={{ overflowY: "auto", height: 450 }}>
               <DndProvider backend={HTML5Backend}>
                 <List dense key={JSON.stringify(selectedQuestions)}>
                   {allQuestions.map((question, i) => (
@@ -359,7 +357,7 @@ NewQuestionSet.getLayout = (page) => <DashboardLayout>{page}</DashboardLayout>;
 export default NewQuestionSet;
 
 type ListItemProps = {
-  question: { stem: string; code: string };
+  question: Qs;
   index: number;
   onDelete: () => void;
   onDrop: (dragId: string, dropId: string) => void;
@@ -393,7 +391,20 @@ function DraggableListItem({
       <ListItemAvatar></ListItemAvatar>
       <ListItemText
         primary={`${index + 1}) ${question.code}`}
-        secondary={question.stem}
+        secondary={
+          <span
+            title={question.stem}
+            style={{
+              maxWidth: "100%",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
+              display: "block",
+            }}
+          >
+            {question.stem}
+          </span>
+        }
       />
       <ListItemSecondaryAction>
         <IconButton edge="end" aria-label="delete" onClick={onDelete}>
@@ -410,7 +421,20 @@ function DraggableListItem({
       </ListItemAvatar>
       <ListItemText
         primary={`${index + 1}) ${question.code}`}
-        secondary={question.stem}
+        secondary={
+          <span
+            title={question.stem}
+            style={{
+              maxWidth: "100%",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
+              display: "block",
+            }}
+          >
+            {question.stem}
+          </span>
+        }
       />
 
       <ListItemSecondaryAction>

@@ -3,6 +3,8 @@ import { z } from "zod";
 import { Prisma, SET_TYPE } from "@prisma/client";
 import { createAdminRouter } from "./admin-router";
 
+// type orderByType = { [key: string]: "asc" | "desc" } | undefined;
+
 export const questionSetsRouter = createAdminRouter()
   .query("get", {
     input: z.object({
@@ -23,27 +25,35 @@ export const questionSetsRouter = createAdminRouter()
         code: { contains: code },
         type: input.type,
       };
+
       const orderBy = sortBy
         ? {
             [sortBy]: sortDesc ? "desc" : "asc",
           }
         : undefined;
+      try {
+        const [count, questionSets] = await ctx.prisma.$transaction([
+          ctx.prisma.questionSet.count({ where }),
+          ctx.prisma.questionSet.findMany({
+            where,
+            orderBy,
+            skip: page * pageSize,
+            take: pageSize,
+            include: { _count: true },
+          }),
+        ]);
+        return {
+          questionSets,
+          count,
+        };
+      } catch (error) {
+        console.error(error);
 
-      const [count, questionSets] = await ctx.prisma.$transaction([
-        ctx.prisma.questionSet.count({ where }),
-        ctx.prisma.questionSet.findMany({
-          where,
-          orderBy,
-          skip: page * pageSize,
-          take: pageSize,
-          include: { _count: true },
-        }),
-      ]);
-
-      return {
-        questionSets,
-        count,
-      };
+        throw new TRPCError({
+          message: "Something Went Wrong!",
+          code: "INTERNAL_SERVER_ERROR",
+        });
+      }
     },
   })
   .query("getOne", {
@@ -54,7 +64,18 @@ export const questionSetsRouter = createAdminRouter()
         include: {
           createdBy: { select: { name: true } },
           updatedBy: { select: { name: true } },
-          questions: true,
+          questions: {
+            orderBy: { order: "asc" },
+            select: {
+              question: {
+                select: {
+                  id: true,
+                  stem: true,
+                  code: true,
+                },
+              },
+            },
+          },
           _count: true,
         },
       });
@@ -64,7 +85,10 @@ export const questionSetsRouter = createAdminRouter()
           message: "No question set found with this ID",
         });
       }
-      return questionSet;
+      return {
+        ...questionSet,
+        questions: questionSet.questions.map((q) => q.question),
+      };
     },
   })
   .query("list", {
@@ -93,7 +117,10 @@ export const questionSetsRouter = createAdminRouter()
             published,
             type,
             questions: {
-              connect: questions.map((code) => ({ code })),
+              create: questions.map((id, i) => ({
+                question: { connect: { id } },
+                order: i + 1,
+              })),
             },
             createdById: ctx.session?.user.id,
           },
@@ -135,13 +162,19 @@ export const questionSetsRouter = createAdminRouter()
             code,
             published,
             questions: {
-              set: questions.map((id) => ({ id })),
+              deleteMany: {},
+              create: questions.map((id, i) => ({
+                question: { connect: { id } },
+                order: i + 1,
+              })),
             },
             updatedById: ctx.session?.user.id,
           },
         });
         return questionSet;
       } catch (e) {
+        console.error(e);
+
         if (e instanceof Prisma.PrismaClientKnownRequestError) {
           if (e.code === "P2002") {
             throw new TRPCError({
@@ -157,6 +190,7 @@ export const questionSetsRouter = createAdminRouter()
       }
     },
   })
+
   .mutation("delete", {
     input: z.string(),
     async resolve({ ctx, input }) {

@@ -165,7 +165,7 @@ model Question {
     correctOption   OPTION
     published       Boolean  @default(true)
     answers         Answer[]
-    questionSets    QuestionSet[]
+    questionSets    QuestionsOnSets[]
     comments        Comment[]
     note            Note?    @relation(fields: [noteId], references: [id])
     noteId          String?
@@ -175,6 +175,7 @@ model Question {
     createdById     String?
     updatedBy       User?    @relation("question_updater", fields: [updatedById], references: [id], onDelete:NoAction )
     updatedById     String?
+    @@map("questions")
 }
 
 model QuestionSet {
@@ -182,7 +183,7 @@ model QuestionSet {
     code            String   @unique
     title           String
     type            SET_TYPE
-    questions       Question[]
+    questions       QuestionsOnSets[]
     answerSheets    AnswerSheet[]
     published       Boolean  @default(true)
     createdAt       DateTime @default(now())
@@ -191,6 +192,18 @@ model QuestionSet {
     createdById     String?
     updatedBy       User?    @relation("set_updater", fields: [updatedById], references: [id], onDelete:NoAction )
     updatedById     String?
+
+    @@map("question_sets")
+}
+
+model QuestionsOnSets {
+    questionSet     QuestionSet @relation(fields: [questionSetId], references: [id], onDelete: Cascade)
+    questionSetId   String
+    question        Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+    questionId      String
+    order           Int
+    @@id([questionSetId, questionId])
+
 }
 
 enum SET_TYPE {
