@@ -14,7 +14,7 @@ import { NextPageWithLayout } from "@/pages/_app";
 import DashboardLayout from "@/layouts/DashboardLayout";
 import Link from "@/components/Link";
 import { trpc } from "@/utils/trpc";
-import { QuestionSet } from "@prisma/client";
+import { QuestionSet, SET_TYPE } from "@prisma/client";
 import { format } from "date-fns";
 
 type ColumnFilter = { id: string; value: unknown };
@@ -39,8 +39,14 @@ const QuestionSets: NextPageWithLayout = () => {
       {
         page: pagination.pageIndex,
         pageSize: pagination.pageSize,
-        sortBy: sorting[0]?.id as "createdAt" | "code" | "title" | "published",
+        sortBy: sorting[0]?.id as
+          | "createdAt"
+          | "code"
+          | "title"
+          | "type"
+          | "published",
         sortDesc: sorting[0]?.desc,
+        type: columnFilters.find((f) => f.id === "type")?.value as SET_TYPE,
         title: columnFilters.find((f) => f.id === "title")?.value as string,
         code: columnFilters.find((f) => f.id === "code")?.value as string,
       },
@@ -57,7 +63,16 @@ const QuestionSets: NextPageWithLayout = () => {
         enableSorting: false,
       },
       { accessorKey: "code", header: "Code" },
+      {
+        accessorKey: "type",
+        header: "Type",
+        filterVariant: "select",
+        filterSelectOptions: Object.values(SET_TYPE),
+        Cell: ({ cell }) =>
+          cell.getValue<SET_TYPE>().split("_").join(" ").toLowerCase(),
+      },
       { accessorKey: "title", header: "Title" },
+
       {
         accessorKey: "_count.questions",
         header: "Total Questions",

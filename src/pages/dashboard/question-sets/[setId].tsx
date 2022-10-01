@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Head from "next/head";
 import NextLink from "next/link";
 import { useFormik } from "formik";
@@ -71,23 +71,10 @@ const NewQuestionSet: NextPageWithLayout = () => {
   const { data: questions } = trpc.useQuery(
     ["admin.questions.list", chapterId],
     {
-      onSuccess: (data) => {
-        const selectedQs = allQuestions.map((q) => q.code);
-        const thisChapterQuestions = data
-          .filter((q) => selectedQs.includes(q.code))
-          .map((q) => q.code);
-        setSelectedQuestions([...thisChapterQuestions]);
-      },
       enabled: !!chapterId,
       refetchOnWindowFocus: false,
     }
   );
-  useEffect(() => {
-    setChapterId("");
-  }, [subjectId]);
-  useEffect(() => {
-    setSelectedQuestions([]);
-  }, [chapterId]);
 
   const addSetMutation = trpc.useMutation("admin.sets.add", {
     onSuccess: (data) => {

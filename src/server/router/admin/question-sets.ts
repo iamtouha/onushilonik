@@ -10,7 +10,10 @@ export const questionSetsRouter = createAdminRouter()
       pageSize: z.number().int(),
       title: z.string().optional(),
       code: z.string().optional(),
-      sortBy: z.enum(["createdAt", "title", "code", "published"]).optional(),
+      type: z.nativeEnum(SET_TYPE).optional(),
+      sortBy: z
+        .enum(["createdAt", "title", "type", "code", "published"])
+        .optional(),
       sortDesc: z.boolean().optional(),
     }),
     async resolve({ ctx, input }) {
@@ -18,6 +21,7 @@ export const questionSetsRouter = createAdminRouter()
       const where = {
         title: { contains: title },
         code: { contains: code },
+        type: input.type,
       };
       const orderBy = sortBy
         ? {
