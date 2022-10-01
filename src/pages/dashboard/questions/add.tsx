@@ -97,7 +97,7 @@ const AddQuestion: NextPageWithLayout = () => {
       optionC: "",
       optionD: "",
       correctOption: OPTION.A,
-      noteId: undefined,
+      noteId: "",
     },
     validationSchema,
     onSubmit: async (values, { resetForm }) => {
@@ -167,29 +167,27 @@ const AddQuestion: NextPageWithLayout = () => {
               </FormControl>
             </Grid>
             <Grid xs={12} md={6}>
-              {chapters && (
-                <FormControl sx={{ mb: 2 }} fullWidth>
-                  <InputLabel id="chapter-select-label">
-                    Select Chapter
-                  </InputLabel>
-                  <Select
-                    labelId="chapter-select-label"
-                    name="chapterId"
-                    value={chapterId}
-                    label="Select Chapter"
-                    onChange={(e) => setChapterId(e.target.value as string)}
-                  >
-                    <MenuItem value="" disabled>
-                      Select an option
+              <FormControl disabled={!chapters} sx={{ mb: 2 }} fullWidth>
+                <InputLabel id="chapter-select-label">
+                  Select Chapter
+                </InputLabel>
+                <Select
+                  labelId="chapter-select-label"
+                  name="chapterId"
+                  value={chapterId}
+                  label="Select Chapter"
+                  onChange={(e) => setChapterId(e.target.value as string)}
+                >
+                  <MenuItem value="" disabled>
+                    Select an option
+                  </MenuItem>
+                  {chapters?.map((chapter) => (
+                    <MenuItem key={chapter.id} value={chapter.id}>
+                      {chapter.title}
                     </MenuItem>
-                    {chapters?.map((chapter) => (
-                      <MenuItem key={chapter.id} value={chapter.id}>
-                        {chapter.title}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              )}
+                  ))}
+                </Select>
+              </FormControl>
             </Grid>
           </Grid>
           <TextField

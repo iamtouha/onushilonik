@@ -87,7 +87,7 @@ export const questionsRouter = createAdminRouter()
     async resolve({ ctx, input: chapterId }) {
       const questions = await ctx.prisma.question.findMany({
         where: chapterId ? { chapterId } : {},
-        select: { id: true, code: true },
+        select: { id: true, code: true, stem: true },
       });
       return questions;
     },
