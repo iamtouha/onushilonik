@@ -1,12 +1,11 @@
 import superjson from "superjson";
-import { useMemo } from "react";
+import { useMemo, useContext } from "react";
 import type { NextPage } from "next";
 import { withTRPC } from "@trpc/next";
 import { httpBatchLink } from "@trpc/client/links/httpBatchLink";
 import { loggerLink } from "@trpc/client/links/loggerLink";
 import { SessionProvider } from "next-auth/react";
 import { createTheme } from "@mui/material/styles";
-import useMediaQuery from "@mui/material/useMediaQuery";
 import { ThemeProvider } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import orange from "@mui/material/colors/orange";
@@ -15,6 +14,9 @@ import type { ReactElement, ReactNode, FunctionComponent } from "react";
 import type { AppProps } from "next/app";
 import type { AppRouter } from "../server/router";
 import DefaultLayout from "../layouts/DefaultLayout";
+import ColorModeContext, {
+  ColorModeProvider,
+} from "../contexts/ColorModeContext";
 
 import "react-toastify/dist/ReactToastify.css";
 
@@ -29,29 +31,37 @@ type AppPropsWithLayout = AppProps & {
   Component: NextPageWithLayout;
 };
 
-function MyApp({ Component, pageProps }: AppPropsWithLayout) {
-  const prefersDarkMode = useMediaQuery("(prefers-color-scheme: dark)");
-
+const MuiTheme = ({ children }: { children: ReactNode }) => {
+  const [mode] = useContext(ColorModeContext);
   const theme = useMemo(
     () =>
       createTheme({
         palette: {
-          mode: prefersDarkMode ? "dark" : "light",
-          primary: orange,
+          mode,
+          primary: {
+            main: orange[500],
+          },
         },
       }),
-    [prefersDarkMode]
+    [mode]
   );
+  return (
+    <ThemeProvider theme={theme}>
+      {children}
+      <CssBaseline />
+    </ThemeProvider>
+  );
+};
 
+function MyApp({ Component, pageProps }: AppPropsWithLayout) {
   const getLayout =
     Component.getLayout ?? ((page) => <DefaultLayout>{page}</DefaultLayout>);
 
   return (
     <SessionProvider session={pageProps.session}>
-      <ThemeProvider theme={theme}>
-        <CssBaseline />
-        {getLayout(<Component {...pageProps} />)}
-      </ThemeProvider>
+      <ColorModeProvider>
+        <MuiTheme>{getLayout(<Component {...pageProps} />)}</MuiTheme>
+      </ColorModeProvider>
       <ToastContainer />
     </SessionProvider>
   );

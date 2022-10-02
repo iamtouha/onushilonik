@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
 import NextLink from "next/link";
 import { useRouter } from "next/router";
 import { signOut, useSession } from "next-auth/react";
@@ -17,12 +17,16 @@ import ListItemText from "@mui/material/ListItemText";
 import ListItemButton from "@mui/material/ListItemButton";
 import Drawer from "@mui/material/Drawer";
 import ListItemAvatar from "@mui/material/ListItemAvatar";
+import CircularProgress from "@mui/material/CircularProgress";
 import Divider from "@mui/material/Divider";
 import LogoutIcon from "@mui/icons-material/Logout";
 import MenuIcon from "@mui/icons-material/Menu";
 import SpeedIcon from "@mui/icons-material/Speed";
 import CloseIcon from "@mui/icons-material/Close";
-import CircularProgress from "@mui/material/CircularProgress";
+import WarningIcon from "@mui/icons-material/Warning";
+import Brightness4Icon from "@mui/icons-material/Brightness4";
+import Brightness7Icon from "@mui/icons-material/Brightness7";
+import ColorModeContext from "@/contexts/ColorModeContext";
 
 const routes = [
   { title: "হোম", href: "/app" },
@@ -53,6 +57,7 @@ const DrawerContent = () => {
 type Props = { children: React.ReactNode; window?: () => Window };
 
 function DefaultLayout(props: Props) {
+  const [mode, toggleColorMode] = useContext(ColorModeContext);
   const { window, children } = props;
   const [mobileOpen, setMobileOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -93,6 +98,36 @@ function DefaultLayout(props: Props) {
   if (!session) {
     return <Typography>not logged in</Typography>;
   }
+  if (!session.user?.active) {
+    return (
+      <Box
+        sx={{
+          display: "grid",
+          placeItems: "center",
+          minHeight: "100vh",
+        }}
+      >
+        <Box sx={{ textAlign: "center" }}>
+          <WarningIcon color="error" sx={{ fontSize: 80 }} />
+          <Typography variant="h5" gutterBottom>
+            আপনার একাউন্টটি নিষ্ক্রিয় করা হয়েছে
+          </Typography>
+          <Typography variant="body2" gutterBottom>
+            আপনার একাউন্টটি নিষ্ক্রিয় করা হয়েছে, অনুগ্রহ করে একাউন্ট সম্পর্কিত
+            সমস্যা সমাধানের জন্য আমাদের সাথে যোগাযোগ করুন
+          </Typography>
+          <Button
+            variant="contained"
+            color="secondary"
+            sx={{ mt: 2 }}
+            onClick={() => signOut()}
+          >
+            সাইন আউট
+          </Button>
+        </Box>
+      </Box>
+    );
+  }
 
   return (
     <>
@@ -116,6 +151,13 @@ function DefaultLayout(props: Props) {
             ))}
           </Box>
           <Box sx={{ display: { xs: "none", md: "block" }, ml: "auto", mr: 2 }}>
+            <IconButton
+              sx={{ mr: 1 }}
+              onClick={() => toggleColorMode()}
+              color="inherit"
+            >
+              {mode === "dark" ? <Brightness4Icon /> : <Brightness7Icon />}
+            </IconButton>
             <IconButton
               id="basic-button"
               aria-controls={open ? "basic-menu" : undefined}

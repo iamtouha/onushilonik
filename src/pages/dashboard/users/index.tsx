@@ -76,6 +76,18 @@ const Users: NextPageWithLayout = () => {
         filterVariant: "select",
       },
       {
+        accessorKey: "active",
+        header: "Active",
+        enableColumnFilter: false,
+        Cell: ({ cell }) => {
+          return cell.getValue() ? (
+            <Typography>Yes</Typography>
+          ) : (
+            <Typography color="error">No</Typography>
+          );
+        },
+      },
+      {
         accessorKey: "createdAt",
         header: "Joined on",
         Cell: ({ cell }) =>

@@ -2,10 +2,6 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { prisma } from "../../server/db/client";
 
 const InitailSetup = async (req: NextApiRequest, res: NextApiResponse) => {
-  // const resp = await prisma.user.deleteMany({});
-  // if (resp) {
-  //   return res.status(200).json({ message: "success" });
-  // }
   const user = await prisma.user.findFirst({
     where: { role: "SUPER_ADMIN" },
   });
@@ -16,7 +12,7 @@ const InitailSetup = async (req: NextApiRequest, res: NextApiResponse) => {
     });
   }
   const firstUser = await prisma.user.findFirst({
-    orderBy: { createdAt: "asc" },
+    orderBy: { createdAt: "desc" },
   });
   if (!firstUser) {
     return res.status(401).json({

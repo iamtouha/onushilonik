@@ -47,7 +47,7 @@ type Qs = { code: string; stem: string; id: string };
 
 const validationSchema = yup.object().shape({
   code: yup.string().min(2).max(100).required("Set Code is required"),
-  title: yup.string().min(2).max(100).required("Set Title is required"),
+  title: yup.string().min(2).max(255).required("Set Title is required"),
   type: yup
     .mixed()
     .oneOf([Object.values(SET_TYPE)])

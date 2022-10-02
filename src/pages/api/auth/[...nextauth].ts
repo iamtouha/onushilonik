@@ -13,6 +13,7 @@ export const authOptions: NextAuthOptions = {
       if (session.user) {
         session.user.id = user.id;
         session.user.role = user.role as USER_ROLE;
+        session.user.active = user.active as boolean;
       }
       return session;
     },

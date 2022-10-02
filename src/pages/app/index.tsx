@@ -1,21 +1,33 @@
-import React from "react";
-import { NextPage } from "next";
-import Box from "@mui/material/Box";
-import Container from "@mui/material/Container";
+import NextLink from "next/link";
 import Head from "next/head";
+import Container from "@mui/material/Container";
+import Box from "@mui/material/Box";
+import Card from "@mui/material/Card";
+import CardContent from "@mui/material/CardContent";
+import Typography from "@mui/material/Typography";
+import Button from "@mui/material/Button";
 
-const HomePage: NextPage = () => {
+const Home = () => {
   return (
     <>
       <Head>
         <title>Home | Onushilonik</title>
       </Head>
-
       <Container>
-        <Box></Box>
+        <Box sx={{ my: 4 }}>
+          <Card>
+            <CardContent>
+              <Typography variant="h5" component="h2">
+                ফ্রী ট্রায়াল শুরু করুন
+              </Typography>
+              <NextLink passHref href="/app/free-trial">
+                <Button></Button>
+              </NextLink>
+            </CardContent>
+          </Card>
+        </Box>
       </Container>
     </>
   );
 };
-
-export default HomePage;
+export default Home;

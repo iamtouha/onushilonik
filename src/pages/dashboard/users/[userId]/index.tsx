@@ -5,7 +5,7 @@ import { useRouter } from "next/router";
 import Container from "@mui/material/Container";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
-import Button from "@mui/material/Button";
+import LoadingButton from "@mui/lab/LoadingButton";
 import Alert from "@mui/material/Alert";
 import LinearProgress from "@mui/material/LinearProgress";
 import FormControl from "@mui/material/FormControl";
@@ -35,6 +35,7 @@ const User: NextPageWithLayout = () => {
     isLoading,
     isError,
     error,
+    refetch,
   } = trpc.useQuery(["admin.users.getOne", router.query.userId as string], {
     enabled: !!router.query.userId,
     refetchOnWindowFocus: false,
@@ -42,9 +43,25 @@ const User: NextPageWithLayout = () => {
       if (data) setRole(data.role);
     },
   });
+
   const updateRoleMutation = trpc.useMutation("admin.users.updateRole", {
     onSuccess: () => {
       toast.success("Role updated successfully");
+      refetch();
+    },
+    onError: (err) => {
+      toast.error(err.message);
+    },
+  });
+  const blockUserMutation = trpc.useMutation("admin.users.block", {
+    onSuccess: (data) => {
+      refetch();
+      toast.success(
+        `User ${data.active ? "unblocked" : "blocked"} successfully`
+      );
+    },
+    onError: (err) => {
+      toast.error(err.message);
     },
   });
 
@@ -106,23 +123,35 @@ const User: NextPageWithLayout = () => {
                   ))}
                 </Select>
               </FormControl>
-              <Button
+              <LoadingButton
                 variant="outlined"
+                loading={updateRoleMutation.isLoading}
                 disabled={
                   session?.user?.role !== USER_ROLE.SUPER_ADMIN ||
                   session?.user?.id === user?.id ||
-                  !role ||
-                  updateRoleMutation.isLoading
+                  !role
                 }
                 onClick={() => {
-                  updateRoleMutation.mutate({
-                    id: user.id,
-                    role: role as USER_ROLE,
-                  });
+                  if (!role || role === user.role) return;
+                  updateRoleMutation.mutate({ id: user.id, role: role });
                 }}
               >
                 Update
-              </Button>
+              </LoadingButton>
+              <LoadingButton
+                color="error"
+                variant={user.active ? "text" : "outlined"}
+                loading={blockUserMutation.isLoading}
+                disabled={session?.user?.id === user?.id}
+                onClick={() => {
+                  blockUserMutation.mutate({
+                    id: user.id,
+                    active: !user.active,
+                  });
+                }}
+              >
+                {user.active ? "Block User" : "Unblock User"}
+              </LoadingButton>
             </Box>
           </Box>
         ) : (
