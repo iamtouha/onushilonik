@@ -1,4 +1,4 @@
-import { useState, useContext } from "react";
+import { useState, useContext, useEffect } from "react";
 import NextLink from "next/link";
 import { useRouter } from "next/router";
 import { signOut, useSession } from "next-auth/react";
@@ -57,12 +57,12 @@ const DrawerContent = () => {
 type Props = { children: React.ReactNode; window?: () => Window };
 
 function DefaultLayout(props: Props) {
+  const router = useRouter();
   const [mode, toggleColorMode] = useContext(ColorModeContext);
   const { window, children } = props;
   const [mobileOpen, setMobileOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
-  const router = useRouter();
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
@@ -76,6 +76,10 @@ function DefaultLayout(props: Props) {
 
   const container =
     window !== undefined ? () => window().document.body : undefined;
+
+  useEffect(() => {
+    setMobileOpen(false);
+  }, [router.pathname]);
 
   const { data: session, status } = useSession({ required: true });
 
