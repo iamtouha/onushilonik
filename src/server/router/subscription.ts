@@ -1,5 +1,4 @@
 import { PAYMENT_METHOD } from "@prisma/client";
-import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { createProtectedRouter } from "./protected-router";
 

@@ -11,14 +11,16 @@ type LayoutProps = {
 const SubscriptionLayout = ({ children }: LayoutProps) => {
   return (
     <DefaultLayout>
-      <SubscriptionProvider>{hasSubscription(children)}</SubscriptionProvider>
+      <SubscriptionProvider>
+        <HasSubscription>{children}</HasSubscription>
+      </SubscriptionProvider>
     </DefaultLayout>
   );
 };
 
 export default SubscriptionLayout;
 
-function hasSubscription(children: ReactNode) {
+function HasSubscription({ children }: { children: ReactNode }) {
   const router = useRouter();
   const [subscription] = useContext(SubscriptionContext);
   useEffect(() => {

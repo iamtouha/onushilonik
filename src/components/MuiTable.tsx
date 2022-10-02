@@ -96,15 +96,15 @@ function TablePaginationActions(props: TablePaginationActionsProps) {
   );
 }
 
-type Column = {
+type Column<T> = {
   id: string;
   label?: string;
-  cell?: (value: any) => React.ReactNode;
+  cell?: (value: T) => React.ReactNode;
 };
 
 type TableProps<T> = {
   rows: T[];
-  columns: Column[];
+  columns: Column<T>[];
 };
 
 export default function MuiTable<T extends { [key: string]: unknown }>(

@@ -1,5 +1,3 @@
-import { PAYMENT_METHOD } from "@prisma/client";
-import { z } from "zod";
 import { createProtectedRouter } from "./protected-router";
 
 export const accountRouter = createProtectedRouter().query("get", {

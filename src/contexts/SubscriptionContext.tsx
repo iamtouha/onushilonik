@@ -8,7 +8,10 @@ import Button from "@mui/material/Button";
 
 type ContextProps = [Subscription | null | undefined, () => void];
 
-const SubscriptionContext = createContext<ContextProps>([null, () => {}]);
+const SubscriptionContext = createContext<ContextProps>([
+  null,
+  () => undefined,
+]);
 
 export default SubscriptionContext;
 

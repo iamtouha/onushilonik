@@ -4,7 +4,7 @@ import useMediaQuery from "@mui/material/useMediaQuery";
 
 const ColorModeContext = createContext<["light" | "dark", () => void]>([
   "light",
-  () => {},
+  () => undefined,
 ]);
 
 export default ColorModeContext;
