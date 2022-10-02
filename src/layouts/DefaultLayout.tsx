@@ -282,7 +282,7 @@ function DefaultLayout(props: Props) {
 
             {session?.user?.role.includes("ADMIN") && (
               <ListItem sx={{ mt: 0 }}>
-                <NextLink href="/account" passHref>
+                <NextLink href="/dashboard" passHref>
                   <ListItemButton component="a">
                     <SpeedIcon sx={{ mr: 1 }} />
                     Dashboard
