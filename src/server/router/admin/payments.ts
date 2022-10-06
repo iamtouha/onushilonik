@@ -75,7 +75,10 @@ export const paymentsRouter = createAdminRouter()
         where: { id: input },
         include: {
           subscription: {
-            select: { user: { select: { id: true, email: true } } },
+            select: {
+              phoneNumber: true,
+              user: { select: { id: true, email: true } },
+            },
           },
         },
       });
@@ -85,6 +88,23 @@ export const paymentsRouter = createAdminRouter()
           message: "Payment not found!",
         });
       }
+      return payment;
+    },
+  })
+  .mutation("update-status", {
+    input: z.object({
+      id: z.string(),
+      status: z.nativeEnum(PAYMENT_STATUS),
+    }),
+    async resolve({ ctx, input }) {
+      const payment = await ctx.prisma.payment.update({
+        where: { id: input.id },
+        data: {
+          status: input.status,
+          approvedAt:
+            input.status === PAYMENT_STATUS.SUCCESS ? new Date() : null,
+        },
+      });
       return payment;
     },
   });

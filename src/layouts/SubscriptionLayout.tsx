@@ -33,27 +33,27 @@ function HasSubscription({ children }: { children: ReactNode }) {
     return (
       <Box
         sx={{
-          pt: 4,
           display: "grid",
           placeItems: "center",
+          height: "calc(100vh - 70px)",
         }}
       >
-        <Card>
+        <Card variant="outlined" sx={{ textAlign: "center" }}>
           <CardContent>
-            <Typography variant="h5" component="h2">
-              You don't have an active subscription
+            <Typography variant="h5" gutterBottom component="h2">
+              আপনার সাবস্ক্রিপশন সক্রিয় নয়
             </Typography>
-            <Typography sx={{ mb: 1.5 }} color="text.secondary">
-              You can subscribe to our service to get access to all features.
-            </Typography>
+
             <NextLink href="/app/subscribe" passHref>
               <Button
                 variant="contained"
                 component="a"
                 color="primary"
-                sx={{ mx: "auto" }}
+                disableElevation
+                size="large"
+                sx={{ mx: "auto", mt: 2 }}
               >
-                Subscribe
+                সাবস্ক্রাইব করুন
               </Button>
             </NextLink>
           </CardContent>
@@ -65,27 +65,28 @@ function HasSubscription({ children }: { children: ReactNode }) {
     return (
       <Box
         sx={{
-          pt: 4,
           display: "grid",
           placeItems: "center",
+          height: "calc(100vh - 70px)",
         }}
       >
-        <Card>
+        <Card variant="outlined" sx={{ textAlign: "center" }}>
           <CardContent>
-            <Typography variant="h5" component="h2">
-              Your subscription is pending
+            <Typography variant="h5" gutterBottom component="h2">
+              সাবস্ক্রিপশন পেন্ডিং
             </Typography>
-            <Typography sx={{ mb: 1.5 }} color="text.secondary">
-              Please wait for your subscription to be approved.
+            <Typography sx={{ mb: 2 }} color="text.secondary">
+              দয়া করে সাবস্ক্রিপশনটি অনুমোদনের জন্য অপেক্ষা করুন
             </Typography>
             <NextLink href="/app/account" passHref>
               <Button
                 variant="contained"
                 component="a"
                 color="primary"
-                sx={{ mx: "auto" }}
+                disableElevation
+                size="large"
               >
-                Account
+                okay
               </Button>
             </NextLink>
           </CardContent>
@@ -97,27 +98,27 @@ function HasSubscription({ children }: { children: ReactNode }) {
     return (
       <Box
         sx={{
-          pt: 4,
           display: "grid",
           placeItems: "center",
+          height: "calc(100vh - 70px)",
         }}
       >
-        <Card>
+        <Card variant="outlined" sx={{ textAlign: "center" }}>
           <CardContent>
-            <Typography variant="h5" component="h2">
-              Your subscription has expired
+            <Typography variant="h5" gutterBottom component="h2">
+              সাবস্ক্রিপশন মেয়াদোত্তীর্ণ
             </Typography>
-            <Typography sx={{ mb: 1.5 }} color="text.secondary">
-              Please renew your subscription to get access to all features.
-            </Typography>
+
             <NextLink href="/app/subscribe" passHref>
               <Button
                 variant="contained"
                 component="a"
                 color="primary"
-                sx={{ mx: "auto" }}
+                disableElevation
+                size="large"
+                sx={{ mx: "auto", mt: 2 }}
               >
-                Renew subscription
+                পুনরায় সাবস্ক্রাইব করুন
               </Button>
             </NextLink>
           </CardContent>

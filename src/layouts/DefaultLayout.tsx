@@ -29,7 +29,7 @@ import Brightness7Icon from "@mui/icons-material/Brightness7";
 import ColorModeContext from "@/contexts/ColorModeContext";
 
 const routes = [
-  { title: "হোম", href: "/app" },
+  { title: "হোম পেজ", href: "/app" },
   { title: "প্রশ্ন ব্যাংক", href: "/app/question-bank" },
   { title: "বিগত বছরের প্রশ্নপত্র", href: "/app/prev-questions" },
   { title: "মডেল টেস্ট", href: "/app/model-tests" },

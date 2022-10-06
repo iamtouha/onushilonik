@@ -1,9 +1,9 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Head from "next/head";
 import NextLink from "next/link";
 import { useRouter } from "next/router";
 import Box from "@mui/material/Box";
-import Button from "@mui/material/Button";
+import LoadingButton from "@mui/lab/LoadingButton";
 import Grid from "@mui/material/Grid";
 import Container from "@mui/material/Container";
 import Typography from "@mui/material/Typography";
@@ -25,6 +25,7 @@ import { NextPageWithLayout } from "@/pages/_app";
 import DashboardLayout from "@/layouts/DashboardLayout";
 import Link from "@/components/Link";
 import { trpc } from "@/utils/trpc";
+import { toast } from "react-toastify";
 
 const Example: NextPageWithLayout = () => {
   const router = useRouter();
@@ -35,6 +36,7 @@ const Example: NextPageWithLayout = () => {
     isLoading,
     isError,
     error,
+    refetch,
   } = trpc.useQuery(["admin.payments.get", paymentId as string], {
     enabled: !!paymentId,
     refetchOnWindowFocus: false,
@@ -42,10 +44,18 @@ const Example: NextPageWithLayout = () => {
       if (data) setStatus(data.status);
     },
   });
+
+  const statusMutation = trpc.useMutation("admin.payments.update-status", {
+    onSuccess: () => {
+      toast.success("Payment status updated");
+      refetch();
+    },
+  });
+
   return (
     <>
       <Head>
-        <title>Example | Onushilonik Dashboard</title>
+        <title>{payment?.paymentId} | Onushilonik Dashboard</title>
       </Head>
       <Container sx={{ mt: 2 }}>
         <Breadcrumbs sx={{ mb: 1, ml: -1 }} aria-label="breadcrumb">
@@ -76,25 +86,51 @@ const Example: NextPageWithLayout = () => {
               {payment.paymentId}
             </Typography>
             <Box sx={{ ml: "auto", mr: 0 }} />
-            <FormControl fullWidth sx={{ maxWidth: 200 }}>
-              <InputLabel id="payment-status-select">Payment Status</InputLabel>
-              <Select
-                label="Payment Status"
-                id="payment-status-select"
-                value={status}
-                onChange={(e) => setStatus(e.target.value as PAYMENT_STATUS)}
-              >
-                {Object.values(PAYMENT_STATUS).map((status) => (
-                  <MenuItem key={status} value={status}>
-                    {status}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
           </Box>
         )}
         {payment && (
-          <Grid container spacing={4} sx={{ maxWidth: 600 }}>
+          <Grid container spacing={2} sx={{ maxWidth: 600 }}>
+            <Grid
+              sx={{
+                display: "flex",
+                alignItems: "end",
+                gap: 2,
+              }}
+              item
+              xs={12}
+            >
+              <FormControl variant="standard" fullWidth sx={{ maxWidth: 200 }}>
+                <InputLabel id="payment-status-select">
+                  Payment Status
+                </InputLabel>
+                <Select
+                  label="Payment Status"
+                  id="payment-status-select"
+                  value={status}
+                  onChange={(e) => setStatus(e.target.value as PAYMENT_STATUS)}
+                >
+                  {Object.values(PAYMENT_STATUS).map((status) => (
+                    <MenuItem key={status} value={status}>
+                      {status}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+              <LoadingButton
+                variant="outlined"
+                disableElevation
+                disabled={payment.status === status || isLoading}
+                loading={statusMutation.isLoading}
+                onClick={() =>
+                  statusMutation.mutate({
+                    id: payment.id,
+                    status,
+                  })
+                }
+              >
+                Update Status
+              </LoadingButton>
+            </Grid>
             <Grid item xs={12} md={6}>
               <List
                 dense
@@ -125,59 +161,38 @@ const Example: NextPageWithLayout = () => {
                 <ListItem>
                   <ListItemText
                     primary="Payment Status"
-                    secondary={payment?.status}
+                    secondary={payment.status}
                   />
                 </ListItem>
-                <ListItem>
-                  <ListItemText
-                    primary="Payment Amount"
-                    secondary={payment?.amount}
-                  />
-                </ListItem>
-                <ListItem>
-                  <ListItemText
-                    primary="Payment Currency"
-                    secondary={payment?.currency}
-                  />
-                </ListItem>
+                {payment.approvedAt && (
+                  <ListItem>
+                    <ListItemText
+                      primary="Approved at"
+                      secondary={payment.approvedAt?.toLocaleString()}
+                    />
+                  </ListItem>
+                )}
               </List>
             </Grid>
             <Grid item xs={12} md={6}>
-              <List>
+              <List
+                dense
+                subheader={
+                  <ListSubheader component="div" id="payment-details">
+                    Subscription Details
+                  </ListSubheader>
+                }
+              >
                 <ListItem>
                   <ListItemText
-                    primary="Payment ID"
-                    secondary={payment?.paymentId}
+                    primary="User Email"
+                    secondary={payment.subscription.user.email}
                   />
                 </ListItem>
                 <ListItem>
                   <ListItemText
-                    primary="Payment Method"
-                    secondary={payment?.method}
-                  />
-                </ListItem>
-                <ListItem>
-                  <ListItemText
-                    primary="Transaction ID"
-                    secondary={payment?.transactionId}
-                  />
-                </ListItem>
-                <ListItem>
-                  <ListItemText
-                    primary="Payment Status"
-                    secondary={payment?.status}
-                  />
-                </ListItem>
-                <ListItem>
-                  <ListItemText
-                    primary="Payment Amount"
-                    secondary={payment?.amount}
-                  />
-                </ListItem>
-                <ListItem>
-                  <ListItemText
-                    primary="Payment Currency"
-                    secondary={payment?.currency}
+                    primary="User Phone"
+                    secondary={payment.subscription.phoneNumber ?? ""}
                   />
                 </ListItem>
               </List>

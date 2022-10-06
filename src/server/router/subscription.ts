@@ -12,6 +12,7 @@ export const subscriptionRouter = createProtectedRouter()
           id: true,
           phoneNumber: true,
           payments: {
+            where: { NOT: { status: PAYMENT_STATUS.FAILED } },
             orderBy: { createdAt: "desc" },
             take: 1,
             select: {
@@ -35,16 +36,13 @@ export const subscriptionRouter = createProtectedRouter()
           status: "inactive",
         };
       }
-      if (lastPayment.status !== PAYMENT_STATUS.SUCCESS) {
-        return {
-          id: subscription.id,
-          phoneNumber: subscription.phoneNumber,
-          status: "inactive",
-        };
-      }
+
       const lastPaymentApprovedAt = lastPayment.approvedAt?.getTime() ?? 0;
 
-      if (!lastPaymentApprovedAt) {
+      if (
+        !lastPaymentApprovedAt ||
+        lastPayment.status === PAYMENT_STATUS.PENDING
+      ) {
         return {
           id: subscription.id,
           phoneNumber: subscription.phoneNumber,
@@ -81,16 +79,14 @@ export const subscriptionRouter = createProtectedRouter()
       method: z.nativeEnum(PAYMENT_METHOD),
       paymentId: z.string().min(10).max(14),
       transactionId: z.string().min(10),
-      amount: z.number().min(0),
     }),
     async resolve({ ctx, input }) {
-      const { phoneNumber, paymentId, amount, method, transactionId } = input;
+      const { phoneNumber, paymentId, method, transactionId } = input;
       const data = {
         phoneNumber,
         payments: {
           create: {
             paymentId,
-            amount,
             method,
             transactionId,
           },

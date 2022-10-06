@@ -83,7 +83,6 @@ const Subscribe = () => {
     validationSchema,
     onSubmit: (values) => {
       createSubscription.mutate({
-        amount: SUBSCRIPTION_PRICE,
         phoneNumber: values.phoneNumber,
         method: values.method as PAYMENT_METHOD,
         paymentId: values.paymentId,

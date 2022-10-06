@@ -2,6 +2,7 @@ import Head from "next/head";
 import Container from "@mui/material/Container";
 import Box from "@mui/material/Box";
 import { NextPageWithLayout } from "@/pages/_app";
+import SubscriptionLayout from "@/layouts/SubscriptionLayout";
 
 const QuestionBank: NextPageWithLayout = () => {
   return (
@@ -15,5 +16,9 @@ const QuestionBank: NextPageWithLayout = () => {
     </>
   );
 };
+
+QuestionBank.getLayout = (page) => (
+  <SubscriptionLayout>{page}</SubscriptionLayout>
+);
 
 export default QuestionBank;
