@@ -17,11 +17,18 @@ const Home = () => {
         <Box sx={{ my: 4 }}>
           <Card>
             <CardContent>
-              <Typography variant="h5" component="h2">
+              <Typography gutterBottom variant="h5" component="h2">
                 ফ্রী ট্রায়াল শুরু করুন
               </Typography>
               <NextLink passHref href="/app/free-trial">
-                <Button></Button>
+                <Button
+                  component={"a"}
+                  disableElevation
+                  size="large"
+                  variant="contained"
+                >
+                  ফ্রী ট্রায়াল
+                </Button>
               </NextLink>
             </CardContent>
           </Card>

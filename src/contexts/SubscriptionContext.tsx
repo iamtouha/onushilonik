@@ -1,10 +1,15 @@
 import { createContext, type ReactNode } from "react";
 import { trpc } from "@/utils/trpc";
-import { Subscription } from "@prisma/client";
 import { useSession } from "next-auth/react";
 import Alert from "@mui/material/Alert";
 import LinearProgress from "@mui/material/LinearProgress";
 import Button from "@mui/material/Button";
+
+type Subscription = {
+  id: string | null;
+  phoneNumber: string | null;
+  status: string;
+};
 
 type ContextProps = [Subscription | null | undefined, () => void];
 

@@ -17,6 +17,7 @@ import MenuBookIcon from "@mui/icons-material/MenuBook";
 import QuizIcon from "@mui/icons-material/Quiz";
 import ListAltIcon from "@mui/icons-material/ListAlt";
 import StickyNote2Icon from "@mui/icons-material/StickyNote2";
+import PaymentIcon from "@mui/icons-material/Payment";
 import { NextPageWithLayout } from "../_app";
 import DashboardLayout from "@/layouts/DashboardLayout";
 
@@ -31,6 +32,7 @@ const routes = [
     icon: ListAltIcon,
   },
   { name: "Users", href: "/dashboard/users", icon: SupervisedUserCircleIcon },
+  { name: "Payments", href: "/dashboard/payments", icon: PaymentIcon },
 ];
 
 const DashboardHome: NextPageWithLayout = () => {

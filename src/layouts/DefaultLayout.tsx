@@ -137,17 +137,23 @@ function DefaultLayout(props: Props) {
     <>
       <AppBar position="fixed" color="default">
         <Toolbar>
-          <Typography variant="h5" color={"primary"}>
-            অনুশীলনিক
-          </Typography>
-          <Box sx={{ display: { xs: "none", md: "block" }, ml: 4 }}>
+          <NextLink href="/" passHref>
+            <Typography
+              variant="h5"
+              component="a"
+              sx={{ textDecoration: "none" }}
+              color={"primary"}
+            >
+              অনুশীলনিক
+            </Typography>
+          </NextLink>
+          <Box sx={{ display: { xs: "none", md: "flex" }, ml: 4 }}>
             {routes.map((route) => (
               <NextLink key={route.href} href={route.href} passHref>
                 <Button
                   component="a"
                   disabled={router.pathname === route.href}
-                  sx={{ ":hover": { textDecoration: "underline" } }}
-                  color="inherit"
+                  sx={{ color: "inherit", display: "block" }}
                 >
                   {route.title}
                 </Button>

@@ -91,15 +91,15 @@ const User: NextPageWithLayout = () => {
         </Breadcrumbs>
         <Typography variant="h4">{user?.name ?? "User"}</Typography>
         {isLoading && <LinearProgress sx={{ mt: 1 }} />}
-        {user && (
-          <Typography variant="body1" gutterBottom sx={{ mb: 4 }}>
-            {user?.email}
-          </Typography>
-        )}
         {isError && (
           <Alert severity="error">
             <Typography variant="body1">{error?.message}</Typography>
           </Alert>
+        )}
+        {user && (
+          <Typography variant="body1" gutterBottom sx={{ mb: 4 }}>
+            {user?.email}
+          </Typography>
         )}
         {user ? (
           <Box>

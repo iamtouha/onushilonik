@@ -20,8 +20,6 @@ export const usersRouter = createAdminRouter()
       const needFilter = input.email || input.name || input.role;
 
       const query = {
-        skip: input.page * input.size,
-        take: input.size,
         orderBy: input.sortBy
           ? { [input.sortBy]: input.sortDesc ? "desc" : "asc" }
           : undefined,
@@ -38,7 +36,11 @@ export const usersRouter = createAdminRouter()
 
       const [count, users] = await ctx.prisma.$transaction([
         ctx.prisma.user.count(query),
-        ctx.prisma.user.findMany(query),
+        ctx.prisma.user.findMany({
+          ...query,
+          skip: input.page * input.size,
+          take: input.size,
+        }),
       ]);
       return { count, users };
     },

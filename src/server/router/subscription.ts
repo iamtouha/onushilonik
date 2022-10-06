@@ -1,13 +1,78 @@
-import { PAYMENT_METHOD } from "@prisma/client";
+import { PAYMENT_METHOD, PAYMENT_STATUS, PLAN } from "@prisma/client";
 import { z } from "zod";
+import add from "date-fns/add";
 import { createProtectedRouter } from "./protected-router";
 
 export const subscriptionRouter = createProtectedRouter()
   .query("get", {
     async resolve({ ctx }) {
-      return await ctx.prisma.subscription.findUnique({
+      const subscription = await ctx.prisma.subscription.findUnique({
         where: { userId: ctx.session.user.id },
+        select: {
+          id: true,
+          phoneNumber: true,
+          payments: {
+            orderBy: { createdAt: "desc" },
+            take: 1,
+            select: {
+              id: true,
+              status: true,
+              createdAt: true,
+              approvedAt: true,
+              plan: true,
+            },
+          },
+        },
       });
+      if (!subscription) {
+        return null;
+      }
+      const lastPayment = subscription.payments[0];
+      if (!lastPayment) {
+        return {
+          id: subscription.id,
+          phoneNumber: subscription.phoneNumber,
+          status: "inactive",
+        };
+      }
+      if (lastPayment.status !== PAYMENT_STATUS.SUCCESS) {
+        return {
+          id: subscription.id,
+          phoneNumber: subscription.phoneNumber,
+          status: "inactive",
+        };
+      }
+      const lastPaymentApprovedAt = lastPayment.approvedAt?.getTime() ?? 0;
+
+      if (!lastPaymentApprovedAt) {
+        return {
+          id: subscription.id,
+          phoneNumber: subscription.phoneNumber,
+          status: "pending",
+        };
+      }
+      let durationInDays = 0;
+      switch (lastPayment.plan) {
+        case PLAN.MONTHLY:
+          durationInDays = 30;
+          break;
+        case PLAN.QUARTERLY:
+          durationInDays = 90;
+          break;
+      }
+      const expiresAt = add(lastPaymentApprovedAt, { days: durationInDays });
+      if (expiresAt.getTime() < Date.now()) {
+        return {
+          id: subscription.id,
+          phoneNumber: subscription.phoneNumber,
+          status: "expired",
+        };
+      }
+      return {
+        id: subscription.id,
+        phoneNumber: subscription.phoneNumber,
+        status: "active",
+      };
     },
   })
   .mutation("create", {

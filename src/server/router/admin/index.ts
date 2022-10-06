@@ -1,6 +1,7 @@
 import { createRouter } from "../context";
 import { chaptersRouter } from "./chapters";
 import { notesRouter } from "./notes";
+import { paymentsRouter } from "./payments";
 import { questionSetsRouter } from "./question-sets";
 import { questionsRouter } from "./questions";
 import { subjectsRouter } from "./subjects";
@@ -12,4 +13,5 @@ export const adminRouter = createRouter()
   .merge("chapters.", chaptersRouter)
   .merge("questions.", questionsRouter)
   .merge("notes.", notesRouter)
-  .merge("sets.", questionSetsRouter);
+  .merge("sets.", questionSetsRouter)
+  .merge("payments.", paymentsRouter);

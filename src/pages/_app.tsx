@@ -39,7 +39,7 @@ const MuiTheme = ({ children }: { children: ReactNode }) => {
         palette: {
           mode,
           primary: {
-            main: orange[500],
+            main: orange[600],
           },
         },
       }),

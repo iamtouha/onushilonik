@@ -38,6 +38,14 @@ model Session {
      
 }
 
+model VerificationToken {
+    identifier      String
+    token           String   @unique
+    expires         DateTime
+
+    @@unique([identifier, token])
+}
+
 model User {
     id              String    @id @default(cuid())
     name            String?
@@ -77,18 +85,11 @@ model Subscription {
     userId          String   @unique
     user            User     @relation("subscriber",fields: [userId], references: [id], onDelete: Cascade)
     phoneNumber     String?
-    status          SUBSCRIPTION_STATUS @default(INACTIVE)
-    expires         DateTime?
     payments        Payment[]
     createdAt       DateTime @default(now())
     updatedAt       DateTime @updatedAt
     updatedBy       User?    @relation("sub_updater", fields: [updatedById], references: [id])
     updatedById     String? 
-}
-
-enum SUBSCRIPTION_STATUS {
-    ACTIVE
-    INACTIVE
 }
 
 model Payment {
@@ -98,9 +99,10 @@ model Payment {
     status          PAYMENT_STATUS @default(PENDING)
     method          PAYMENT_METHOD
     currency        CURRENCY @default(BDT)
-    amount          Int
+    plan            PLAN @default(MONTHLY)
     paymentId       String
     transactionId   String @unique
+    approvedAt      DateTime?
     createdAt       DateTime @default(now())
     updatedAt       DateTime @updatedAt
 }
@@ -113,19 +115,14 @@ enum PAYMENT_METHOD {
     ROCKET
     NAGAD
 }
-
 enum PAYMENT_STATUS {
     PENDING
     SUCCESS
     FAILED
 }
-
-model VerificationToken {
-    identifier      String
-    token           String   @unique
-    expires         DateTime
-
-    @@unique([identifier, token])
+enum PLAN {
+    MONTHLY
+    QUARTERLY
 }
 
 model Subject {
@@ -199,7 +196,6 @@ model QuestionSet {
     createdById     String?
     updatedBy       User?    @relation("set_updater", fields: [updatedById], references: [id], onDelete:NoAction )
     updatedById     String?
- 
 }
 
 model QuestionsOnSets {
