@@ -56,11 +56,7 @@ function Account() {
               id: "transactionId",
               label: "Transaction Id",
             },
-            {
-              id: "amount",
-              label: "Amount",
-              cell: ({ amount }) => `${amount} BDT`,
-            },
+
             {
               id: "createdAt",
               label: "Payment Time",
