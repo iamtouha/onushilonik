@@ -1,9 +1,9 @@
 import { PAYMENT_METHOD, PAYMENT_STATUS } from "@prisma/client";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
-import { createAdminRouter } from "./admin-router";
+import { createSuperAdminRouter } from "./superadmin-router";
 
-export const paymentsRouter = createAdminRouter()
+export const paymentsRouter = createSuperAdminRouter()
   .query("getAll", {
     input: z.object({
       page: z.number().int(),

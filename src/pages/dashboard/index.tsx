@@ -20,8 +20,9 @@ import StickyNote2Icon from "@mui/icons-material/StickyNote2";
 import PaymentIcon from "@mui/icons-material/Payment";
 import { NextPageWithLayout } from "../_app";
 import DashboardLayout from "@/layouts/DashboardLayout";
+import { useSession } from "next-auth/react";
 
-const routes = [
+const adminRoutes = [
   { name: "Subjects", href: "/dashboard/subjects", icon: BookIcon },
   { name: "Chapters", href: "/dashboard/chapters", icon: MenuBookIcon },
   { name: "Questions", href: "/dashboard/questions", icon: QuizIcon },
@@ -31,11 +32,18 @@ const routes = [
     href: "/dashboard/question-sets",
     icon: ListAltIcon,
   },
+];
+
+const superAdminRoutes = [
+  ...adminRoutes,
   { name: "Users", href: "/dashboard/users", icon: SupervisedUserCircleIcon },
   { name: "Payments", href: "/dashboard/payments", icon: PaymentIcon },
 ];
 
 const DashboardHome: NextPageWithLayout = () => {
+  const { data: session } = useSession({ required: true });
+  const routes =
+    session?.user?.role === "SUPER_ADMIN" ? superAdminRoutes : adminRoutes;
   return (
     <>
       <Head>

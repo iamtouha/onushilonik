@@ -1,9 +1,9 @@
 import { USER_ROLE } from "@prisma/client";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
-import { createAdminRouter } from "./admin-router";
+import { createSuperAdminRouter } from "./superadmin-router";
 
-export const usersRouter = createAdminRouter()
+export const usersRouter = createSuperAdminRouter()
   .query("getAll", {
     input: z.object({
       page: z.number().int(),
@@ -132,6 +132,35 @@ export const usersRouter = createAdminRouter()
       const user = await ctx.prisma.user.update({
         where: { id: input.id },
         data: { active: input.active },
+      });
+      return user;
+    },
+  })
+  .mutation("delete", {
+    input: z.string(),
+    async resolve({ ctx, input }) {
+      if (ctx.session.user.id === input) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "You can't delete yourself!",
+        });
+      }
+      const userData = await ctx.prisma.user.findUnique({
+        where: { id: input },
+      });
+      if (!userData) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "User not found!" });
+      }
+
+      if (userData.role !== USER_ROLE.USER) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "You can't delete an admin!",
+        });
+      }
+
+      const user = await ctx.prisma.user.delete({
+        where: { id: input },
       });
       return user;
     },
