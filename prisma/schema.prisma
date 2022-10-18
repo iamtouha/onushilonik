@@ -190,6 +190,7 @@ model QuestionSet {
     questions       QuestionsOnSets[]
     answerSheets    AnswerSheet[]
     published       Boolean  @default(true)
+    trial           Boolean  @default(false)
     createdAt       DateTime @default(now())
     updatedAt       DateTime @updatedAt
     createdBy       User?    @relation("set_creator", fields: [createdById], references: [id], onDelete:NoAction )
