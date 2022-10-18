@@ -51,7 +51,9 @@ function HomepageLayout(props: Props) {
             <Box sx={{ mr: 2, ml: "auto" }}>
               <IconButton
                 sx={{ mr: 1 }}
-                onClick={() => toggleColorMode()}
+                onClick={() =>
+                  toggleColorMode(mode === "dark" ? "light" : "dark")
+                }
                 color="inherit"
               >
                 {mode === "dark" ? <Brightness4Icon /> : <Brightness7Icon />}

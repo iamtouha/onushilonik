@@ -20,6 +20,7 @@ import Brightness4Icon from "@mui/icons-material/Brightness4";
 import Brightness7Icon from "@mui/icons-material/Brightness7";
 import ColorModeContext from "@/contexts/ColorModeContext";
 import AdminNavGuard from "@/components/AdminNavGuard";
+import ColorModeToggle from "@/components/ColormodeToggle";
 
 type Props = { children: React.ReactNode };
 
@@ -58,13 +59,6 @@ function DashboardLayout({ children }: Props) {
 
           <Box>
             <IconButton
-              sx={{ mr: 1 }}
-              onClick={() => toggleColorMode()}
-              color="inherit"
-            >
-              {mode === "dark" ? <Brightness4Icon /> : <Brightness7Icon />}
-            </IconButton>
-            <IconButton
               id="basic-button"
               aria-controls={open ? "basic-menu" : undefined}
               aria-haspopup="true"
@@ -101,6 +95,11 @@ function DashboardLayout({ children }: Props) {
                   />
                 </ListItem>
               </List>
+              <Box
+                sx={{ display: "flex", justifyContent: "center", my: 1, px: 1 }}
+              >
+                <ColorModeToggle />
+              </Box>
               <Divider />
               <NextLink href={"/api/auth/signout"} passHref>
                 <MenuItem component="a" sx={{ mt: 1 }}>

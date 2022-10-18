@@ -27,6 +27,7 @@ import WarningIcon from "@mui/icons-material/Warning";
 import Brightness4Icon from "@mui/icons-material/Brightness4";
 import Brightness7Icon from "@mui/icons-material/Brightness7";
 import ColorModeContext from "@/contexts/ColorModeContext";
+import ColorModeToggle from "@/components/ColormodeToggle";
 
 const routes = [
   { title: "হোম পেজ", href: "/app" },
@@ -58,7 +59,6 @@ type Props = { children: React.ReactNode; window?: () => Window };
 
 function DefaultLayout(props: Props) {
   const router = useRouter();
-  const [mode, toggleColorMode] = useContext(ColorModeContext);
   const { window, children } = props;
   const [mobileOpen, setMobileOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -162,13 +162,6 @@ function DefaultLayout(props: Props) {
           </Box>
           <Box sx={{ display: { xs: "none", md: "block" }, ml: "auto", mr: 2 }}>
             <IconButton
-              sx={{ mr: 1 }}
-              onClick={() => toggleColorMode()}
-              color="inherit"
-            >
-              {mode === "dark" ? <Brightness4Icon /> : <Brightness7Icon />}
-            </IconButton>
-            <IconButton
               id="basic-button"
               aria-controls={open ? "basic-menu" : undefined}
               aria-haspopup="true"
@@ -206,7 +199,12 @@ function DefaultLayout(props: Props) {
                 </ListItem>
               </NextLink>
 
-              <Divider />
+              <Box
+                sx={{ display: "flex", justifyContent: "center", my: 1, px: 1 }}
+              >
+                <ColorModeToggle />
+              </Box>
+
               {session?.user?.role.includes("ADMIN") && (
                 <NextLink href="/dashboard" passHref>
                   <MenuItem component="a" sx={{ mt: 1 }}>
@@ -289,7 +287,11 @@ function DefaultLayout(props: Props) {
                 ></ListItemText>
               </ListItem>
             </NextLink>
-
+            <Box
+              sx={{ display: "flex", justifyContent: "center", my: 1, px: 1 }}
+            >
+              <ColorModeToggle />
+            </Box>
             {session?.user?.role.includes("ADMIN") && (
               <ListItem sx={{ mt: 0 }}>
                 <NextLink href="/dashboard" passHref>
