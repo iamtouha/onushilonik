@@ -1,4 +1,4 @@
-import { useState, useContext } from "react";
+import { useState } from "react";
 import NextLink from "next/link";
 import { useSession } from "next-auth/react";
 import Box from "@mui/material/Box";
@@ -16,16 +16,12 @@ import ListItemText from "@mui/material/ListItemText";
 import Divider from "@mui/material/Divider";
 import LogoutIcon from "@mui/icons-material/Logout";
 import LaunchIcon from "@mui/icons-material/Launch";
-import Brightness4Icon from "@mui/icons-material/Brightness4";
-import Brightness7Icon from "@mui/icons-material/Brightness7";
-import ColorModeContext from "@/contexts/ColorModeContext";
 import AdminNavGuard from "@/components/AdminNavGuard";
-import ColorModeToggle from "@/components/ColormodeToggle";
+import ColorModeToggle from "@/components/ColorModeToggle";
 
 type Props = { children: React.ReactNode };
 
 function DashboardLayout({ children }: Props) {
-  const [mode, toggleColorMode] = useContext(ColorModeContext);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
 

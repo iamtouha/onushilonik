@@ -20,6 +20,7 @@ import { format } from "date-fns";
 type ColumnFilter = { id: string; value: unknown };
 type ColumnSort = { id: string; desc: boolean };
 type QuestionSetWithCount = QuestionSet & { _count: { questions: number } };
+type SortType = "createdAt" | "code" | "title" | "type" | "published" | "trial";
 
 const QuestionSets: NextPageWithLayout = () => {
   const router = useRouter();
@@ -39,12 +40,7 @@ const QuestionSets: NextPageWithLayout = () => {
       {
         page: pagination.pageIndex,
         pageSize: pagination.pageSize,
-        sortBy: sorting[0]?.id as
-          | "createdAt"
-          | "code"
-          | "title"
-          | "type"
-          | "published",
+        sortBy: sorting[0]?.id as SortType,
         sortDesc: sorting[0]?.desc,
         type: columnFilters.find((f) => f.id === "type")?.value as SET_TYPE,
         title: columnFilters.find((f) => f.id === "title")?.value as string,
@@ -86,6 +82,12 @@ const QuestionSets: NextPageWithLayout = () => {
         enableColumnFilter: false,
       },
       {
+        accessorKey: "trial",
+        header: "Free Trial",
+        Cell: ({ cell }) => (cell.getValue() ? "Yes" : ""),
+        enableColumnFilter: false,
+      },
+      {
         accessorKey: "createdAt",
         header: "Added at",
         Cell: ({ cell }) =>
@@ -108,7 +110,7 @@ const QuestionSets: NextPageWithLayout = () => {
       <Head>
         <title>Question Sets | Onushilonik Dashboard</title>
       </Head>
-      <Container sx={{ mt: 2 }}>
+      <Container maxWidth="xl" sx={{ mt: 2 }}>
         <Breadcrumbs sx={{ mb: 1, ml: -1 }} aria-label="breadcrumb">
           <NextLink href="/app" passHref>
             <IconButton component="a">

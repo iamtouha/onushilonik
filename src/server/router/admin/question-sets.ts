@@ -14,7 +14,7 @@ export const questionSetsRouter = createAdminRouter()
       code: z.string().optional(),
       type: z.nativeEnum(SET_TYPE).optional(),
       sortBy: z
-        .enum(["createdAt", "title", "type", "code", "published"])
+        .enum(["createdAt", "title", "type", "code", "published", "trial"])
         .optional(),
       sortDesc: z.boolean().optional(),
     }),
@@ -150,6 +150,7 @@ export const questionSetsRouter = createAdminRouter()
       code: z.string().min(2).max(100),
       type: z.nativeEnum(SET_TYPE),
       published: z.boolean(),
+      trial: z.boolean(),
       questions: z.string().array(),
     }),
     async resolve({ ctx, input }) {
@@ -161,6 +162,7 @@ export const questionSetsRouter = createAdminRouter()
             title,
             code,
             published,
+            trial: input.trial,
             questions: {
               deleteMany: {},
               create: questions.map((id, i) => ({

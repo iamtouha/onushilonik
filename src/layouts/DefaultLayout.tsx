@@ -1,4 +1,4 @@
-import { useState, useContext, useEffect } from "react";
+import { useState, useEffect } from "react";
 import NextLink from "next/link";
 import { useRouter } from "next/router";
 import { signOut, useSession } from "next-auth/react";
@@ -24,10 +24,7 @@ import MenuIcon from "@mui/icons-material/Menu";
 import SpeedIcon from "@mui/icons-material/Speed";
 import CloseIcon from "@mui/icons-material/Close";
 import WarningIcon from "@mui/icons-material/Warning";
-import Brightness4Icon from "@mui/icons-material/Brightness4";
-import Brightness7Icon from "@mui/icons-material/Brightness7";
-import ColorModeContext from "@/contexts/ColorModeContext";
-import ColorModeToggle from "@/components/ColormodeToggle";
+import ColorModeToggle from "@/components/ColorModeToggle";
 
 const routes = [
   { title: "হোম পেজ", href: "/app" },

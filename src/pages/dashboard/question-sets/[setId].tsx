@@ -51,6 +51,7 @@ interface QuestionSetForm {
   title: string;
   type: SET_TYPE;
   published: boolean;
+  trial: boolean;
 }
 type Qs = { code: string; stem: string; id: string };
 
@@ -62,6 +63,7 @@ const validationSchema = yup.object().shape({
     .oneOf([Object.values(SET_TYPE)])
     .required("Set type is required"),
   published: yup.boolean(),
+  trial: yup.boolean(),
 });
 
 const NewQuestionSet: NextPageWithLayout = () => {
@@ -87,6 +89,7 @@ const NewQuestionSet: NextPageWithLayout = () => {
         title: data.title,
         type: data.type,
         published: data.published,
+        trial: data.trial,
       });
       setAllQuestions(
         data.questions.map((q) => ({ code: q.code, stem: q.stem, id: q.id }))
@@ -160,6 +163,7 @@ const NewQuestionSet: NextPageWithLayout = () => {
       title: "",
       code: "",
       published: true,
+      trial: false,
       type: SET_TYPE.MODEL_TEST,
     },
     validationSchema,
@@ -210,7 +214,7 @@ const NewQuestionSet: NextPageWithLayout = () => {
       <Head>
         <title>New Questions Set | Onushilonik Dashboard</title>
       </Head>
-      <Container sx={{ mt: 2 }}>
+      <Container maxWidth="xl" sx={{ mt: 2 }}>
         <Breadcrumbs sx={{ mb: 1, ml: -1 }} aria-label="breadcrumb">
           <NextLink href="/app" passHref>
             <IconButton component="a">
@@ -293,16 +297,33 @@ const NewQuestionSet: NextPageWithLayout = () => {
                   error={formik.touched.title && !!formik.errors.title}
                   helperText={formik.touched.title && formik.errors.title}
                 />
-                <Box sx={{ mb: 2, mx: 2 }}>
-                  <FormControlLabel
-                    control={
-                      <Android12Switch checked={formik.values.published} />
-                    }
-                    name="published"
-                    onChange={formik.handleChange}
-                    label="Publish"
-                  />
-                </Box>
+
+                <Grid container spacing={2}>
+                  <Grid item xs={12} md={6}>
+                    <Box sx={{ mb: 2, mx: 2 }}>
+                      <FormControlLabel
+                        control={
+                          <Android12Switch checked={formik.values.published} />
+                        }
+                        name="published"
+                        onChange={formik.handleChange}
+                        label="Publish"
+                      />
+                    </Box>
+                  </Grid>
+                  <Grid item xs={12} md={6}>
+                    <Box sx={{ mb: 2, mx: 2 }}>
+                      <FormControlLabel
+                        control={
+                          <Android12Switch checked={formik.values.trial} />
+                        }
+                        name="trial"
+                        onChange={formik.handleChange}
+                        label="Free Trial"
+                      />
+                    </Box>
+                  </Grid>
+                </Grid>
                 <Grid container spacing={2}>
                   <Grid item xs={12} md={6}>
                     <FormControl sx={{ mb: 2 }} fullWidth>

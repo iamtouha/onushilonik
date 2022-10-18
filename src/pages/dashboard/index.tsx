@@ -5,7 +5,6 @@ import Container from "@mui/material/Container";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import CardActionArea from "@mui/material/CardActionArea";
-import Avatar from "@mui/material/Avatar";
 import Typography from "@mui/material/Typography";
 import Breadcrumbs from "@mui/material/Breadcrumbs";
 import Grid from "@mui/material/Unstable_Grid2";
@@ -21,6 +20,7 @@ import PaymentIcon from "@mui/icons-material/Payment";
 import { NextPageWithLayout } from "../_app";
 import DashboardLayout from "@/layouts/DashboardLayout";
 import { useSession } from "next-auth/react";
+import ColorModeContext from "@/contexts/ColorModeContext";
 
 const adminRoutes = [
   { name: "Subjects", href: "/dashboard/subjects", icon: BookIcon },
@@ -41,6 +41,7 @@ const superAdminRoutes = [
 ];
 
 const DashboardHome: NextPageWithLayout = () => {
+  const [mode] = React.useContext(ColorModeContext);
   const { data: session } = useSession({ required: true });
   const routes =
     session?.user?.role === "SUPER_ADMIN" ? superAdminRoutes : adminRoutes;
@@ -49,7 +50,7 @@ const DashboardHome: NextPageWithLayout = () => {
       <Head>
         <title>Home | Onushilonik Dashboard</title>
       </Head>
-      <Container sx={{ mt: 2 }}>
+      <Container maxWidth="xl" sx={{ mt: 2 }}>
         <Breadcrumbs sx={{ mb: 1, ml: -1 }} aria-label="breadcrumb">
           <NextLink href="/app" passHref>
             <IconButton component="a">
@@ -64,17 +65,15 @@ const DashboardHome: NextPageWithLayout = () => {
         </Typography>
         <Grid container spacing={{ xs: 2, md: 4 }}>
           {routes.map((route) => (
-            <Grid xs={6} sm={4} md={3} lg={3} key={route.name}>
-              <Card>
+            <Grid xs={12} sm={6} md={3} key={route.name}>
+              <Card variant={mode === "dark" ? "elevation" : "outlined"}>
                 <NextLink href={route.href} passHref>
                   <CardActionArea component="a">
-                    <CardContent>
-                      <Avatar sx={{ mx: "auto", width: 60, height: 60 }}>
-                        <route.icon sx={{ fontSize: 44 }} />
-                      </Avatar>
-                      <Typography variant="h6" align="center" sx={{ mt: 2 }}>
-                        {route.name}
-                      </Typography>
+                    <CardContent
+                      sx={{ display: "flex", alignItems: "center", gap: 2 }}
+                    >
+                      <route.icon sx={{ fontSize: 44 }} />
+                      <Typography variant="h6">{route.name}</Typography>
                     </CardContent>
                   </CardActionArea>
                 </NextLink>

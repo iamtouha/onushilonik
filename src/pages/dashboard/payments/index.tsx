@@ -101,7 +101,7 @@ const Payments: NextPageWithLayout = () => {
       <Head>
         <title>Payments | Onushilonik Dashboard</title>
       </Head>
-      <Container sx={{ mt: 2 }}>
+      <Container maxWidth="xl" sx={{ mt: 2 }}>
         <Breadcrumbs sx={{ mb: 1, ml: -1 }} aria-label="breadcrumb">
           <NextLink href="/app" passHref>
             <IconButton component="a">
