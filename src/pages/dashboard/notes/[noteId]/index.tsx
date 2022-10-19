@@ -6,6 +6,8 @@ import { useFormik } from "formik";
 import { format } from "date-fns";
 import * as yup from "yup";
 import ReactMarkdown from "react-markdown";
+import rehypeRaw from "rehype-raw";
+import remarkGfm from "remark-gfm";
 import { toast } from "react-toastify";
 import { styled } from "@mui/material/styles";
 import Alert from "@mui/material/Alert";
@@ -190,7 +192,7 @@ const AddNote: NextPageWithLayout = () => {
                 <Box
                   component="form"
                   onSubmit={formik.handleSubmit}
-                  sx={{ pb: 10 }}
+                  sx={{ pb: { lg: 4, xs: 1 } }}
                 >
                   <Grid container spacing={2}>
                     <Grid xs={6}>
@@ -323,7 +325,7 @@ const AddNote: NextPageWithLayout = () => {
                   </Button>
                 </Box>
                 <Typography
-                  sx={{ mt: 4 }}
+                  sx={{ mt: { xs: 1, lg: 3 } }}
                   variant="body2"
                   color={"GrayText"}
                   gutterBottom
@@ -341,7 +343,28 @@ const AddNote: NextPageWithLayout = () => {
               </Grid>
               <Grid xs={12} md={6}>
                 {content.length ? (
-                  <ReactMarkdown>{content}</ReactMarkdown>
+                  <Box
+                    sx={{
+                      "& img": {
+                        width: "100%",
+                        height: "auto",
+                        display: "block",
+                        margin: "auto",
+                        maxWidth: 600,
+                      },
+                      "& table, & th, & td": {
+                        borderCollapse: "collapse",
+                        border: 1,
+                      },
+                      "& th, & td": {
+                        padding: "2px 8px",
+                      },
+                    }}
+                  >
+                    <ReactMarkdown rehypePlugins={[remarkGfm, rehypeRaw]}>
+                      {content}
+                    </ReactMarkdown>
+                  </Box>
                 ) : (
                   <Typography variant="body1" color="GrayText">
                     <i>Markdown Preview wil appear here</i>
