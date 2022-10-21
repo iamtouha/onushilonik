@@ -253,17 +253,25 @@ model AnswerSheet {
     questionSetId   String
     answers         Answer[]
     createdAt       DateTime @default(now())
+    status          ANSWERSHEET_STATUS @default(ONGOING)
+    expireAt        DateTime?
     updatedAt       DateTime @updatedAt
+}
+
+enum ANSWERSHEET_STATUS {
+    ONGOING
+    SUBMITTED
 }
 
 model Answer {
     id              String   @id @default(cuid())
-    option          OPTION
-    question        Question @relation(fields: [questionId], references: [id])
     answerSheet     AnswerSheet @relation(fields: [answerSheetId], references: [id])
     answerSheetId   String
+    question        Question @relation(fields: [questionId], references: [id])
     questionId      String
+    option          OPTION
     createdAt       DateTime @default(now())
+    @@unique([answerSheetId, questionId])
 }
 
 enum OPTION {

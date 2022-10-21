@@ -36,6 +36,8 @@ export const questionSetRouter = createProtectedRouter()
             orderBy: { createdAt: "desc" },
             select: {
               id: true,
+              status: true,
+              expireAt: true,
               createdAt: true,
               answers: {
                 select: {
@@ -56,16 +58,6 @@ export const questionSetRouter = createProtectedRouter()
           message: "Question set not found",
         });
       }
-      const mark = trialSet.answerSheets.map((sheet) => {
-        let total = 0;
-        sheet.answers.forEach((answer) => {
-          if (answer.question.correctOption === answer.option) total++;
-        });
-        return { id: sheet.id, mark: total / trialSet.questions.length };
-      });
-      return {
-        set: trialSet,
-        marks: mark,
-      };
+      return trialSet;
     },
   });

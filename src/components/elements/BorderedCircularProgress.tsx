@@ -6,7 +6,7 @@ import CircularProgress, {
 import CircularProgressWithLabel from "./CircularProgressWithLabel";
 
 export default function BorderedCircularProgress(
-  props: CircularProgressProps & { value: number }
+  props: CircularProgressProps & { value: number; label: string }
 ) {
   return (
     <Box sx={{ position: "relative" }}>
@@ -21,7 +21,6 @@ export default function BorderedCircularProgress(
         value={100}
       />
       <CircularProgressWithLabel
-        disableShrink
         sx={{
           left: 0,
           [`& .${circularProgressClasses.circle}`]: {
@@ -29,6 +28,7 @@ export default function BorderedCircularProgress(
           },
         }}
         {...props}
+        label={props.label}
         value={props.value}
       />
     </Box>

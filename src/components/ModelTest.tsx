@@ -9,7 +9,7 @@ import SheetContext from "@/contexts/SheetContext";
 const ModelTest = () => {
   const router = useRouter();
   const query = router.query;
-  const { questionSet } = useContext(SheetContext);
+  const { questionSet, answerSheet } = useContext(SheetContext);
 
   useEffect(() => {
     if (!questionSet) return;
@@ -26,25 +26,25 @@ const ModelTest = () => {
     }
   }, [query.q, JSON.stringify(questionSet?.questions)]);
 
-  useEffect(() => {
-    const beforeUnload = (e: BeforeUnloadEvent) => {
-      e.preventDefault();
-      e.returnValue = "";
-    };
-    const handleRouteChange = () => {
-      console.log("route change");
-    };
-    router.events.on("routeChangeStart", (e) => {
-      console.log(e);
-    });
-    window.addEventListener("beforeunload", beforeUnload);
-    return () => {
-      router.events.off("routeChangeStart", handleRouteChange);
-      window.removeEventListener("beforeunload", beforeUnload);
-    };
-  }, []);
+  // useEffect(() => {
+  //   const beforeUnload = (e: BeforeUnloadEvent) => {
+  //     e.preventDefault();
+  //     e.returnValue = "";
+  //   };
+  //   const handleRouteChange = () => {
+  //     console.log("route change");
+  //   };
+  //   router.events.on("routeChangeStart", (e) => {
+  //     console.log(e);
+  //   });
+  //   window.addEventListener("beforeunload", beforeUnload);
+  //   return () => {
+  //     router.events.off("routeChangeStart", handleRouteChange);
+  //     window.removeEventListener("beforeunload", beforeUnload);
+  //   };
+  // }, []);
 
-  if (!questionSet) return <></>;
+  if (!questionSet || !answerSheet) return <></>;
 
   return (
     <Box sx={{ my: 4 }}>

@@ -26,7 +26,7 @@ const TrialQuestionSet: NextPageWithLayout = () => {
     {
       enabled: !!query.id,
       onSuccess: (data) => {
-        if (data) setQuestionSet(data.set);
+        if (data) setQuestionSet(data);
       },
     }
   );

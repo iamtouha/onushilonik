@@ -1,4 +1,4 @@
-import { OPTION } from "@prisma/client";
+import { ANSWERSHEET_STATUS, OPTION } from "@prisma/client";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { createProtectedRouter } from "./protected-router";
@@ -30,8 +30,21 @@ export const answerSheetRouter = createProtectedRouter()
       id: z.string(),
     }),
     async resolve({ ctx, input }) {
+      const questionSet = await ctx.prisma.questionSet.findUnique({
+        where: { id: input.id },
+      });
+      if (!questionSet) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Question set not found",
+        });
+      }
       return await ctx.prisma.answerSheet.create({
         data: {
+          expireAt:
+            questionSet.duration > 0
+              ? new Date(Date.now() + questionSet.duration * 60 * 1000)
+              : undefined,
           questionSetId: input.id,
           userId: ctx.session.user.id,
         },
@@ -53,6 +66,18 @@ export const answerSheetRouter = createProtectedRouter()
         throw new TRPCError({
           code: "NOT_FOUND",
           message: "Answer sheet not found",
+        });
+      }
+      if (answerSheet.expireAt && answerSheet.expireAt.getTime() < Date.now()) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Answer sheet expired",
+        });
+      }
+      if (answerSheet.status !== ANSWERSHEET_STATUS.ONGOING) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Test is already submitted",
         });
       }
       return await ctx.prisma.answer.create({

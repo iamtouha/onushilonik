@@ -3,6 +3,7 @@ import { useRouter } from "next/router";
 import Box from "@mui/material/Box";
 import Alert from "@mui/material/Alert";
 import Button from "@mui/material/Button";
+import LoadingButton from "@mui/lab/LoadingButton";
 import IconButton from "@mui/material/IconButton";
 import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
@@ -15,8 +16,9 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import { OPTION } from "@prisma/client";
 import { trpc } from "@/utils/trpc";
-import { Question } from "./QuestionSkeleton";
+import { Question as QuestionLoading } from "./QuestionSkeleton";
 import SheetContext from "@/contexts/SheetContext";
+import { toast } from "react-toastify";
 
 export default function QuestionSheet() {
   const router = useRouter();
@@ -27,13 +29,52 @@ export default function QuestionSheet() {
     [JSON.stringify(questionSet?.questions)]
   );
   const [selectedQuestion, setSelectedQuestion] = useState<string>();
+  const [selectedOption, setSelectedOption] = useState<OPTION>();
   const {
     data: question,
     isLoading,
     isError,
-  } = trpc.useQuery(["question.get", { id: selectedQuestion ?? "" }], {
-    enabled: !!selectedQuestion,
-  });
+  } = trpc.useQuery(
+    [
+      "question.get-answer",
+      { id: selectedQuestion ?? "", sheetId: answerSheet?.id ?? "" },
+    ],
+    { enabled: !!selectedQuestion && !!answerSheet?.id }
+  );
+
+  const answerQuestionMutation = trpc.useMutation("answersheet.add-answer");
+
+  const answer = useMemo(
+    () => question?.answers[0] ?? null,
+    [JSON.stringify(question)]
+  );
+  const navigation = useMemo(
+    () => ({
+      next: questions.find((q) => q.order === order + 1)?.order,
+      prev: questions.find((q) => q.order === order - 1)?.order,
+    }),
+    [order, JSON.stringify(questions)]
+  );
+  const answerQuestion = () => {
+    if (!selectedQuestion || !answerSheet) return;
+    if (!selectedOption) {
+      toast.error("Please select the correct option");
+      return;
+    }
+    answerQuestionMutation.mutate({
+      answerSheetId: answerSheet?.id,
+      questionId: selectedQuestion,
+      option: selectedOption,
+    });
+  };
+
+  const navigateTo = (order: number) => {
+    router.push(
+      { pathname: router.pathname, query: { ...router.query, q: order } },
+      undefined,
+      { shallow: true }
+    );
+  };
 
   useEffect(() => {
     if (!order) return;
@@ -43,20 +84,14 @@ export default function QuestionSheet() {
     }
   }, [order, JSON.stringify(questions)]);
 
-  const navigation = useMemo(
-    () => ({
-      next: questions.find((q) => q.order === order + 1)?.order,
-      prev: questions.find((q) => q.order === order - 1)?.order,
-    }),
-    [order, JSON.stringify(questions)]
-  );
-  const navigateTo = (order: number) => {
-    router.push(
-      { pathname: router.pathname, query: { ...router.query, q: order } },
-      undefined,
-      { shallow: true }
-    );
-  };
+  useEffect(() => {
+    setSelectedOption(undefined);
+  }, [order, JSON.stringify(question)]);
+  useEffect(() => {
+    if (answer) {
+      setSelectedOption(answer.option);
+    }
+  }, [JSON.stringify(answer)]);
 
   return (
     <Box>
@@ -79,7 +114,7 @@ export default function QuestionSheet() {
               Could not load the question set. Please try again.
             </Alert>
           )}
-          {isLoading && <Question />}
+          {isLoading && <QuestionLoading />}
           {question && (
             <Box sx={{ my: 2 }}>
               <Typography variant="body1" component="p" gutterBottom>
@@ -95,6 +130,10 @@ export default function QuestionSheet() {
                 <RadioGroup
                   aria-labelledby="option-group-input-label"
                   name="option-buttons-group"
+                  value={selectedOption ?? ""}
+                  onChange={(e, val) => {
+                    if (!answer) setSelectedOption(val as OPTION);
+                  }}
                 >
                   <FormControlLabel
                     value={OPTION.A}
@@ -119,9 +158,15 @@ export default function QuestionSheet() {
                 </RadioGroup>
               </FormControl>
               <Box sx={{ mt: 2, display: "flex", gap: 1 }}>
-                <Button size="large" variant={"outlined"} disableElevation>
-                  Submit answer
-                </Button>
+                <LoadingButton
+                  size="large"
+                  variant={"outlined"}
+                  disabled={!!answer}
+                  onClick={answerQuestion}
+                  loading={answerQuestionMutation.isLoading}
+                >
+                  {!!answer ? "Answer Submitted" : "Submit answer"}
+                </LoadingButton>
                 <div style={{ marginRight: 0, marginLeft: "auto" }} />
                 <IconButton
                   color="primary"

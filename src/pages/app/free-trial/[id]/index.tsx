@@ -14,18 +14,34 @@ import LinearProgress from "@mui/material/LinearProgress";
 import { trpc } from "@/utils/trpc";
 import { toast } from "react-toastify";
 import { format } from "date-fns";
-import CircularProgressWithLabel from "@/components/elements/CircularProgressWithLabel";
 import BorderedCircularProgress from "@/components/elements/BorderedCircularProgress";
+import { ANSWERSHEET_STATUS, OPTION } from "@prisma/client";
+
+type SheetType = {
+  status: ANSWERSHEET_STATUS;
+  createdAt: Date;
+  id: string;
+  answers: {
+    question: {
+      id: string;
+      correctOption: OPTION;
+    };
+    id: string;
+    option: OPTION;
+  }[];
+  expireAt: Date | null;
+};
 
 const TrialQuestionSet = () => {
   const router = useRouter();
   const query = router.query;
-  const { data, isLoading, isError } = trpc.useQuery(
-    ["questionset.trial-set", { id: query.id as string }],
-    {
-      enabled: !!query.id,
-    }
-  );
+  const {
+    data: qsSet,
+    isLoading,
+    isError,
+  } = trpc.useQuery(["questionset.trial-set", { id: query.id as string }], {
+    enabled: !!query.id,
+  });
 
   const newTestMutation = trpc.useMutation("answersheet.create", {
     onError: () => {
@@ -34,15 +50,31 @@ const TrialQuestionSet = () => {
   });
 
   const startTest = async () => {
-    if (!data?.set) return;
+    if (!qsSet) return;
     await newTestMutation
-      .mutateAsync({ id: data.set.id })
+      .mutateAsync({ id: qsSet.id })
       .then((res) => {
         router.push(`${router.asPath}/${res.id}`);
       })
       .catch(() => {
         console.log("Error");
       });
+  };
+
+  const calculateResult = (sheet: SheetType) => {
+    const correct = sheet.answers.filter(
+      (a) => a.question.correctOption === a.option
+    ).length;
+    const total = sheet.answers.length;
+    const result = { label: `${correct}/${total}`, value: correct / total };
+    const notResult = { label: "Ongoing", value: 0 };
+    if (sheet.status === ANSWERSHEET_STATUS.SUBMITTED) {
+      return result;
+    }
+    if (sheet.expireAt && sheet.expireAt.getTime() < new Date().getTime()) {
+      return result;
+    }
+    return notResult;
   };
 
   return (
@@ -66,24 +98,24 @@ const TrialQuestionSet = () => {
           Could not load the question set. Please try again.
         </Alert>
       )}
-      {data?.set && (
+      {qsSet && (
         <Container sx={{ mt: 4 }}>
           <Typography variant="h4" component="h1" gutterBottom>
-            {data.set.title}
+            {qsSet.title}
           </Typography>
           <Typography variant="h5" component="h2" sx={{ my: 4 }}>
             Your Attampts:
           </Typography>
           <Grid container spacing={2}>
-            {data.set.answerSheets.map((sheet, i) => (
-              <Grid xs={12} sm={6} md={4} key={sheet.id}>
+            {qsSet.answerSheets.map((sheet, i) => (
+              <Grid item xs={12} sm={6} md={4} key={sheet.id}>
                 <NextLink href={`${router.asPath}/${sheet.id}`}>
                   <Card>
                     <CardActionArea>
                       <CardContent sx={{ display: "flex" }}>
                         <Box sx={{ flex: 1 }}>
                           <Typography color="textSecondary" variant="h5">
-                            Attampt {data.set.answerSheets.length - i}
+                            Attampt {qsSet.answerSheets.length - i}
                           </Typography>
                           <Typography color="textSecondary" gutterBottom>
                             {sheet.answers.length} questions answered
@@ -93,11 +125,16 @@ const TrialQuestionSet = () => {
                           </Typography>
                         </Box>
                         <Box>
-                          <BorderedCircularProgress
-                            color="success"
-                            size={80}
-                            value={(data.marks[i]?.mark ?? 0) * 100}
-                          />
+                          {
+                            <BorderedCircularProgress
+                              color="success"
+                              size={80}
+                              value={Math.round(
+                                calculateResult(sheet).value * 100
+                              )}
+                              label={calculateResult(sheet).label}
+                            />
+                          }
                         </Box>
                       </CardContent>
                     </CardActionArea>
@@ -106,12 +143,12 @@ const TrialQuestionSet = () => {
               </Grid>
             ))}
           </Grid>
-          {data?.set.answerSheets.length === 0 && (
+          {qsSet.answerSheets.length === 0 && (
             <Typography variant="body2" color={"GrayText"}>
               You have not attempts anything yet. Start now.
             </Typography>
           )}
-          {data?.set.answerSheets.length === 0 && (
+          {qsSet.answerSheets.length === 0 && (
             <NextLink href={`${router.asPath}/take-test`} passHref>
               <Button
                 variant="contained"
