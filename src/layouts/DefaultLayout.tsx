@@ -27,11 +27,11 @@ import WarningIcon from "@mui/icons-material/Warning";
 import ColorModeToggle from "@/components/ColorModeToggle";
 
 const routes = [
-  { title: "হোম পেজ", href: "/app" },
-  { title: "প্রশ্ন ব্যাংক", href: "/app/question-bank" },
-  { title: "বিগত বছরের প্রশ্নপত্র", href: "/app/prev-questions" },
-  { title: "মডেল টেস্ট", href: "/app/model-tests" },
-  { title: "শর্ট নোটস", href: "/app/short-notes" },
+  { title: "Home", href: "/app" },
+  { title: "Question Bank", href: "/app/question-bank" },
+  { title: "Previous year questions", href: "/app/prev-questions" },
+  { title: "Model Test", href: "/app/model-tests" },
+  { title: "Short Notes", href: "/app/short-notes" },
 ];
 
 const DrawerContent = () => {
@@ -149,8 +149,11 @@ function DefaultLayout(props: Props) {
               <NextLink key={route.href} href={route.href} passHref>
                 <Button
                   component="a"
-                  disabled={router.pathname === route.href}
-                  sx={{ color: "inherit", display: "block" }}
+                  sx={{
+                    color:
+                      router.pathname === route.href ? "primary" : "inherit",
+                    display: "block",
+                  }}
                 >
                   {route.title}
                 </Button>

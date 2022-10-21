@@ -42,6 +42,13 @@ const MuiTheme = ({ children }: { children: ReactNode }) => {
             main: orange[600],
           },
         },
+        components: {
+          MuiCard: {
+            defaultProps: {
+              variant: mode === "dark" ? "elevation" : "outlined",
+            },
+          },
+        },
       }),
     [mode]
   );

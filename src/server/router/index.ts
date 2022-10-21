@@ -1,15 +1,20 @@
-// src/server/router/index.ts
-import { createRouter } from "./context";
 import superjson from "superjson";
+import { createRouter } from "./context";
 import { adminRouter } from "./admin";
 import { subscriptionRouter } from "./subscription";
 import { accountRouter } from "./account";
+import { questionSetRouter } from "./questionset";
+import { questionRouter } from "./question";
+import { answerSheetRouter } from "./answersheet";
 
 export const appRouter = createRouter()
   .transformer(superjson)
   .merge("admin.", adminRouter)
   .merge("account.", accountRouter)
-  .merge("subscription.", subscriptionRouter);
+  .merge("subscription.", subscriptionRouter)
+  .merge("questionset.", questionSetRouter)
+  .merge("question.", questionRouter)
+  .merge("answersheet.", answerSheetRouter);
 
 // export type definition of API
 export type AppRouter = typeof appRouter;

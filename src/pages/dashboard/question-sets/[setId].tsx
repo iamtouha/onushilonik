@@ -1,22 +1,14 @@
-import { useState, useEffect } from "react";
+import { useState, useRef } from "react";
 import Head from "next/head";
 import NextLink from "next/link";
 import { useRouter } from "next/router";
-import { useFormik } from "formik";
-import * as yup from "yup";
 import { format } from "date-fns";
 import { toast } from "react-toastify";
 import Alert from "@mui/material/Alert";
 import LinearProgress from "@mui/material/LinearProgress";
 import Container from "@mui/material/Container";
 import Grid from "@mui/material/Grid";
-import InputLabel from "@mui/material/InputLabel";
-import MenuItem from "@mui/material/MenuItem";
-import FormControl from "@mui/material/FormControl";
-import Select from "@mui/material/Select";
-import FormControlLabel from "@mui/material/FormControlLabel";
 import Typography from "@mui/material/Typography";
-import TextField from "@mui/material/TextField";
 import Breadcrumbs from "@mui/material/Breadcrumbs";
 import Button from "@mui/material/Button";
 import IconButton from "@mui/material/IconButton";
@@ -42,39 +34,16 @@ import { NextPageWithLayout } from "@/pages/_app";
 import Link from "@/components/Link";
 import DashboardLayout from "@/layouts/DashboardLayout";
 import { trpc } from "@/utils/trpc";
-import { Android12Switch } from "@/components/CustomComponents";
-import { SET_TYPE } from "@prisma/client";
-import MultipleChipSelect from "@/components/MultipleChipSelect";
+import QuestionSetForm from "@/components/QuestionSetForm";
 
-interface QuestionSetForm {
-  code: string;
-  title: string;
-  type: SET_TYPE;
-  published: boolean;
-  trial: boolean;
-}
 type Qs = { code: string; stem: string; id: string };
 
-const validationSchema = yup.object().shape({
-  code: yup.string().min(2).max(100).required("Set Code is required"),
-  title: yup.string().min(2).max(255).required("Set Title is required"),
-  type: yup
-    .mixed()
-    .oneOf([Object.values(SET_TYPE)])
-    .required("Set type is required"),
-  published: yup.boolean(),
-  trial: yup.boolean(),
-});
-
 const NewQuestionSet: NextPageWithLayout = () => {
-  const [subjectId, setSubjectId] = useState<string>("");
-  const [chapterId, setChapterId] = useState<string>("");
-  const [selectedQuestions, setSelectedQuestions] = useState<string[]>([]);
-  const [allQuestions, setAllQuestions] = useState<Qs[]>([]);
-
+  const [addedQuestions, setAddedQuestions] = useState<Qs[]>([]);
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const formRef = useRef<HTMLFormElement | null>(null);
   const router = useRouter();
   const { setId } = router.query;
-  const [confirmDelete, setConfirmDelete] = useState(false);
   const {
     data: qsSet,
     isLoading,
@@ -83,51 +52,12 @@ const NewQuestionSet: NextPageWithLayout = () => {
   } = trpc.useQuery(["admin.sets.getOne", setId as string], {
     enabled: !!setId,
     refetchOnWindowFocus: false,
-    onSuccess: (data) => {
-      formik.setValues({
-        code: data.code,
-        title: data.title,
-        type: data.type,
-        published: data.published,
-        trial: data.trial,
-      });
-      setAllQuestions(
-        data.questions.map((q) => ({ code: q.code, stem: q.stem, id: q.id }))
-      );
-    },
   });
-
-  const { data: subjects } = trpc.useQuery(["admin.subjects.list"], {
-    refetchOnWindowFocus: false,
-  });
-  const { data: chapters } = trpc.useQuery(["admin.chapters.list", subjectId], {
-    enabled: !!subjectId,
-    refetchOnWindowFocus: false,
-  });
-  const { data: questions } = trpc.useQuery(
-    ["admin.questions.list", chapterId],
-    {
-      onSuccess: (data) => {
-        const selectedQs = allQuestions.map((q) => q.code);
-        const thisChapterQuestions = data
-          .filter((q) => selectedQs.includes(q.code))
-          .map((q) => q.code);
-        setSelectedQuestions([...thisChapterQuestions]);
-      },
-      enabled: !!chapterId,
-      refetchOnWindowFocus: false,
-    }
-  );
-  useEffect(() => {
-    setChapterId("");
-  }, [subjectId]);
-  useEffect(() => {
-    setSelectedQuestions([]);
-  }, [chapterId]);
 
   const updateSetMutation = trpc.useMutation("admin.sets.update", {
     onSuccess: (data) => {
       if (data) {
+        formRef.current?.reset();
         toast.success(`${data.code} updated!`);
         router.push("/dashboard/question-sets");
       }
@@ -158,39 +88,9 @@ const NewQuestionSet: NextPageWithLayout = () => {
       toast.error("Could not delete Question Set");
     },
   });
-  const formik = useFormik<QuestionSetForm>({
-    initialValues: {
-      title: "",
-      code: "",
-      published: true,
-      trial: false,
-      type: SET_TYPE.MODEL_TEST,
-    },
-    validationSchema,
-    onSubmit: (values) => {
-      if (!qsSet) return;
 
-      updateSetMutation.mutate({
-        ...values,
-        id: qsSet.id,
-        questions: allQuestions.map((q) => q.id),
-      });
-    },
-  });
-
-  const addQuestionsToList = () => {
-    if (!questions) return;
-    setAllQuestions((prev) => {
-      const newPrev = prev.filter((qs) => !selectedQuestions.includes(qs.code));
-      const newQuestions = questions
-        .filter((qs) => selectedQuestions.includes(qs.code))
-        .map((qs) => ({ code: qs.code, stem: qs.stem, id: qs.id }));
-
-      return [...newPrev, ...newQuestions];
-    });
-  };
   const onDrop = (dragId: string, dropId: string) => {
-    setAllQuestions((questions) => {
+    setAddedQuestions((questions) => {
       const dragIndex = questions.findIndex((q) => q.code === dragId);
       const dropIndex = questions.findIndex((q) => q.code === dropId);
       const newQuestions = [...questions];
@@ -212,8 +112,9 @@ const NewQuestionSet: NextPageWithLayout = () => {
   return (
     <>
       <Head>
-        <title>New Questions Set | Onushilonik Dashboard</title>
+        <title>{qsSet?.title ?? "Question Set"} | Onushilonik Dashboard</title>
       </Head>
+      {isLoading && <LinearProgress />}
       <Container maxWidth="xl" sx={{ mt: 2 }}>
         <Breadcrumbs sx={{ mb: 1, ml: -1 }} aria-label="breadcrumb">
           <NextLink href="/app" passHref>
@@ -243,173 +144,24 @@ const NewQuestionSet: NextPageWithLayout = () => {
             <Typography variant="body1">{error?.message}</Typography>
           </Alert>
         )}
-        {isLoading ? (
-          <LinearProgress sx={{ mt: 1 }} />
-        ) : (
+        {qsSet && (
           <Grid container spacing={4} sx={{ pb: 2 }}>
             <Grid item xs={12} md={6}>
-              <Box component="form" onSubmit={formik.handleSubmit}>
-                <Grid container spacing={2}>
-                  <Grid item xs={12} md={6}>
-                    <FormControl sx={{ mb: 2 }} fullWidth>
-                      <InputLabel id="option-select-label">
-                        Question Set Type
-                      </InputLabel>
-                      <Select
-                        labelId="option-select-label"
-                        name="type"
-                        label="Question Set Type"
-                        value={formik.values.type}
-                        onChange={formik.handleChange}
-                      >
-                        <MenuItem value="" disabled>
-                          Select an option
-                        </MenuItem>
-                        {Object.values(SET_TYPE).map((option) => (
-                          <MenuItem value={option} key={option}>
-                            {option.split("_").join(" ")}
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
-                  </Grid>
-                  <Grid item xs={12} md={6}>
-                    <TextField
-                      label="Set Code"
-                      name="code"
-                      value={formik.values.code}
-                      onChange={formik.handleChange}
-                      fullWidth
-                      sx={{ mb: 2 }}
-                      error={formik.touched.code && !!formik.errors.code}
-                      helperText={formik.touched.code && formik.errors.code}
-                    />
-                  </Grid>
-                </Grid>
-
-                <TextField
-                  name="title"
-                  label="Set Title"
-                  value={formik.values.title}
-                  onChange={formik.handleChange}
-                  fullWidth
-                  sx={{ mb: 2 }}
-                  error={formik.touched.title && !!formik.errors.title}
-                  helperText={formik.touched.title && formik.errors.title}
-                />
-
-                <Grid container spacing={2}>
-                  <Grid item xs={12} md={6}>
-                    <Box sx={{ mb: 2, mx: 2 }}>
-                      <FormControlLabel
-                        control={
-                          <Android12Switch checked={formik.values.published} />
-                        }
-                        name="published"
-                        onChange={formik.handleChange}
-                        label="Publish"
-                      />
-                    </Box>
-                  </Grid>
-                  <Grid item xs={12} md={6}>
-                    <Box sx={{ mb: 2, mx: 2 }}>
-                      <FormControlLabel
-                        control={
-                          <Android12Switch checked={formik.values.trial} />
-                        }
-                        name="trial"
-                        onChange={formik.handleChange}
-                        label="Free Trial"
-                      />
-                    </Box>
-                  </Grid>
-                </Grid>
-                <Grid container spacing={2}>
-                  <Grid item xs={12} md={6}>
-                    <FormControl sx={{ mb: 2 }} fullWidth>
-                      <InputLabel id="subject-select-label">
-                        Select Subject
-                      </InputLabel>
-                      <Select
-                        labelId="subject-select-label"
-                        name="subjectId"
-                        value={subjectId}
-                        label="Select Subject"
-                        onChange={(e) => setSubjectId(e.target.value as string)}
-                      >
-                        <MenuItem value="" disabled>
-                          Select an option
-                        </MenuItem>
-                        {subjects?.map((subject) => (
-                          <MenuItem key={subject.id} value={subject.id}>
-                            {subject.title}
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
-                  </Grid>
-                  <Grid item xs={12} md={6}>
-                    <FormControl disabled={!chapters} sx={{ mb: 2 }} fullWidth>
-                      <InputLabel id="chapter-select-label">
-                        Select Chapter
-                      </InputLabel>
-                      <Select
-                        labelId="chapter-select-label"
-                        name="chapterId"
-                        value={chapterId}
-                        label="Select Chapter"
-                        onChange={(e) => setChapterId(e.target.value as string)}
-                      >
-                        <MenuItem value="" disabled>
-                          Select an option
-                        </MenuItem>
-                        {chapters?.map((chapter) => (
-                          <MenuItem key={chapter.id} value={chapter.id}>
-                            {chapter.title}
-                          </MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
-                  </Grid>
-                </Grid>
-                <Box
-                  sx={{ mb: 2, display: "flex", gap: 4, alignItems: "start" }}
-                >
-                  <Box sx={{ flex: 1 }}>
-                    <MultipleChipSelect
-                      label="Select Questions"
-                      disabled={!questions}
-                      options={questions?.map(({ code }) => code) || []}
-                      selected={selectedQuestions}
-                      onChange={setSelectedQuestions}
-                    />
-                  </Box>
-
-                  <Button
-                    sx={{ mt: 2 }}
-                    disabled={!selectedQuestions.length}
-                    onClick={addQuestionsToList}
-                  >
-                    Add Questions
-                  </Button>
-                </Box>
-                <LoadingButton
+              <Box>
+                <QuestionSetForm
+                  ref={formRef}
+                  questionSet={qsSet}
+                  addedQuestions={addedQuestions}
                   loading={updateSetMutation.isLoading}
-                  variant="contained"
-                  type="submit"
-                  size="large"
-                >
-                  Update Set
-                </LoadingButton>
-                <LoadingButton
-                  sx={{ ml: 2 }}
-                  size="large"
-                  color="error"
-                  onClick={() => setConfirmDelete(true)}
-                >
-                  {"Delete"}
-                </LoadingButton>
-
+                  onDelete={() => setConfirmDelete(true)}
+                  setAddedQuestions={setAddedQuestions}
+                  onSubmit={(values) => {
+                    updateSetMutation.mutate({
+                      id: qsSet.id,
+                      ...values,
+                    });
+                  }}
+                ></QuestionSetForm>
                 {qsSet?.createdAt && (
                   <Typography
                     sx={{ mt: 4 }}
@@ -433,21 +185,23 @@ const NewQuestionSet: NextPageWithLayout = () => {
             <Grid item xs={12} md={6} sx={{ height: "100%" }}>
               <Paper sx={{ overflowY: "auto", height: 450 }}>
                 <DndProvider backend={HTML5Backend}>
-                  <List dense key={JSON.stringify(selectedQuestions)}>
-                    {allQuestions.map((question, i) => (
+                  <List dense key={JSON.stringify(addedQuestions)}>
+                    {addedQuestions.map((question, i) => (
                       <DraggableListItem
                         question={question}
                         index={i}
                         key={question.code}
                         onDelete={() => {
-                          setAllQuestions(
-                            allQuestions.filter((q) => q.code !== question.code)
+                          setAddedQuestions(
+                            addedQuestions.filter(
+                              (q) => q.code !== question.code
+                            )
                           );
                         }}
                         onDrop={onDrop}
                       />
                     ))}
-                    {allQuestions.length === 0 && (
+                    {addedQuestions.length === 0 && (
                       <ListItem>
                         <ListItemText
                           primary="No questions added yet"

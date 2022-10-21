@@ -130,7 +130,7 @@ const Home: NextPageWithLayout = () => {
                     </CardContent>
                     <CardMedia
                       component="img"
-                      sx={{ width: 250, p: 2 }}
+                      sx={{ width: { xs: 150, sm: 250 }, p: 2 }}
                       image={service.cover}
                       alt={service.title}
                     ></CardMedia>
@@ -140,7 +140,10 @@ const Home: NextPageWithLayout = () => {
             </Grid>
           ))}
         </Grid>
-        <Grid container sx={{ mt: 10 }} spacing={{ xs: 2, md: 4 }}>
+        <Typography variant="h5" align="center" sx={{ mt: 10, mb: 6 }}>
+          সুবিধা সমূহ
+        </Typography>
+        <Grid container spacing={{ xs: 2, md: 4 }}>
           {features.map((feature, i) => (
             <Grid key={i} xs={12} md={4}>
               <Card elevation={0} sx={{ p: 4 }} color="rgba(0,0,0,0)">

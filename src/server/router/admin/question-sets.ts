@@ -104,6 +104,7 @@ export const questionSetsRouter = createAdminRouter()
       title: z.string().min(2).max(100),
       code: z.string().min(2).max(100),
       type: z.nativeEnum(SET_TYPE),
+      duration: z.number().int().default(0),
       published: z.boolean(),
       questions: z.string().array(),
     }),
@@ -116,6 +117,8 @@ export const questionSetsRouter = createAdminRouter()
             code,
             published,
             type,
+            duration:
+              input.type !== SET_TYPE.QUESTION_BANK ? input.duration : 0,
             questions: {
               create: questions.map((id, i) => ({
                 question: { connect: { id } },
@@ -148,6 +151,7 @@ export const questionSetsRouter = createAdminRouter()
       id: z.string(),
       title: z.string().min(2).max(100),
       code: z.string().min(2).max(100),
+      duration: z.number().int().default(0),
       type: z.nativeEnum(SET_TYPE),
       published: z.boolean(),
       trial: z.boolean(),
@@ -163,6 +167,8 @@ export const questionSetsRouter = createAdminRouter()
             code,
             published,
             trial: input.trial,
+            duration:
+              input.type !== SET_TYPE.QUESTION_BANK ? input.duration : 0,
             questions: {
               deleteMany: {},
               create: questions.map((id, i) => ({
