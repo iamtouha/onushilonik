@@ -46,7 +46,7 @@ export default function QuestionSheet() {
 
   const answer = useMemo(
     () => question?.answers[0] ?? null,
-    [JSON.stringify(question)]
+    [JSON.stringify(question?.answers)]
   );
   const navigation = useMemo(
     () => ({
@@ -116,7 +116,7 @@ export default function QuestionSheet() {
           )}
           {isLoading && <QuestionLoading />}
           {question && (
-            <Box sx={{ my: 2 }}>
+            <Box sx={{ my: 2, userSelect: "none" }}>
               <Typography variant="body1" component="p" gutterBottom>
                 {question.stem}
               </Typography>

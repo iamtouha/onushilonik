@@ -31,8 +31,8 @@ type ContextProps = {
 };
 
 const SheetContext = createContext<ContextProps>({
-  setAnswerSheet: () => {},
-  setQuestionSet: () => {},
+  setAnswerSheet: () => null,
+  setQuestionSet: () => null,
 } as ContextProps);
 
 export default SheetContext;
