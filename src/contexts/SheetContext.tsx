@@ -28,17 +28,17 @@ type ContextProps = {
   marks?: { id: string; mark: number }[];
   setQuestionSet: (questionSet: QuestionSetWithQuestion) => void;
   setAnswerSheet: (answerSheet: AnswerSheetWithAnswer) => void;
-  // refetchAnswerSheet: () => void;
-  // setRefetchAnswerSheet: (refetchAnswerSheet: () => void) => void;
+  refetchAnswerSheet: () => void;
+  setRefetchAnswerSheet: (refetchAnswerSheet: () => void) => void;
 };
 
 const SheetContext = createContext<ContextProps>({
   setAnswerSheet: () => null,
   setQuestionSet: () => null,
-  // refetchAnswerSheet: () => null,
-  // setRefetchAnswerSheet: () => {
-  //   return;
-  // },
+  refetchAnswerSheet: () => null,
+  setRefetchAnswerSheet: () => {
+    return;
+  },
 } as ContextProps);
 
 export default SheetContext;
@@ -46,9 +46,9 @@ export default SheetContext;
 export const SheetProvider = ({ children }: { children: ReactNode }) => {
   const [questionSet, setQuestionSet] = useState<QuestionSetWithQuestion>();
   const [answerSheet, setAnswerSheet] = useState<AnswerSheetWithAnswer>();
-  // const ref = useRef(() => {
-  //   return;
-  // });
+  const [refetchAnswerSheet, setRefetchAnswerSheet] = useState<() => void>(
+    () => () => null
+  );
 
   return (
     <SheetContext.Provider
@@ -57,10 +57,8 @@ export const SheetProvider = ({ children }: { children: ReactNode }) => {
         answerSheet,
         setQuestionSet,
         setAnswerSheet,
-        // refetchAnswerSheet: ref.current,
-        // setRefetchAnswerSheet: (refetchAnswerSheet) => {
-        //   ref.current = refetchAnswerSheet;
-        // },
+        refetchAnswerSheet,
+        setRefetchAnswerSheet,
       }}
     >
       {children}

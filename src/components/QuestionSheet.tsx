@@ -28,7 +28,8 @@ import { styled } from "@mui/material/styles";
 export default function QuestionSheet() {
   const router = useRouter();
   const order = Number(router.query.q);
-  const { questionSet, answerSheet, setAnswerSheet } = useContext(SheetContext);
+  const { questionSet, answerSheet, refetchAnswerSheet } =
+    useContext(SheetContext);
   const questions = useMemo(
     () => questionSet?.questions ?? [],
     [JSON.stringify(questionSet?.questions)]
@@ -53,7 +54,10 @@ export default function QuestionSheet() {
     { id: selectedQuestion ?? "" },
   ]);
   const answerQuestionMutation = trpc.useMutation("answersheet.add-answer", {
-    onSuccess: () => refetch(),
+    onSuccess: () => {
+      refetch();
+      refetchAnswerSheet();
+    },
   });
 
   const stats = useMemo(() => {
@@ -95,6 +99,13 @@ export default function QuestionSheet() {
       undefined,
       { shallow: true }
     );
+  };
+
+  const getButtonColor = (id: string) => {
+    const answer = answerSheet?.answers.find((a) => a.question.id === id);
+    if (!answer) return "inherit";
+    if (answer.option === answer.question.correctOption) return "success";
+    return "error";
   };
 
   useEffect(() => {
@@ -247,7 +258,10 @@ export default function QuestionSheet() {
             {questions.map((q) => (
               <Button
                 variant="outlined"
-                color="inherit"
+                sx={{
+                  fontWeight: "bold",
+                }}
+                color={getButtonColor(q.question.id)}
                 key={q.question.id}
                 disabled={q.order === order}
                 onClick={() => navigateTo(q.order)}
@@ -312,7 +326,7 @@ function LinearProgressWithLabel(
 }
 
 const BorderLinearProgress = styled(LinearProgress)(({ theme }) => ({
-  height: 10,
+  height: 6,
   borderRadius: 5,
   [`&.${linearProgressClasses.colorPrimary}`]: {},
   [`& .${linearProgressClasses.bar}`]: {

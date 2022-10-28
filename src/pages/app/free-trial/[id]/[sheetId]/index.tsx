@@ -1,15 +1,9 @@
 import Head from "next/head";
-import Link from "next/link";
 import { useRouter } from "next/router";
 import Container from "@mui/material/Container";
-import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
-import Grid from "@mui/material/Grid";
 import Alert from "@mui/material/Alert";
-import Typography from "@mui/material/Typography";
-import LinearProgress from "@mui/material/LinearProgress";
 import { trpc } from "@/utils/trpc";
-import QuestionSheet from "@/components/QuestionSheet";
 import { useContext, useEffect } from "react";
 import ModelTest from "@/components/ModelTest";
 import QuestionSkeleton from "@/components/QuestionSkeleton";
@@ -19,7 +13,8 @@ import SheetContext, { SheetProvider } from "@/contexts/SheetContext";
 
 const TrialQuestionSet: NextPageWithLayout = () => {
   const router = useRouter();
-  const { setAnswerSheet, setQuestionSet } = useContext(SheetContext);
+  const { setAnswerSheet, setQuestionSet, setRefetchAnswerSheet } =
+    useContext(SheetContext);
   const query = router.query;
   const { isLoading: questionLoading, isError: questionError } = trpc.useQuery(
     ["questionset.trial-set", { id: query.id as string }],
@@ -30,7 +25,7 @@ const TrialQuestionSet: NextPageWithLayout = () => {
       },
     }
   );
-  const { isError: sheetError } = trpc.useQuery(
+  const { isError: sheetError, refetch } = trpc.useQuery(
     ["answersheet.get", { id: query.sheetId as string }],
     {
       enabled: !!query.sheetId,
@@ -39,6 +34,10 @@ const TrialQuestionSet: NextPageWithLayout = () => {
       },
     }
   );
+  useEffect(() => {
+    setRefetchAnswerSheet(refetch);
+  }, [refetch]);
+
   return (
     <>
       <Head>

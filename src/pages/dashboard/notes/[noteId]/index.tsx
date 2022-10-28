@@ -5,9 +5,6 @@ import { useRouter } from "next/router";
 import { useFormik } from "formik";
 import { format } from "date-fns";
 import * as yup from "yup";
-import ReactMarkdown from "react-markdown";
-import rehypeRaw from "rehype-raw";
-import remarkGfm from "remark-gfm";
 import { toast } from "react-toastify";
 import { styled } from "@mui/material/styles";
 import Alert from "@mui/material/Alert";
@@ -37,6 +34,7 @@ import Link from "@/components/Link";
 import DashboardLayout from "@/layouts/DashboardLayout";
 import { trpc } from "@/utils/trpc";
 import { Android12Switch } from "@/components/CustomComponents";
+import ShortNote from "@/components/ShortNote";
 
 const ResizableTextarea = styled(TextField)(({ theme }) => ({
   root: {
@@ -343,28 +341,7 @@ const AddNote: NextPageWithLayout = () => {
               </Grid>
               <Grid xs={12} md={6}>
                 {content.length ? (
-                  <Box
-                    sx={{
-                      "& img": {
-                        width: "100%",
-                        height: "auto",
-                        display: "block",
-                        margin: "auto",
-                        maxWidth: 600,
-                      },
-                      "& table, & th, & td": {
-                        borderCollapse: "collapse",
-                        border: 1,
-                      },
-                      "& th, & td": {
-                        padding: "2px 8px",
-                      },
-                    }}
-                  >
-                    <ReactMarkdown rehypePlugins={[remarkGfm, rehypeRaw]}>
-                      {content}
-                    </ReactMarkdown>
-                  </Box>
+                  <ShortNote content={content} />
                 ) : (
                   <Typography variant="body1" color="GrayText">
                     <i>Markdown Preview wil appear here</i>

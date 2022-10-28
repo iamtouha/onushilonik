@@ -28,6 +28,7 @@ import { trpc } from "@/utils/trpc";
 import { Android12Switch } from "@/components/CustomComponents";
 
 import { styled } from "@mui/material/styles";
+import ShortNote from "@/components/ShortNote";
 
 const ResizableTextarea = styled(TextField)(({ theme }) => ({
   root: {
@@ -253,28 +254,7 @@ const AddNote: NextPageWithLayout = () => {
           </Grid>
           <Grid xs={12} md={6}>
             {content.length ? (
-              <Box
-                sx={{
-                  "& img": {
-                    width: "100%",
-                    height: "auto",
-                    display: "block",
-                    margin: "auto",
-                    maxWidth: 600,
-                  },
-                  "& table, & th, & td": {
-                    borderCollapse: "collapse",
-                    border: 1,
-                  },
-                  "& th, & td": {
-                    padding: "2px 8px",
-                  },
-                }}
-              >
-                <ReactMarkdown rehypePlugins={[remarkGfm, rehypeRaw]}>
-                  {content}
-                </ReactMarkdown>
-              </Box>
+              <ShortNote content={content} />
             ) : (
               <Typography variant="body1" color="GrayText">
                 <i>Markdown Preview wil appear here</i>
