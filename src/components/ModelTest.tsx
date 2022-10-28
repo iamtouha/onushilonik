@@ -53,9 +53,6 @@ const ModelTest = () => {
           {questionSet.title}
         </Typography>
         <Box sx={{ mr: 0, ml: "auto" }} />
-        <Button disableElevation variant="contained" size="large">
-          Finish Test
-        </Button>
       </Box>
 
       <QuestionSheet />

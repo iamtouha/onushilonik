@@ -12,7 +12,6 @@ import { trpc } from "@/utils/trpc";
 
 const FreeTrial = () => {
   const { data: sets, isLoading } = trpc.useQuery(["questionset.free-trial"]);
-  console.log(sets);
 
   return (
     <>

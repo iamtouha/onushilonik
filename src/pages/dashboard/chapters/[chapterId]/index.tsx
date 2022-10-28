@@ -73,7 +73,7 @@ const Chapter: NextPageWithLayout = () => {
       }
     },
     onError: (error) => {
-      console.log(error.message);
+      console.error(error.message);
 
       if (error.data?.code === "CONFLICT") {
         toast.error("Chapter with this code already exists");
@@ -96,7 +96,7 @@ const Chapter: NextPageWithLayout = () => {
     },
     onError: (error) => {
       setConfirmDelete(false);
-      console.log(error.message);
+      console.error(error.message);
       toast.error("Could not delete chapter");
     },
   });

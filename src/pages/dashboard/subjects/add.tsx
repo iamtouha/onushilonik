@@ -39,7 +39,7 @@ const AddSubject: NextPageWithLayout = () => {
       }
     },
     onError: (error) => {
-      console.log(error.message);
+      console.error(error.message);
 
       if (error.data?.code === "CONFLICT") {
         toast.error("Subject with this code already exists");

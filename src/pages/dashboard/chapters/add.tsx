@@ -48,7 +48,7 @@ const AddChapter: NextPageWithLayout = () => {
       }
     },
     onError: (error) => {
-      console.log(error.message);
+      console.error(error.message);
 
       if (error.data?.code === "CONFLICT") {
         toast.error("Chapter with this code already exists");

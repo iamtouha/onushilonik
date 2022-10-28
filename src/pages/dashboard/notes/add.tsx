@@ -74,7 +74,7 @@ const AddNote: NextPageWithLayout = () => {
       }
     },
     onError: (error) => {
-      console.log(error.message);
+      console.error(error.message);
 
       if (error.data?.code === "CONFLICT") {
         toast.error("Question with this code already exists");
@@ -96,7 +96,6 @@ const AddNote: NextPageWithLayout = () => {
     },
     validationSchema,
     onSubmit: async (values, { resetForm }) => {
-      console.log(values);
       if (!chapterId.length) {
         toast.warn("Select a chapter");
         return;

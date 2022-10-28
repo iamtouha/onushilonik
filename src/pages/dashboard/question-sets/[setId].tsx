@@ -84,7 +84,7 @@ const NewQuestionSet: NextPageWithLayout = () => {
     },
     onError: (error) => {
       setConfirmDelete(false);
-      console.log(error.message);
+      console.error(error.message);
       toast.error("Could not delete Question Set");
     },
   });

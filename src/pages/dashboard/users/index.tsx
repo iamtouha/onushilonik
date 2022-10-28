@@ -96,7 +96,6 @@ const Users: NextPageWithLayout = () => {
       },
     ];
   }, []);
-  console.log(data);
 
   return (
     <>

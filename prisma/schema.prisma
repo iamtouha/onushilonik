@@ -59,6 +59,7 @@ model User {
     active          Boolean   @default(true)
     answerSheets    AnswerSheet[]
     comments        Comment[]
+    flags           Flag[]
     subscriptionsUpdated Subscription[] @relation("sub_updater")
     subjectsCreated Subject[] @relation("subject_creator")
     subjectsUpdated Subject[] @relation("subject_updater")
@@ -172,6 +173,7 @@ model Question {
     answers         Answer[]
     questionSets    QuestionsOnSets[]
     comments        Comment[]
+    flags           Flag[]
     note            Note?    @relation(fields: [noteId], references: [id])
     noteId          String?
     createdAt       DateTime @default(now())
@@ -200,6 +202,11 @@ model QuestionSet {
     updatedById     String?
 }
 
+enum SET_TYPE {
+    MODEL_TEST
+    PREVIOUS_YEAR_QUESTION
+    QUESTION_BANK
+}
 model QuestionsOnSets {
     questionSet     QuestionSet @relation(fields: [questionSetId], references: [id], onDelete: Cascade)
     questionSetId   String
@@ -210,10 +217,14 @@ model QuestionsOnSets {
 
 }
 
-enum SET_TYPE {
-    MODEL_TEST
-    PREVIOUS_YEAR_QUESTION
-    QUESTION_BANK
+model Flag {
+    id              String   @id @default(cuid())
+    question        Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+    questionId String
+    user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+    userId          String
+    createdAt       DateTime @default(now())
+    updatedAt       DateTime @updatedAt
 }
 
 model Note {
@@ -253,15 +264,11 @@ model AnswerSheet {
     questionSetId   String
     answers         Answer[]
     createdAt       DateTime @default(now())
-    status          ANSWERSHEET_STATUS @default(ONGOING)
     expireAt        DateTime?
     updatedAt       DateTime @updatedAt
 }
 
-enum ANSWERSHEET_STATUS {
-    ONGOING
-    SUBMITTED
-}
+
 
 model Answer {
     id              String   @id @default(cuid())

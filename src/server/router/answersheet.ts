@@ -1,4 +1,4 @@
-import { ANSWERSHEET_STATUS, OPTION } from "@prisma/client";
+import { OPTION } from "@prisma/client";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { createProtectedRouter } from "./protected-router";
@@ -74,12 +74,7 @@ export const answerSheetRouter = createProtectedRouter()
           message: "Answer sheet expired",
         });
       }
-      if (answerSheet.status !== ANSWERSHEET_STATUS.ONGOING) {
-        throw new TRPCError({
-          code: "BAD_REQUEST",
-          message: "Test is already submitted",
-        });
-      }
+
       return await ctx.prisma.answer.create({
         data: {
           answerSheetId: input.answerSheetId,

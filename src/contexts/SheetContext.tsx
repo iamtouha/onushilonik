@@ -1,4 +1,4 @@
-import { createContext, useState, type ReactNode } from "react";
+import { createContext, useRef, useState, type ReactNode } from "react";
 import type { AnswerSheet, OPTION, Prisma, QuestionSet } from "@prisma/client";
 
 type QuestionSetWithQuestion = QuestionSet & {
@@ -28,11 +28,17 @@ type ContextProps = {
   marks?: { id: string; mark: number }[];
   setQuestionSet: (questionSet: QuestionSetWithQuestion) => void;
   setAnswerSheet: (answerSheet: AnswerSheetWithAnswer) => void;
+  // refetchAnswerSheet: () => void;
+  // setRefetchAnswerSheet: (refetchAnswerSheet: () => void) => void;
 };
 
 const SheetContext = createContext<ContextProps>({
   setAnswerSheet: () => null,
   setQuestionSet: () => null,
+  // refetchAnswerSheet: () => null,
+  // setRefetchAnswerSheet: () => {
+  //   return;
+  // },
 } as ContextProps);
 
 export default SheetContext;
@@ -40,6 +46,9 @@ export default SheetContext;
 export const SheetProvider = ({ children }: { children: ReactNode }) => {
   const [questionSet, setQuestionSet] = useState<QuestionSetWithQuestion>();
   const [answerSheet, setAnswerSheet] = useState<AnswerSheetWithAnswer>();
+  // const ref = useRef(() => {
+  //   return;
+  // });
 
   return (
     <SheetContext.Provider
@@ -48,6 +57,10 @@ export const SheetProvider = ({ children }: { children: ReactNode }) => {
         answerSheet,
         setQuestionSet,
         setAnswerSheet,
+        // refetchAnswerSheet: ref.current,
+        // setRefetchAnswerSheet: (refetchAnswerSheet) => {
+        //   ref.current = refetchAnswerSheet;
+        // },
       }}
     >
       {children}

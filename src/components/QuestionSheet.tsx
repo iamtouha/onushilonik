@@ -10,6 +10,10 @@ import Typography from "@mui/material/Typography";
 import Radio from "@mui/material/Radio";
 import RadioGroup from "@mui/material/RadioGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
+import LinearProgress, {
+  LinearProgressProps,
+  linearProgressClasses,
+} from "@mui/material/LinearProgress";
 import FormControl from "@mui/material/FormControl";
 import FormLabel from "@mui/material/FormLabel";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
@@ -19,19 +23,22 @@ import { trpc } from "@/utils/trpc";
 import { Question as QuestionLoading } from "./QuestionSkeleton";
 import SheetContext from "@/contexts/SheetContext";
 import { toast } from "react-toastify";
+import { styled } from "@mui/material/styles";
 
 export default function QuestionSheet() {
   const router = useRouter();
   const order = Number(router.query.q);
-  const { questionSet, answerSheet } = useContext(SheetContext);
+  const { questionSet, answerSheet, setAnswerSheet } = useContext(SheetContext);
   const questions = useMemo(
     () => questionSet?.questions ?? [],
     [JSON.stringify(questionSet?.questions)]
   );
   const [selectedQuestion, setSelectedQuestion] = useState<string>();
   const [selectedOption, setSelectedOption] = useState<OPTION>();
+
   const {
     data: question,
+    refetch,
     isLoading,
     isError,
   } = trpc.useQuery(
@@ -41,9 +48,23 @@ export default function QuestionSheet() {
     ],
     { enabled: !!selectedQuestion && !!answerSheet?.id }
   );
+  const { data: statsData } = trpc.useQuery([
+    "question.get-stats",
+    { id: selectedQuestion ?? "" },
+  ]);
+  const answerQuestionMutation = trpc.useMutation("answersheet.add-answer", {
+    onSuccess: () => refetch(),
+  });
 
-  const answerQuestionMutation = trpc.useMutation("answersheet.add-answer");
-
+  const stats = useMemo(() => {
+    const initial = { A: 0, B: 0, C: 0, D: 0, total: 0 };
+    if (!statsData) return initial;
+    return statsData.reduce((acc, curr) => {
+      acc[curr.option] += curr._count;
+      acc.total += curr._count;
+      return acc;
+    }, initial);
+  }, [JSON.stringify(statsData)]);
   const answer = useMemo(
     () => question?.answers[0] ?? null,
     [JSON.stringify(question?.answers)]
@@ -93,6 +114,8 @@ export default function QuestionSheet() {
     }
   }, [JSON.stringify(answer)]);
 
+  if (!answerSheet) return <></>;
+
   return (
     <Box>
       <Grid container spacing={{ xs: 2, md: 6 }}>
@@ -115,55 +138,85 @@ export default function QuestionSheet() {
             </Alert>
           )}
           {isLoading && <QuestionLoading />}
+
           {question && (
             <Box sx={{ my: 2, userSelect: "none" }}>
               <Typography variant="body1" component="p" gutterBottom>
                 {question.stem}
               </Typography>
-              <FormControl sx={{ mt: 2 }}>
-                <FormLabel
-                  id="option-group-input-label"
-                  sx={{ color: "inherit" }}
-                >
-                  Select the correct option
-                </FormLabel>
-                <RadioGroup
-                  aria-labelledby="option-group-input-label"
-                  name="option-buttons-group"
-                  value={selectedOption ?? ""}
-                  onChange={(e, val) => {
-                    if (!answer) setSelectedOption(val as OPTION);
-                  }}
-                >
-                  <FormControlLabel
-                    value={OPTION.A}
-                    control={<Radio />}
-                    label={question.optionA}
+              {answer ? (
+                <Box sx={{ mt: 4 }}>
+                  <AnswerStat
+                    label={`A) ${question.optionA}`}
+                    isAnswered={answer.option === OPTION.A}
+                    isCorrect={question.correctOption === OPTION.A}
+                    value={(stats.A / stats.total) * 100}
                   />
-                  <FormControlLabel
-                    value={OPTION.B}
-                    control={<Radio />}
-                    label={question.optionB}
+                  <AnswerStat
+                    label={`B) ${question.optionB}`}
+                    isAnswered={answer.option === OPTION.B}
+                    isCorrect={question.correctOption === OPTION.B}
+                    value={(stats.B / stats.total) * 100}
                   />
-                  <FormControlLabel
-                    value={OPTION.C}
-                    control={<Radio />}
-                    label={question.optionC}
+                  <AnswerStat
+                    label={`C) ${question.optionC}`}
+                    isAnswered={answer.option === OPTION.C}
+                    isCorrect={question.correctOption === OPTION.C}
+                    value={(stats.C / stats.total) * 100}
                   />
-                  <FormControlLabel
-                    value={OPTION.D}
-                    control={<Radio />}
-                    label={question.optionD}
+                  <AnswerStat
+                    label={`D) ${question.optionD}`}
+                    isAnswered={answer.option === OPTION.D}
+                    isCorrect={question.correctOption === OPTION.D}
+                    value={(stats.D / stats.total) * 100}
                   />
-                </RadioGroup>
-              </FormControl>
+                </Box>
+              ) : (
+                <FormControl sx={{ mt: 2 }}>
+                  <FormLabel
+                    id="option-group-input-label"
+                    sx={{ color: "inherit" }}
+                  >
+                    Select the correct option
+                  </FormLabel>
+                  <RadioGroup
+                    aria-labelledby="option-group-input-label"
+                    name="option-buttons-group"
+                    value={selectedOption ?? ""}
+                    onChange={(e, val) => {
+                      if (!answer) setSelectedOption(val as OPTION);
+                    }}
+                  >
+                    <FormControlLabel
+                      value={OPTION.A}
+                      control={<Radio />}
+                      label={`A) ${question.optionA}`}
+                    />
+                    <FormControlLabel
+                      value={OPTION.B}
+                      control={<Radio />}
+                      label={`B) ${question.optionB}`}
+                    />
+                    <FormControlLabel
+                      value={OPTION.C}
+                      control={<Radio />}
+                      label={`C) ${question.optionC}`}
+                    />
+                    <FormControlLabel
+                      value={OPTION.D}
+                      control={<Radio />}
+                      label={`D) ${question.optionD}`}
+                    />
+                  </RadioGroup>
+                </FormControl>
+              )}
               <Box sx={{ mt: 2, display: "flex", gap: 1 }}>
                 <LoadingButton
                   size="large"
                   variant={"outlined"}
-                  disabled={!!answer}
+                  disabled={!!answer || !question || !answerSheet}
                   onClick={answerQuestion}
-                  loading={answerQuestionMutation.isLoading}
+                  loading={answerQuestionMutation.isLoading || isLoading}
                 >
                   {!!answer ? "Answer Submitted" : "Submit answer"}
                 </LoadingButton>
@@ -208,3 +261,61 @@ export default function QuestionSheet() {
     </Box>
   );
 }
+
+const AnswerStat = ({
+  label,
+  value,
+  isAnswered,
+  isCorrect,
+}: {
+  label: string;
+  value: number;
+  isAnswered: boolean;
+  isCorrect: boolean;
+}) => {
+  return (
+    <Box sx={{ mb: 2 }}>
+      <Typography variant="body1" component="p">
+        {label}
+      </Typography>
+      <LinearProgressWithLabel
+        color={
+          isAnswered
+            ? isCorrect
+              ? "success"
+              : "error"
+            : isCorrect
+            ? "success"
+            : "info"
+        }
+        value={value ?? 0}
+      />
+    </Box>
+  );
+};
+
+function LinearProgressWithLabel(
+  props: LinearProgressProps & { value: number }
+) {
+  return (
+    <Box sx={{ display: "flex", alignItems: "center" }}>
+      <Box sx={{ width: "100%", mr: 1 }}>
+        <BorderLinearProgress variant="determinate" {...props} />
+      </Box>
+      <Box sx={{ minWidth: 35 }}>
+        <Typography variant="body2" color="text.secondary">{`${Math.round(
+          props.value
+        )}%`}</Typography>
+      </Box>
+    </Box>
+  );
+}
+
+const BorderLinearProgress = styled(LinearProgress)(({ theme }) => ({
+  height: 10,
+  borderRadius: 5,
+  [`&.${linearProgressClasses.colorPrimary}`]: {},
+  [`& .${linearProgressClasses.bar}`]: {
+    borderRadius: 5,
+  },
+}));

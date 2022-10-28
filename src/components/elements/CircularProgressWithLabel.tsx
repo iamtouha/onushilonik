@@ -24,7 +24,7 @@ export default function CircularProgressWithLabel(
         }}
       >
         <Typography
-          variant="body2"
+          variant="h6"
           component="div"
           color="text.secondary"
         >{`${props.label}`}</Typography>

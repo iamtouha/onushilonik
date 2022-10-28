@@ -28,7 +28,6 @@ export const questionSetRouter = createProtectedRouter()
               },
               order: true,
             },
-
             orderBy: { order: "asc" },
           },
           answerSheets: {
@@ -36,7 +35,6 @@ export const questionSetRouter = createProtectedRouter()
             orderBy: { createdAt: "desc" },
             select: {
               id: true,
-              status: true,
               expireAt: true,
               createdAt: true,
               answers: {

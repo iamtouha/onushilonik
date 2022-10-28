@@ -15,10 +15,9 @@ import { trpc } from "@/utils/trpc";
 import { toast } from "react-toastify";
 import { format } from "date-fns";
 import BorderedCircularProgress from "@/components/elements/BorderedCircularProgress";
-import { ANSWERSHEET_STATUS, OPTION } from "@prisma/client";
+import { OPTION } from "@prisma/client";
 
 type SheetType = {
-  status: ANSWERSHEET_STATUS;
   createdAt: Date;
   id: string;
   answers: {
@@ -41,40 +40,34 @@ const TrialQuestionSet = () => {
     isError,
   } = trpc.useQuery(["questionset.trial-set", { id: query.id as string }], {
     enabled: !!query.id,
+    onError: () => {
+      toast.error("Something went wrong!");
+    },
   });
 
   const newTestMutation = trpc.useMutation("answersheet.create", {
+    onSuccess: (res) => {
+      router.push(`${router.asPath}/${res.id}`);
+    },
     onError: () => {
       toast.error("Could not start the test. Please try again.");
     },
   });
 
-  const startTest = async () => {
+  const startTest = () => {
     if (!qsSet) return;
-    await newTestMutation
-      .mutateAsync({ id: qsSet.id })
-      .then((res) => {
-        router.push(`${router.asPath}/${res.id}`);
-      })
-      .catch(() => {
-        console.log("Error");
-      });
+    newTestMutation.mutate({ id: qsSet.id });
   };
 
   const calculateResult = (sheet: SheetType) => {
     const correct = sheet.answers.filter(
       (a) => a.question.correctOption === a.option
     ).length;
-    const total = sheet.answers.length;
-    const result = { label: `${correct}/${total}`, value: correct / total };
-    const notResult = { label: "Ongoing", value: 0 };
-    if (sheet.status === ANSWERSHEET_STATUS.SUBMITTED) {
-      return result;
-    }
-    if (sheet.expireAt && sheet.expireAt.getTime() < new Date().getTime()) {
-      return result;
-    }
-    return notResult;
+    const total = qsSet?.questions.length || 0;
+    return {
+      label: `${Math.round((100 * correct) / total)}%`,
+      value: correct / total,
+    };
   };
 
   return (
@@ -127,7 +120,7 @@ const TrialQuestionSet = () => {
                         <Box>
                           {
                             <BorderedCircularProgress
-                              color="success"
+                              color="info"
                               size={80}
                               value={Math.round(
                                 calculateResult(sheet).value * 100
