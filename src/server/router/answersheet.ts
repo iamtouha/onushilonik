@@ -68,10 +68,11 @@ export const answerSheetRouter = createProtectedRouter()
           message: "Answer sheet not found",
         });
       }
+
       if (answerSheet.expireAt && answerSheet.expireAt.getTime() < Date.now()) {
         throw new TRPCError({
           code: "BAD_REQUEST",
-          message: "Answer sheet expired",
+          message: "Test time is over.",
         });
       }
 

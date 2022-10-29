@@ -55,8 +55,11 @@ export default function QuestionSheet() {
   ]);
   const answerQuestionMutation = trpc.useMutation("answersheet.add-answer", {
     onSuccess: () => {
-      refetch();
+      refetch({});
       refetchAnswerSheet();
+    },
+    onError: (err) => {
+      toast.error(err.message);
     },
   });
 
