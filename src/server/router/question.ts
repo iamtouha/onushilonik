@@ -11,11 +11,13 @@ export const questionRouter = createProtectedRouter()
   .query("get-answer", {
     input: z.object({ id: z.string(), sheetId: z.string() }),
     async resolve({ ctx, input }) {
-      const data = await ctx.prisma.question.findUnique({
+      return await ctx.prisma.question.findUnique({
         where: { id: input.id },
-        include: { answers: { where: { answerSheetId: input.sheetId } } },
+        include: {
+          note: true,
+          answers: { where: { answerSheetId: input.sheetId } },
+        },
       });
-      return data;
     },
   })
   .query("get-stats", {

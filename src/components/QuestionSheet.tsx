@@ -1,5 +1,6 @@
 import { useContext, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/router";
+import isAfter from "date-fns/isAfter";
 import Box from "@mui/material/Box";
 import Alert from "@mui/material/Alert";
 import Button from "@mui/material/Button";
@@ -24,6 +25,7 @@ import { Question as QuestionLoading } from "./QuestionSkeleton";
 import SheetContext from "@/contexts/SheetContext";
 import { toast } from "react-toastify";
 import { styled } from "@mui/material/styles";
+import ShortNote from "./ShortNote";
 
 export default function QuestionSheet() {
   const router = useRouter();
@@ -204,21 +206,41 @@ export default function QuestionSheet() {
                     <FormControlLabel
                       value={OPTION.A}
                       control={<Radio />}
+                      disabled={
+                        answerSheet.expireAt
+                          ? isAfter(Date.now(), answerSheet.expireAt)
+                          : false
+                      }
                       label={`A) ${question.optionA}`}
                     />
                     <FormControlLabel
                       value={OPTION.B}
                       control={<Radio />}
+                      disabled={
+                        answerSheet.expireAt
+                          ? isAfter(Date.now(), answerSheet.expireAt)
+                          : false
+                      }
                       label={`B) ${question.optionB}`}
                     />
                     <FormControlLabel
                       value={OPTION.C}
                       control={<Radio />}
+                      disabled={
+                        answerSheet.expireAt
+                          ? isAfter(Date.now(), answerSheet.expireAt)
+                          : false
+                      }
                       label={`C) ${question.optionC}`}
                     />
                     <FormControlLabel
                       value={OPTION.D}
                       control={<Radio />}
+                      disabled={
+                        answerSheet.expireAt
+                          ? isAfter(Date.now(), answerSheet.expireAt)
+                          : false
+                      }
                       label={`D) ${question.optionD}`}
                     />
                   </RadioGroup>
@@ -273,6 +295,20 @@ export default function QuestionSheet() {
               </Button>
             ))}
           </Box>
+        </Grid>
+        <Grid item xs={12} md={8} order={{ xs: 3, md: 3 }}>
+          {!isLoading && answer ? (
+            <Box>
+              <Typography variant="h5" component="h5" gutterBottom>
+                Short Note:
+              </Typography>
+              {question?.note ? (
+                <ShortNote content={question.note.content} />
+              ) : (
+                "No short note found for this question"
+              )}
+            </Box>
+          ) : null}
         </Grid>
       </Grid>
     </Box>
