@@ -35,6 +35,7 @@ import Link from "@/components/Link";
 import DashboardLayout from "@/layouts/DashboardLayout";
 import { trpc } from "@/utils/trpc";
 import QuestionSetForm from "@/components/QuestionSetForm";
+import { SET_TYPE } from "@prisma/client";
 
 type Qs = { code: string; stem: string; id: string };
 
@@ -150,6 +151,7 @@ const NewQuestionSet: NextPageWithLayout = () => {
               <Box>
                 <QuestionSetForm
                   ref={formRef}
+                  formType="update"
                   questionSet={qsSet}
                   addedQuestions={addedQuestions}
                   loading={updateSetMutation.isLoading}
@@ -158,7 +160,16 @@ const NewQuestionSet: NextPageWithLayout = () => {
                   onSubmit={(values) => {
                     updateSetMutation.mutate({
                       id: qsSet.id,
-                      ...values,
+                      title: values.title,
+                      type: values.type,
+                      chapterId:
+                        values.type === SET_TYPE.QUESTION_BANK
+                          ? values.chapterId
+                          : undefined,
+                      duration: values.duration,
+                      questions: values.questions,
+                      published: values.published,
+                      trial: values.trial,
                     });
                   }}
                 ></QuestionSetForm>

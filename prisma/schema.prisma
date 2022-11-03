@@ -149,6 +149,7 @@ model Chapter {
     subjectId       String
     questions       Question[]
     notes           Note[]
+    questionSets    QuestionSet[]
     createdAt       DateTime @default(now())
     updatedAt       DateTime @updatedAt
     createdBy       User?    @relation("chapter_creator", fields: [createdById], references: [id], onDelete:NoAction )
@@ -188,6 +189,8 @@ model QuestionSet {
     id              String   @id @default(cuid())
     code            String   @unique
     title           String
+    relatedChapter  Chapter? @relation(fields: [relatedChapterId], references: [id])
+    relatedChapterId String?
     type            SET_TYPE
     questions       QuestionsOnSets[]
     answerSheets    AnswerSheet[]

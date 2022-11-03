@@ -23,6 +23,7 @@ import Paper from "@mui/material/Paper";
 import DeleteIcon from "@mui/icons-material/Delete";
 import DragHandleIcon from "@mui/icons-material/DragHandle";
 import QuestionSetForm from "@/components/QuestionSetForm";
+import { SET_TYPE } from "@prisma/client";
 
 type Qs = { code: string; stem: string; id: string };
 
@@ -97,11 +98,18 @@ const NewQuestionSet: NextPageWithLayout = () => {
           <Grid item xs={12} md={6}>
             <QuestionSetForm
               ref={formRef}
+              formType="create"
               addedQuestions={addedQuestions}
               setAddedQuestions={setAddedQuestions}
               loading={addSetMutation.isLoading}
               onSubmit={(values) => {
-                addSetMutation.mutate({ ...values });
+                addSetMutation.mutate({
+                  ...values,
+                  chapterId:
+                    values.type === SET_TYPE.QUESTION_BANK
+                      ? values.chapterId
+                      : undefined,
+                });
               }}
             />
           </Grid>

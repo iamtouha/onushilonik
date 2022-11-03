@@ -104,98 +104,138 @@ export const questionSetsRouter = createAdminRouter()
       title: z.string().min(2).max(100),
       code: z.string().min(2).max(100),
       type: z.nativeEnum(SET_TYPE),
+      chapterId: z.string().optional(),
       duration: z.number().int().default(0),
       published: z.boolean(),
       questions: z.string().array(),
     }),
     async resolve({ ctx, input }) {
       const { title, code, published, type, questions } = input;
-      try {
-        const questionSet = await ctx.prisma.questionSet.create({
-          data: {
-            title,
-            code,
-            published,
-            type,
-            duration:
-              input.type !== SET_TYPE.QUESTION_BANK ? input.duration : 0,
-            questions: {
-              create: questions.map((id, i) => ({
-                question: { connect: { id } },
-                order: i + 1,
-              })),
-            },
-            createdById: ctx.session?.user.id,
-          },
-        });
-        return questionSet;
-      } catch (e) {
-        console.error(e);
-        if (e instanceof Prisma.PrismaClientKnownRequestError) {
-          if (e.code === "P2002") {
-            throw new TRPCError({
-              code: "CONFLICT",
-              message: "Code already exists",
-            });
-          }
-        }
+      if (questions.length === 0) {
         throw new TRPCError({
-          code: "INTERNAL_SERVER_ERROR",
-          message: "Something went wrong",
+          code: "BAD_REQUEST",
+          message: "Question Set must have atleast one question",
         });
       }
+      if (input.type === SET_TYPE.QUESTION_BANK && !input.chapterId) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Chapter ID is required for Question Bank",
+        });
+      }
+      if (input.type !== SET_TYPE.QUESTION_BANK && input.chapterId) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Chapter ID is not required for this question set.",
+        });
+      }
+      if (input.type === SET_TYPE.QUESTION_BANK && input.duration !== 0) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Duration is not required for Question Bank",
+        });
+      }
+      if (input.type !== SET_TYPE.QUESTION_BANK && input.duration <= 0) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Duration is required for this question set.",
+        });
+      }
+      const prevQuestionSet = await ctx.prisma.questionSet.findFirst({
+        where: { code },
+      });
+      if (prevQuestionSet) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Question Set with this code already exists",
+        });
+      }
+
+      const questionSet = await ctx.prisma.questionSet.create({
+        data: {
+          title,
+          code,
+          published,
+          relatedChapterId: input.chapterId ? input.chapterId : null,
+          type,
+          duration: input.type !== SET_TYPE.QUESTION_BANK ? input.duration : 0,
+          questions: {
+            create: questions.map((id, i) => ({
+              question: { connect: { id } },
+              order: i + 1,
+            })),
+          },
+          createdById: ctx.session?.user.id,
+        },
+      });
+      return questionSet;
     },
   })
   .mutation("update", {
     input: z.object({
       id: z.string(),
       title: z.string().min(2).max(100),
-      code: z.string().min(2).max(100),
-      duration: z.number().int().default(0),
       type: z.nativeEnum(SET_TYPE),
+      chapterId: z.string().optional(),
+      duration: z.number().int().default(0),
       published: z.boolean(),
       trial: z.boolean(),
       questions: z.string().array(),
     }),
     async resolve({ ctx, input }) {
-      const { id, title, code, published, questions } = input;
-      try {
-        const questionSet = await ctx.prisma.questionSet.update({
-          where: { id },
-          data: {
-            title,
-            code,
-            published,
-            trial: input.trial,
-            duration:
-              input.type !== SET_TYPE.QUESTION_BANK ? input.duration : 0,
-            questions: {
-              deleteMany: {},
-              create: questions.map((id, i) => ({
-                question: { connect: { id } },
-                order: i + 1,
-              })),
-            },
-            updatedById: ctx.session?.user.id,
-          },
-        });
-        return questionSet;
-      } catch (e) {
-        console.error(e);
-
-        if (e instanceof Prisma.PrismaClientKnownRequestError) {
-          if (e.code === "P2002") {
-            throw new TRPCError({
-              code: "CONFLICT",
-              message: "Code already exists",
-            });
-          }
-        }
+      const { id, title, published, questions, duration, type, chapterId } =
+        input;
+      if (questions.length === 0) {
         throw new TRPCError({
-          code: "INTERNAL_SERVER_ERROR",
-          message: "Something went wrong",
+          code: "BAD_REQUEST",
+          message: "Question Set must have atleast one question",
         });
       }
+
+      if (type === SET_TYPE.QUESTION_BANK && !chapterId) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Chapter ID is required for Question Bank",
+        });
+      }
+      if (type === SET_TYPE.QUESTION_BANK && duration !== 0) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Duration is not required for Question Bank",
+        });
+      }
+      if (type !== SET_TYPE.QUESTION_BANK && chapterId) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Chapter ID is not required for this question set.",
+        });
+      }
+      if (type !== SET_TYPE.QUESTION_BANK && duration <= 0) {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Duration is required for this question set.",
+        });
+      }
+      const questionSet = await ctx.prisma.questionSet.update({
+        where: { id },
+        data: {
+          title,
+          published,
+          trial: input.trial,
+          type,
+          duration,
+          relatedChapterId: input.chapterId ? input.chapterId : null,
+          questions: {
+            deleteMany: {},
+            create: questions.map((id, i) => ({
+              question: { connect: { id } },
+              order: i + 1,
+            })),
+          },
+          updatedById: ctx.session?.user.id,
+        },
+      });
+      return questionSet;
     },
   })
 

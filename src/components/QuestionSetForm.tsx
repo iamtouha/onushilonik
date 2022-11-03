@@ -48,6 +48,7 @@ interface QuestionSetFormProps {
   };
   loading: boolean;
   addedQuestions: Qs[];
+  formType: "create" | "update";
   setAddedQuestions: Dispatch<SetStateAction<Qs[]>>;
   onSubmit: (values: QuestionSetFields) => void;
   onDelete?: () => void;
@@ -73,6 +74,7 @@ const QuestionSetForm = forwardRef<FormRef, QuestionSetFormProps>(
   (props, ref) => {
     const [subjectId, setSubjectId] = useState<string>("");
     const [chapterId, setChapterId] = useState<string>("");
+    const [qsType, setQsType] = useState<SET_TYPE>(SET_TYPE.MODEL_TEST);
     const [selectedQuestions, setSelectedQuestions] = useState<string[]>([]);
 
     const { data: subjects } = trpc.useQuery(["admin.subjects.list"], {
@@ -109,7 +111,6 @@ const QuestionSetForm = forwardRef<FormRef, QuestionSetFormProps>(
         const newQuestions = questions
           .filter((qs) => selectedQuestions.includes(qs.code))
           .map((qs) => ({ code: qs.code, stem: qs.stem, id: qs.id }));
-
         return [...newPrev, ...newQuestions];
       });
     };
@@ -131,6 +132,11 @@ const QuestionSetForm = forwardRef<FormRef, QuestionSetFormProps>(
         questions.map((q) => ({ code: q.code, stem: q.stem, id: q.id }))
       );
     }, [JSON.stringify(props.questionSet)]);
+    useEffect(() => {
+      if (qsType === SET_TYPE.QUESTION_BANK) {
+        props.setAddedQuestions([]);
+      }
+    }, [qsType, chapterId]);
 
     const formik = useFormik<QuestionSetFormFields>({
       initialValues: {
@@ -142,7 +148,7 @@ const QuestionSetForm = forwardRef<FormRef, QuestionSetFormProps>(
         duration: 0,
       },
       validationSchema,
-      onSubmit: (values, { resetForm }) => {
+      onSubmit: (values) => {
         props.onSubmit({
           ...values,
           subjectId,
@@ -169,7 +175,10 @@ const QuestionSetForm = forwardRef<FormRef, QuestionSetFormProps>(
                 name="type"
                 label="Question Set Type"
                 value={formik.values.type}
-                onChange={formik.handleChange}
+                onChange={(e) => {
+                  setQsType(e.target.value as SET_TYPE);
+                  formik.handleChange(e);
+                }}
               >
                 <MenuItem value="" disabled>
                   Select an option
@@ -187,6 +196,7 @@ const QuestionSetForm = forwardRef<FormRef, QuestionSetFormProps>(
               label="Set Code"
               name="code"
               value={formik.values.code}
+              disabled={props.formType === "update"}
               onChange={formik.handleChange}
               fullWidth
               sx={{ mb: 2 }}
