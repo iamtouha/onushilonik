@@ -21,6 +21,7 @@
 
 # misc
 .DS_Store
+.vscode
 *.pem
 
 # debug
@@ -38,3 +39,4 @@ yarn-error.log*
 
 # typescript
 *.tsbuildinfo
+
