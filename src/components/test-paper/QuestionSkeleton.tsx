@@ -10,11 +10,12 @@ export const Question = () => {
       <Skeleton variant="text" />
       <Skeleton variant="text" />
       <Skeleton variant="text" width={150} sx={{ mb: 3 }} />
-      <Stack spacing={1} sx={{ mb: 2 }}>
-        <Skeleton variant="text" width={250} />
-        <Skeleton variant="text" width={250} />
-        <Skeleton variant="text" width={250} />
-        <Skeleton variant="text" width={250} />
+      <Skeleton sx={{ mb: 2 }} variant="text" width={200} />
+      <Stack spacing={2} sx={{ mb: 2 }}>
+        <Skeleton variant="text" width={350} />
+        <Skeleton variant="text" width={350} />
+        <Skeleton variant="text" width={350} />
+        <Skeleton variant="text" width={350} />
       </Stack>
       <Skeleton variant="rounded" height={40} width={120} />
     </>

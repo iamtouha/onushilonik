@@ -14,7 +14,6 @@ export const questionRouter = createProtectedRouter()
       return await ctx.prisma.question.findUnique({
         where: { id: input.id },
         include: {
-          note: true,
           answers: { where: { answerSheetId: input.sheetId } },
         },
       });
@@ -27,6 +26,14 @@ export const questionRouter = createProtectedRouter()
         by: ["option"],
         where: { questionId: input.id },
         _count: true,
+      });
+    },
+  })
+  .query("get-short-note", {
+    input: z.object({ id: z.string() }),
+    async resolve({ ctx, input }) {
+      return await ctx.prisma.note.findFirst({
+        where: { questions: { some: { id: input.id } } },
       });
     },
   });

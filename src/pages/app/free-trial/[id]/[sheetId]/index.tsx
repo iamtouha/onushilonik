@@ -5,8 +5,8 @@ import Button from "@mui/material/Button";
 import Alert from "@mui/material/Alert";
 import { trpc } from "@/utils/trpc";
 import { useContext, useEffect } from "react";
-import ModelTest from "@/components/ModelTest";
-import QuestionSkeleton from "@/components/QuestionSkeleton";
+import PaperWrapper from "@/components/test-paper/PaperWrapper";
+import QuestionSkeleton from "@/components/test-paper/QuestionSkeleton";
 import { NextPageWithLayout } from "@/pages/_app";
 import DefaultLayout from "@/layouts/DefaultLayout";
 import SheetContext, { SheetProvider } from "@/contexts/SheetContext";
@@ -74,7 +74,7 @@ const TrialQuestionSet: NextPageWithLayout = () => {
             Could not load the your answers. Please try again.
           </Alert>
         )}
-        {<ModelTest />}
+        {<PaperWrapper />}
       </Container>
     </>
   );

@@ -25,7 +25,7 @@ import { Question as QuestionLoading } from "./QuestionSkeleton";
 import SheetContext from "@/contexts/SheetContext";
 import { toast } from "react-toastify";
 import { styled } from "@mui/material/styles";
-import ShortNote from "./ShortNote";
+import ShortNote from "../ShortNote";
 
 export default function QuestionSheet() {
   const router = useRouter();
@@ -55,6 +55,10 @@ export default function QuestionSheet() {
     "question.get-stats",
     { id: selectedQuestion ?? "" },
   ]);
+  const { data: shortNote, isLoading: noteLoading } = trpc.useQuery(
+    ["question.get-short-note", { id: selectedQuestion ?? "" }],
+    { enabled: !!selectedQuestion && !!question?.answers[0] }
+  );
   const answerQuestionMutation = trpc.useMutation("answersheet.add-answer", {
     onSuccess: () => {
       refetch({});
@@ -297,13 +301,14 @@ export default function QuestionSheet() {
           </Box>
         </Grid>
         <Grid item xs={12} md={8} order={{ xs: 3, md: 3 }}>
-          {!isLoading && answer ? (
+          {answer ? (
             <Box>
               <Typography variant="h5" component="h5" gutterBottom>
                 Short Note:
               </Typography>
-              {question?.note ? (
-                <ShortNote content={question.note.content} />
+              {noteLoading ? <></> : <></>}
+              {shortNote ? (
+                <ShortNote content={shortNote.content} />
               ) : (
                 "No short note found for this question"
               )}
