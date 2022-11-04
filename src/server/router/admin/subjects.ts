@@ -107,36 +107,20 @@ export const subjectsRouter = createAdminRouter()
     input: z.object({
       id: z.string(),
       title: z.string().min(2).max(100),
-      code: z.string().min(2).max(100),
       published: z.boolean(),
     }),
     async resolve({ ctx, input }) {
-      const { id, title, code, published } = input;
-      try {
-        const subject = await ctx.prisma.subject.update({
-          where: { id },
-          data: {
-            title,
-            code,
-            published,
-            updatedById: ctx.session?.user.id,
-          },
-        });
-        return subject;
-      } catch (e) {
-        if (e instanceof Prisma.PrismaClientKnownRequestError) {
-          if (e.code === "P2002") {
-            throw new TRPCError({
-              code: "CONFLICT",
-              message: "Code already exists",
-            });
-          }
-        }
-        throw new TRPCError({
-          code: "INTERNAL_SERVER_ERROR",
-          message: "Something went wrong",
-        });
-      }
+      const { id, title, published } = input;
+
+      const subject = await ctx.prisma.subject.update({
+        where: { id },
+        data: {
+          title,
+          published,
+          updatedById: ctx.session?.user.id,
+        },
+      });
+      return subject;
     },
   })
   .mutation("delete", {

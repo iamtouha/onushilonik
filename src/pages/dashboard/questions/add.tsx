@@ -139,7 +139,7 @@ const AddQuestion: NextPageWithLayout = () => {
         <Box
           component="form"
           onSubmit={formik.handleSubmit}
-          sx={{ maxWidth: 600, pb: 10 }}
+          sx={{ maxWidth: 960, pb: 10 }}
         >
           <Grid container spacing={2}>
             <Grid xs={12} md={6}>

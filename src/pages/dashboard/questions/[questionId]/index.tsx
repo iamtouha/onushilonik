@@ -35,8 +35,7 @@ import DashboardLayout from "@/layouts/DashboardLayout";
 import { trpc } from "@/utils/trpc";
 import { Android12Switch } from "@/components/CustomComponents";
 
-interface QuestionForm {
-  code: string;
+interface UpdateQuestionForm {
   stem: string;
   published: boolean;
   optionA: string;
@@ -48,7 +47,6 @@ interface QuestionForm {
 }
 
 const validationSchema = yup.object().shape({
-  code: yup.string().min(2).max(100).required("Question Code is required"),
   stem: yup.string().min(2).max(1024).required("Stem is required"),
   optionA: yup.string().min(1).max(100).required("Option A cannot be empty"),
   optionB: yup.string().min(1).max(100).required("Option B cannot be empty"),
@@ -62,7 +60,7 @@ const validationSchema = yup.object().shape({
   noteId: yup.string().optional(),
 });
 
-const AddQuestion: NextPageWithLayout = () => {
+const Question: NextPageWithLayout = () => {
   const router = useRouter();
   const [subjectId, setSubjectId] = useState<string>("");
   const [chapterId, setChapterId] = useState<string>("");
@@ -131,10 +129,9 @@ const AddQuestion: NextPageWithLayout = () => {
       toast.error("Something went wrong");
     },
   });
-  const formik = useFormik<QuestionForm>({
+  const formik = useFormik<UpdateQuestionForm>({
     initialValues: {
       stem: question?.stem || "",
-      code: question?.code || "",
       published: question?.published || false,
       optionA: question?.optionA || "",
       optionB: question?.optionB || "",
@@ -195,7 +192,7 @@ const AddQuestion: NextPageWithLayout = () => {
             <Box
               component="form"
               onSubmit={formik.handleSubmit}
-              sx={{ maxWidth: 600 }}
+              sx={{ maxWidth: 960 }}
             >
               <Grid container spacing={2}>
                 <Grid xs={12} md={6}>
@@ -247,13 +244,10 @@ const AddQuestion: NextPageWithLayout = () => {
               </Grid>
               <TextField
                 label="Question Code"
-                name="code"
-                value={formik.values.code}
-                onChange={formik.handleChange}
+                value={question?.code}
                 fullWidth
                 sx={{ mb: 2 }}
-                error={formik.touched.code && !!formik.errors.code}
-                helperText={formik.touched.code && formik.errors.code}
+                disabled
               />
               <TextField
                 name="stem"
@@ -442,6 +436,6 @@ const AddQuestion: NextPageWithLayout = () => {
   );
 };
 
-AddQuestion.getLayout = (page) => <DashboardLayout>{page}</DashboardLayout>;
+Question.getLayout = (page) => <DashboardLayout>{page}</DashboardLayout>;
 
-export default AddQuestion;
+export default Question;

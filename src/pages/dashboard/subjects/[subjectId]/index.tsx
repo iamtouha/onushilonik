@@ -29,15 +29,13 @@ import { trpc } from "@/utils/trpc";
 import { Android12Switch } from "@/components/CustomComponents";
 import { format } from "date-fns";
 
-interface SubjectForm {
+interface UpdateSubjectForm {
   title: string;
-  code: string;
   published: boolean;
 }
 
 const validationSchema = yup.object().shape({
   title: yup.string().min(2).max(100).required("Title is required"),
-  code: yup.string().min(2).max(100).required("Code is required"),
   published: yup.boolean(),
 });
 
@@ -91,20 +89,17 @@ const Subject: NextPageWithLayout = () => {
       toast.error("Could not delete subject");
     },
   });
-  const formik = useFormik<SubjectForm>({
+  const formik = useFormik<UpdateSubjectForm>({
     initialValues: {
       title: subject?.title ?? "",
-      code: subject?.code ?? "",
       published: subject?.published ?? true,
     },
     enableReinitialize: true,
     validationSchema,
     onSubmit: async (values) => {
       if (!subject) return;
-      const { title, code, published } = subject;
-      if (
-        JSON.stringify(values) === JSON.stringify({ title, code, published })
-      ) {
+      const { title, published } = subject;
+      if (JSON.stringify(values) === JSON.stringify({ title, published })) {
         toast.info("No changes made");
         return;
       }
@@ -167,14 +162,10 @@ const Subject: NextPageWithLayout = () => {
               />
               <TextField
                 label="Subject Code"
-                name="code"
-                value={formik.values.code}
-                onChange={formik.handleChange}
+                value={subject.code}
                 fullWidth
                 sx={{ mb: 2 }}
-                inputProps={{ minLength: 3, maxLength: 100 }}
-                error={formik.touched.code && !!formik.errors.code}
-                helperText={formik.touched.code && formik.errors.code}
+                disabled
               />
               <Box sx={{ mb: 2 }}>
                 <FormControlLabel

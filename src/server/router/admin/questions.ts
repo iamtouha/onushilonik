@@ -143,7 +143,6 @@ export const questionsRouter = createAdminRouter()
     input: z.object({
       id: z.string(),
       stem: z.string().min(2).max(1024),
-      code: z.string().min(2).max(100),
       optionA: z.string().trim().min(1).max(100),
       optionB: z.string().trim().min(1).max(100),
       optionC: z.string().trim().min(1).max(100),
@@ -154,38 +153,22 @@ export const questionsRouter = createAdminRouter()
       chapterId: z.string(),
     }),
     async resolve({ ctx, input }) {
-      try {
-        const question = await ctx.prisma.question.update({
-          where: { id: input.id },
-          data: {
-            chapterId: input.chapterId,
-            stem: input.stem,
-            code: input.code,
-            optionA: input.optionA,
-            optionB: input.optionB,
-            optionC: input.optionC,
-            optionD: input.optionD,
-            noteId: input.noteId || null,
-            correctOption: input.correctOption,
-            published: input.published,
-            updatedById: ctx.session?.user.id,
-          },
-        });
-        return question;
-      } catch (e) {
-        if (e instanceof Prisma.PrismaClientKnownRequestError) {
-          if (e.code === "P2002") {
-            throw new TRPCError({
-              code: "CONFLICT",
-              message: "Code already exists",
-            });
-          }
-        }
-        throw new TRPCError({
-          code: "INTERNAL_SERVER_ERROR",
-          message: "Something went wrong",
-        });
-      }
+      const question = await ctx.prisma.question.update({
+        where: { id: input.id },
+        data: {
+          chapterId: input.chapterId,
+          stem: input.stem,
+          optionA: input.optionA,
+          optionB: input.optionB,
+          optionC: input.optionC,
+          optionD: input.optionD,
+          noteId: input.noteId || null,
+          correctOption: input.correctOption,
+          published: input.published,
+          updatedById: ctx.session?.user.id,
+        },
+      });
+      return question;
     },
   })
   .mutation("delete", {

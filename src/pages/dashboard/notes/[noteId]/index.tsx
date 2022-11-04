@@ -47,15 +47,13 @@ const ResizableTextarea = styled(TextField)(({ theme }) => ({
   },
 }));
 
-interface NoteForm {
-  code: string;
+interface UpdateNoteForm {
   title: string;
   content: string;
   published: boolean;
 }
 
 const validationSchema = yup.object().shape({
-  code: yup.string().min(2).max(100).required("Note Code is required"),
   title: yup.string().required("Title is required"),
   content: yup.string().max(2048).required("Note Content is required"),
   published: yup.boolean(),
@@ -127,10 +125,9 @@ const AddNote: NextPageWithLayout = () => {
       toast.error("Something went wrong");
     },
   });
-  const formik = useFormik<NoteForm>({
+  const formik = useFormik<UpdateNoteForm>({
     initialValues: {
       title: note?.title || "",
-      code: note?.code || "",
       published: note?.published || true,
       content: note?.content || "",
     },
@@ -248,12 +245,9 @@ const AddNote: NextPageWithLayout = () => {
                     <Grid xs={12} md={6}>
                       <TextField
                         label="Note Code"
-                        name="code"
-                        value={formik.values.code}
-                        onChange={formik.handleChange}
+                        value={note.code}
                         fullWidth
-                        error={formik.touched.code && !!formik.errors.code}
-                        helperText={formik.touched.code && formik.errors.code}
+                        disabled
                       />
                     </Grid>
                     <Grid xs={12} md={6}>

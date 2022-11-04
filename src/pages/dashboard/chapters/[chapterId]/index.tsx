@@ -35,16 +35,14 @@ import { trpc } from "@/utils/trpc";
 import { Android12Switch } from "@/components/CustomComponents";
 import { format } from "date-fns";
 
-interface ChapterForm {
+interface UpdateChapterForm {
   title: string;
-  code: string;
   published: boolean;
   subjectId: string;
 }
 
 const validationSchema = yup.object().shape({
   title: yup.string().min(2).max(100).required("Title is required"),
-  code: yup.string().min(2).max(100).required("Code is required"),
   subjectId: yup.string().required("Subject is required"),
   published: yup.boolean(),
 });
@@ -100,10 +98,9 @@ const Chapter: NextPageWithLayout = () => {
       toast.error("Could not delete chapter");
     },
   });
-  const formik = useFormik<ChapterForm>({
+  const formik = useFormik<UpdateChapterForm>({
     initialValues: {
       title: chapter?.title ?? "",
-      code: chapter?.code ?? "",
       published: chapter?.published ?? true,
       subjectId: chapter?.subjectId ?? "",
     },
@@ -111,10 +108,10 @@ const Chapter: NextPageWithLayout = () => {
     validationSchema,
     onSubmit: async (values) => {
       if (!chapter) return;
-      const { title, code, published, subjectId } = chapter;
+      const { title, published, subjectId } = chapter;
       if (
         JSON.stringify(values) ===
-        JSON.stringify({ title, code, published, subjectId })
+        JSON.stringify({ title, published, subjectId })
       ) {
         toast.info("No changes made");
         return;
@@ -209,14 +206,11 @@ const Chapter: NextPageWithLayout = () => {
               />
               <TextField
                 label="Chapter Code"
-                name="code"
-                value={formik.values.code}
-                onChange={formik.handleChange}
                 fullWidth
                 sx={{ mb: 2 }}
                 inputProps={{ minLength: 3, maxLength: 100 }}
-                error={formik.touched.code && !!formik.errors.code}
-                helperText={formik.touched.code && formik.errors.code}
+                value={chapter.code}
+                disabled
               />
               <Box sx={{ mb: 2 }}>
                 <FormControlLabel

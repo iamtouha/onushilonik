@@ -140,7 +140,6 @@ export const notesRouter = createAdminRouter()
       id: z.string(),
       title: z.string(),
       content: z.string().min(2).max(1024),
-      code: z.string().min(2).max(100),
       published: z.boolean(),
       chapterId: z.string(),
     }),
@@ -151,7 +150,6 @@ export const notesRouter = createAdminRouter()
           data: {
             chapterId: input.chapterId,
             content: input.content,
-            code: input.code,
             title: input.title,
             published: input.published,
             updatedById: ctx.session?.user.id,

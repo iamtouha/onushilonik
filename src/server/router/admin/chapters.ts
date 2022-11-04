@@ -116,19 +116,17 @@ export const chaptersRouter = createAdminRouter()
     input: z.object({
       id: z.string(),
       title: z.string().min(2).max(100),
-      code: z.string().min(2).max(100),
       subjectId: z.string(),
       published: z.boolean(),
     }),
     async resolve({ ctx, input }) {
-      const { id, title, code, published, subjectId } = input;
+      const { id, title, published, subjectId } = input;
       try {
         const chapter = await ctx.prisma.chapter.update({
           where: { id },
           data: {
             subjectId,
             title,
-            code,
             published,
             updatedById: ctx.session?.user.id,
           },
