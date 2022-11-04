@@ -51,10 +51,10 @@ export default function QuestionSheet() {
     ],
     { enabled: !!selectedQuestion && !!answerSheet?.id }
   );
-  const { data: statsData } = trpc.useQuery([
-    "question.get-stats",
-    { id: selectedQuestion ?? "" },
-  ]);
+  const { data: statsData } = trpc.useQuery(
+    ["question.get-stats", { id: selectedQuestion ?? "" }],
+    { enabled: !!selectedQuestion }
+  );
   const { data: shortNote, isLoading: noteLoading } = trpc.useQuery(
     ["question.get-short-note", { id: selectedQuestion ?? "" }],
     { enabled: !!selectedQuestion && !!question?.answers[0] }

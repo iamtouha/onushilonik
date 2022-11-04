@@ -21,14 +21,15 @@ import { trpc } from "@/utils/trpc";
 
 const QuestionBank: NextPageWithLayout = () => {
   const router = useRouter();
-  const { data: subjects, isLoading } = trpc.useQuery([
-    "questionbank.subjects",
+  const { data: subject, isLoading } = trpc.useQuery([
+    "questionbank.subject",
+    { id: router.query.subjectId as string },
   ]);
 
   return (
     <>
       <Head>
-        <title>Question Bank | Onushilonik Dashboard</title>
+        <title>{subject?.title} | Onushilonik Dashboard</title>
       </Head>
       <Container sx={{ mt: 2 }}>
         <Breadcrumbs sx={{ mb: 1, ml: -1 }} aria-label="breadcrumb">
@@ -37,31 +38,44 @@ const QuestionBank: NextPageWithLayout = () => {
               <HomeIcon />
             </IconButton>
           </NextLink>
-          <Typography color="inherit">Question Bank</Typography>
+          <Link href="/app/question-bank" underline="hover" color="inherit">
+            Question Bank
+          </Link>
+          <Typography color="inherit">{subject?.title}</Typography>
         </Breadcrumbs>
         <Box sx={{ display: "flex", alignItems: "center" }}>
-          <Typography gutterBottom variant="h4" sx={{ mb: 2 }}>
-            Question Bank
+          <Typography gutterBottom variant="h4" sx={{ mb: 4 }}>
+            {subject?.title}
           </Typography>
           <Box sx={{ ml: "auto", mr: 0 }} />
         </Box>
-        <Grid container spacing={2}>
-          {subjects?.map((subject) => (
-            <Grid item xs={12} md={6} lg={4} key={subject.id}>
-              <Card>
-                <NextLink href={`${router.asPath}/${subject.id}`} passHref>
-                  <CardActionArea component={"a"} sx={{ display: "block" }}>
-                    <CardContent>
-                      <Typography gutterBottom variant="h6" component="h5">
-                        {subject.title}
-                      </Typography>
-                    </CardContent>
-                  </CardActionArea>
-                </NextLink>
-              </Card>
+        {subject?.chapters.map((chapter) => (
+          <>
+            <Typography variant="h6" sx={{ mb: 2 }}>
+              {chapter.title}
+            </Typography>
+            <Grid container spacing={2}>
+              {chapter.questionSets.map((set) => (
+                <Grid item xs={12} sm={6} md={4} lg={3} key={chapter.id}>
+                  <Card>
+                    <NextLink href={`${router.asPath}/${set.id}`} passHref>
+                      <CardActionArea component={"a"} sx={{ display: "block" }}>
+                        <CardContent>
+                          <Typography variant="body1">{set.title}</Typography>
+                        </CardContent>
+                      </CardActionArea>
+                    </NextLink>
+                  </Card>
+                </Grid>
+              ))}
             </Grid>
-          ))}
-        </Grid>
+            {chapter.questionSets.length === 0 && (
+              <Typography gutterBottom variant="body1" component="p">
+                No question found for this chapter.
+              </Typography>
+            )}
+          </>
+        ))}
         {isLoading ? <LinearProgress /> : null}
       </Container>
     </>

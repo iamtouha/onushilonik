@@ -47,7 +47,7 @@ const TrialQuestionSet = () => {
 
   const newTestMutation = trpc.useMutation("answersheet.create", {
     onSuccess: (res) => {
-      router.push(`${router.asPath}/${res.id}`);
+      router.push(`/app/free-trial/${query.id}/test?sheetId=${res.id}`);
     },
     onError: () => {
       toast.error("Could not start the test. Please try again.");
@@ -102,7 +102,9 @@ const TrialQuestionSet = () => {
           <Grid container spacing={2}>
             {qsSet.answerSheets.map((sheet, i) => (
               <Grid item xs={12} sm={6} md={4} key={sheet.id}>
-                <NextLink href={`${router.asPath}/${sheet.id}`}>
+                <NextLink
+                  href={`/app/free-trial/${query.id}/test?sheetId=${sheet.id}`}
+                >
                   <Card>
                     <CardActionArea>
                       <CardContent sx={{ display: "flex" }}>
@@ -142,18 +144,16 @@ const TrialQuestionSet = () => {
             </Typography>
           )}
           {qsSet.answerSheets.length === 0 && (
-            <NextLink href={`${router.asPath}/take-test`} passHref>
-              <Button
-                variant="contained"
-                component="a"
-                size="large"
-                disableElevation
-                sx={{ mt: 4 }}
-                onClick={startTest}
-              >
-                Take a test
-              </Button>
-            </NextLink>
+            <Button
+              variant="contained"
+              component="a"
+              size="large"
+              disableElevation
+              sx={{ mt: 4 }}
+              onClick={startTest}
+            >
+              Take a test
+            </Button>
           )}
         </Container>
       )}
