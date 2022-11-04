@@ -6,7 +6,7 @@ import Alert from "@mui/material/Alert";
 import { trpc } from "@/utils/trpc";
 import { useContext, useEffect } from "react";
 import PaperWrapper from "@/components/test-paper/PaperWrapper";
-import QuestionSkeleton from "@/components/test-paper/QuestionSkeleton";
+import QuestionSkeleton from "@/components/QuestionSkeleton";
 import { NextPageWithLayout } from "@/pages/_app";
 import DefaultLayout from "@/layouts/DefaultLayout";
 import SheetContext, { SheetProvider } from "@/contexts/SheetContext";

@@ -8,14 +8,13 @@ import Container from "@mui/material/Container";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import CardActionArea from "@mui/material/CardActionArea";
+import LinearProgress from "@mui/material/LinearProgress";
 import Grid from "@mui/material/Grid";
 import Typography from "@mui/material/Typography";
 import Breadcrumbs from "@mui/material/Breadcrumbs";
-import LinearProgress from "@mui/material/LinearProgress";
 import IconButton from "@mui/material/IconButton";
 import HomeIcon from "@mui/icons-material/Home";
 import { NextPageWithLayout } from "@/pages/_app";
-import SubscriptionLayout from "@/layouts/SubscriptionLayout";
 import Link from "@/components/Link";
 import { trpc } from "@/utils/trpc";
 
@@ -67,9 +66,5 @@ const QuestionBank: NextPageWithLayout = () => {
     </>
   );
 };
-
-QuestionBank.getLayout = (page) => (
-  <SubscriptionLayout>{page}</SubscriptionLayout>
-);
 
 export default QuestionBank;

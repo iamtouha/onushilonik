@@ -21,7 +21,7 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import { OPTION } from "@prisma/client";
 import { trpc } from "@/utils/trpc";
-import { Question as QuestionLoading } from "./QuestionSkeleton";
+import { Question as QuestionLoading } from "../QuestionSkeleton";
 import SheetContext from "@/contexts/SheetContext";
 import { toast } from "react-toastify";
 import { styled } from "@mui/material/styles";

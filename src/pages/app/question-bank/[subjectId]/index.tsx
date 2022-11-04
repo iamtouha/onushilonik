@@ -29,7 +29,7 @@ const QuestionBank: NextPageWithLayout = () => {
   return (
     <>
       <Head>
-        <title>{subject?.title} | Onushilonik Dashboard</title>
+        <title>{subject?.title ?? "Subject"} | Onushilonik Dashboard</title>
       </Head>
       <Container sx={{ mt: 2 }}>
         <Breadcrumbs sx={{ mb: 1, ml: -1 }} aria-label="breadcrumb">
@@ -41,14 +41,21 @@ const QuestionBank: NextPageWithLayout = () => {
           <Link href="/app/question-bank" underline="hover" color="inherit">
             Question Bank
           </Link>
-          <Typography color="inherit">{subject?.title}</Typography>
+          <Typography color="inherit">{subject?.title ?? "Subject"}</Typography>
         </Breadcrumbs>
         <Box sx={{ display: "flex", alignItems: "center" }}>
           <Typography gutterBottom variant="h4" sx={{ mb: 4 }}>
-            {subject?.title}
+            {subject?.title ?? "Subject"}
           </Typography>
           <Box sx={{ ml: "auto", mr: 0 }} />
         </Box>
+        {subject?.chapters.length === 0 && (
+          <Box sx={{ textAlign: "center" }}>
+            <Typography variant="h6" gutterBottom>
+              No chapters found
+            </Typography>
+          </Box>
+        )}
         {subject?.chapters.map((chapter) => (
           <>
             <Typography variant="h6" sx={{ mb: 2 }}>
@@ -58,10 +65,15 @@ const QuestionBank: NextPageWithLayout = () => {
               {chapter.questionSets.map((set) => (
                 <Grid item xs={12} sm={6} md={4} lg={3} key={chapter.id}>
                   <Card>
-                    <NextLink href={`${router.asPath}/${set.id}`} passHref>
+                    <NextLink href={`/app/test/${set.code}`} passHref>
                       <CardActionArea component={"a"} sx={{ display: "block" }}>
                         <CardContent>
-                          <Typography variant="body1">{set.title}</Typography>
+                          <Typography variant="body1" gutterBottom>
+                            {set.title}
+                          </Typography>
+                          <Typography variant="body2">
+                            total questions: {set._count.questions}
+                          </Typography>
                         </CardContent>
                       </CardActionArea>
                     </NextLink>
@@ -81,9 +93,5 @@ const QuestionBank: NextPageWithLayout = () => {
     </>
   );
 };
-
-QuestionBank.getLayout = (page) => (
-  <SubscriptionLayout>{page}</SubscriptionLayout>
-);
 
 export default QuestionBank;

@@ -18,7 +18,12 @@ export const questionBankRouter = createProtectedRouter()
         include: {
           chapters: {
             where: { published: true },
-            include: { questionSets: { where: { published: true } } },
+            include: {
+              questionSets: {
+                where: { published: true },
+                include: { _count: true },
+              },
+            },
           },
         },
       });

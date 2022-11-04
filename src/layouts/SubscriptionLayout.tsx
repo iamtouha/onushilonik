@@ -16,11 +16,9 @@ type LayoutProps = {
 };
 const SubscriptionLayout = ({ children }: LayoutProps) => {
   return (
-    <DefaultLayout>
-      <SubscriptionProvider>
-        <HasSubscription>{children}</HasSubscription>
-      </SubscriptionProvider>
-    </DefaultLayout>
+    <SubscriptionProvider>
+      <HasSubscription>{children}</HasSubscription>
+    </SubscriptionProvider>
   );
 };
 
