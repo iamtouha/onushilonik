@@ -19,11 +19,11 @@ import { trpc } from "@/utils/trpc";
 
 const perPage = 10;
 
-const PrevQuestions: NextPageWithLayout = () => {
+const ModelTests: NextPageWithLayout = () => {
   const router = useRouter();
   const { data, isLoading } = trpc.useQuery(
     [
-      "questionset.prev-questions",
+      "questionset.model-tests",
       { page: +(router.query.page as string), perPage },
     ],
     { enabled: !!router.query.page, refetchOnWindowFocus: false }
@@ -39,7 +39,7 @@ const PrevQuestions: NextPageWithLayout = () => {
   return (
     <>
       <Head>
-        <title>Previous Year Questions | Onushilonik Dashboard</title>
+        <title>Model Tests | Onushilonik Dashboard</title>
       </Head>
       {isLoading ? <LinearProgress /> : null}
       <Container sx={{ mt: 2 }}>
@@ -49,14 +49,15 @@ const PrevQuestions: NextPageWithLayout = () => {
               <HomeIcon />
             </IconButton>
           </NextLink>
-          <Typography color="inherit">Previous Year Questions</Typography>
+          <Typography color="inherit">Model Tests</Typography>
         </Breadcrumbs>
         <Box sx={{ display: "flex", alignItems: "center" }}>
           <Typography gutterBottom variant="h4" sx={{ mb: 2 }}>
-            Previous Year Questions
+            Model Tests
           </Typography>
           <Box sx={{ ml: "auto", mr: 0 }} />
         </Box>
+
         <Grid container spacing={2}>
           {data?.questionSets.map((set) => (
             <Grid item xs={12} md={6} lg={4} key={set.id}>
@@ -92,7 +93,7 @@ const PrevQuestions: NextPageWithLayout = () => {
             />
           ) : (
             <Typography gutterBottom variant="h6" align="center" sx={{ mt: 4 }}>
-              No Previous Year Questions Found!
+              No Model Tests Found!
             </Typography>
           ))}
       </Container>
@@ -100,4 +101,4 @@ const PrevQuestions: NextPageWithLayout = () => {
   );
 };
 
-export default PrevQuestions;
+export default ModelTests;

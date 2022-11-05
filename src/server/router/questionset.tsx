@@ -1,3 +1,4 @@
+import { SET_TYPE } from "@prisma/client";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { createProtectedRouter } from "./protected-router";
@@ -21,7 +22,30 @@ export const questionSetRouter = createProtectedRouter()
       const { page, perPage } = input;
       const questionSet = await ctx.prisma.$transaction([
         ctx.prisma.questionSet.findMany({
-          where: { published: true },
+          where: { published: true, type: SET_TYPE.PREVIOUS_YEAR_QUESTION },
+          skip: (page - 1) * perPage,
+          take: perPage,
+          orderBy: { createdAt: "desc" },
+          include: { _count: true },
+        }),
+        ctx.prisma.questionSet.count({ where: { published: true } }),
+      ]);
+      return {
+        questionSets: questionSet[0],
+        total: questionSet[1],
+      };
+    },
+  })
+  .query("model-tests", {
+    input: z.object({
+      page: z.number(),
+      perPage: z.number(),
+    }),
+    async resolve({ ctx, input }) {
+      const { page, perPage } = input;
+      const questionSet = await ctx.prisma.$transaction([
+        ctx.prisma.questionSet.findMany({
+          where: { published: true, type: SET_TYPE.MODEL_TEST },
           skip: (page - 1) * perPage,
           take: perPage,
           orderBy: { createdAt: "desc" },
