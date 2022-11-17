@@ -128,7 +128,7 @@ const Questions: NextPageWithLayout = () => {
       </Head>
       <Container maxWidth="xl" sx={{ mt: 2 }}>
         <Breadcrumbs sx={{ mb: 1, ml: -1 }} aria-label="breadcrumb">
-          <NextLink href="/app" passHref>
+          <NextLink href="/" passHref>
             <IconButton component="a">
               <HomeIcon />
             </IconButton>
