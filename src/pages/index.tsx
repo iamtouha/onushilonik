@@ -10,7 +10,6 @@ import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import CardActionArea from "@mui/material/CardActionArea";
 import CardMedia from "@mui/material/CardMedia";
-import Box from "@mui/material/Box";
 
 const services = [
   {
@@ -95,7 +94,7 @@ const Home: NextPageWithLayout = () => {
               অসংখ্য প্রশ্ন সমাধানের মাধ্যমে নিজের প্রস্তুতি যাচাই করতে পারবে
               সহজেই।
             </Typography>
-            <NextLink href="/app/start-trial" passHref>
+            <NextLink href="/app/free-trial" passHref>
               <Button
                 variant="contained"
                 sx={{ mt: 3 }}

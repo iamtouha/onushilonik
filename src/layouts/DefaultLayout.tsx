@@ -27,7 +27,7 @@ import WarningIcon from "@mui/icons-material/Warning";
 import ColorModeToggle from "@/components/ColorModeToggle";
 
 const routes = [
-  { title: "Home", href: "/app" },
+  { title: "Home", href: "/" },
   { title: "Question Bank", href: "/app/question-bank" },
   { title: "Previous year questions", href: "/app/prev-questions" },
   { title: "Model Test", href: "/app/model-tests" },

@@ -58,14 +58,14 @@ function HomepageLayout(props: Props) {
               >
                 {mode === "dark" ? <Brightness4Icon /> : <Brightness7Icon />}
               </IconButton>
-              <NextLink href={"/app"} passHref>
+              <NextLink href={"/app/question-bank"} passHref>
                 <Button
                   variant="contained"
                   color="primary"
                   size="large"
                   component="a"
                 >
-                  এখনই শুরু কর
+                  এখনই শুরু করো
                 </Button>
               </NextLink>
             </Box>

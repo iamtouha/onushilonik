@@ -15,18 +15,17 @@ import Breadcrumbs from "@mui/material/Breadcrumbs";
 import IconButton from "@mui/material/IconButton";
 import HomeIcon from "@mui/icons-material/Home";
 import { NextPageWithLayout } from "@/pages/_app";
+import Link from "@/components/Link";
 import { trpc } from "@/utils/trpc";
 
 const QuestionBank: NextPageWithLayout = () => {
   const router = useRouter();
-  const { data: subjects, isLoading } = trpc.useQuery([
-    "questionbank.subjects",
-  ]);
+  const { data: subjects, isLoading } = trpc.useQuery(["shortnotes.subjects"]);
 
   return (
     <>
       <Head>
-        <title>Question Bank | Onushilonik Dashboard</title>
+        <title>Subjects | Onushilonik Dashboard</title>
       </Head>
       <Container sx={{ mt: 2 }}>
         <Breadcrumbs sx={{ mb: 1, ml: -1 }} aria-label="breadcrumb">
@@ -35,11 +34,11 @@ const QuestionBank: NextPageWithLayout = () => {
               <HomeIcon />
             </IconButton>
           </NextLink>
-          <Typography color="inherit">Question Bank</Typography>
+          <Typography color="inherit">Subjects</Typography>
         </Breadcrumbs>
         <Box sx={{ display: "flex", alignItems: "center" }}>
           <Typography gutterBottom variant="h4" sx={{ mb: 2 }}>
-            Question Bank
+            Subjects
           </Typography>
           <Box sx={{ ml: "auto", mr: 0 }} />
         </Box>
@@ -47,7 +46,7 @@ const QuestionBank: NextPageWithLayout = () => {
           {subjects?.map((subject) => (
             <Grid item xs={12} md={6} lg={4} key={subject.id}>
               <Card>
-                <NextLink href={`${router.asPath}/${subject.id}`} passHref>
+                <NextLink href={`${router.asPath}/${subject.code}`} passHref>
                   <CardActionArea component={"a"} sx={{ display: "block" }}>
                     <CardContent>
                       <Typography gutterBottom variant="h6" component="h5">

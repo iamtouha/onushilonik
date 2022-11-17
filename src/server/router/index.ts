@@ -7,6 +7,7 @@ import { questionSetRouter } from "./questionset";
 import { questionRouter } from "./question";
 import { answerSheetRouter } from "./answersheet";
 import { questionBankRouter } from "./question-bank";
+import { shortNotesRouter } from "./short-notes";
 
 export const appRouter = createRouter()
   .transformer(superjson)
@@ -16,6 +17,7 @@ export const appRouter = createRouter()
   .merge("questionset.", questionSetRouter)
   .merge("question.", questionRouter)
   .merge("answersheet.", answerSheetRouter)
+  .merge("shortnotes.", shortNotesRouter)
   .merge("questionbank.", questionBankRouter);
 
 // export type definition of API
