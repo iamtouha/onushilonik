@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useContext } from "react";
 import { formatDuration, intervalToDuration } from "date-fns";
 import Head from "next/head";
 import { useRouter } from "next/router";
@@ -17,15 +17,21 @@ import LinearProgress, {
   LinearProgressProps,
   linearProgressClasses,
 } from "@mui/material/LinearProgress";
+import CssBaseline from "@mui/material/CssBaseline";
+
 import FormControl from "@mui/material/FormControl";
 import FormLabel from "@mui/material/FormLabel";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
-import SheetContext from "@/contexts/SheetContext";
 import { styled } from "@mui/material/styles";
 import Container from "@mui/material/Container";
 import HourglassTopIcon from "@mui/icons-material/HourglassTop";
 import HourglassBottomIcon from "@mui/icons-material/HourglassBottom";
+import { ThemeProvider, createTheme } from "@mui/material/styles";
+import orange from "@mui/material/colors/orange";
+import green from "@mui/material/colors/green";
+import grey from "@mui/material/colors/grey";
+import red from "@mui/material/colors/red";
 import { NextPageWithLayout } from "@/pages/_app";
 import SubscriptionLayout from "@/layouts/SubscriptionLayout";
 import { trpc } from "@/utils/trpc";
@@ -36,7 +42,7 @@ import DefaultLayout from "@/layouts/DefaultLayout";
 import { OPTION } from "@prisma/client";
 import { toast } from "react-toastify";
 import ShortNote from "@/components/ShortNote";
-import BorderedCircularProgress from "@/components/elements/BorderedCircularProgress";
+import ColorModeContext from "@/contexts/ColorModeContext";
 
 const AnswerSheet: NextPageWithLayout = () => {
   const router = useRouter();
@@ -298,9 +304,11 @@ const AnswerSheet: NextPageWithLayout = () => {
                           gutterBottom
                           sx={{ my: 2 }}
                         >
-                          {(stats[question.correctOption] / stats.total) * 100}%
-                          students answered correctly. Total {stats.total}{" "}
-                          students answered.
+                          {Math.round(
+                            (stats[question.correctOption] / stats.total) * 100
+                          )}
+                          % students answered correctly. Total {stats.total}{" "}
+                          students answered this question.
                         </Typography>
                         <AnswerStat
                           label={`A) ${question.optionA}`}
@@ -437,15 +445,11 @@ const AnswerSheet: NextPageWithLayout = () => {
                     </Button>
                   ))}
                 </Box>
-                <Typography variant="body1" component="p" gutterBottom>
-                  Your Score:
-                </Typography>
-                <Box sx={{ p: 2 }}>
-                  <BorderedCircularProgress
-                    color="info"
-                    size={100}
+
+                <Box>
+                  <LinearProgressWithLabel2
+                    label="Your Score"
                     value={Math.round(calculateResult().value * 100)}
-                    label={calculateResult().label}
                   />
                 </Box>
               </Grid>
@@ -473,7 +477,9 @@ const AnswerSheet: NextPageWithLayout = () => {
 
 AnswerSheet.getLayout = (page) => (
   <DefaultLayout>
-    <SubscriptionLayout>{page}</SubscriptionLayout>
+    <SubscriptionLayout>
+      <TestTheme>{page}</TestTheme>
+    </SubscriptionLayout>
   </DefaultLayout>
 );
 
@@ -541,10 +547,8 @@ const AnswerStat = ({
 }) => {
   return (
     <Box sx={{ mb: 2 }}>
-      <Typography variant="body1" component="p">
-        {label}
-      </Typography>
-      <LinearProgressWithLabel
+      <LinearProgressWithLabel2
+        label={label}
         color={
           isAnswered
             ? isCorrect
@@ -552,7 +556,7 @@ const AnswerStat = ({
               : "error"
             : isCorrect
             ? "success"
-            : "info"
+            : "secondary"
         }
         value={value ?? 0}
       />
@@ -560,16 +564,39 @@ const AnswerStat = ({
   );
 };
 
-function LinearProgressWithLabel(
-  props: LinearProgressProps & { value: number }
+function LinearProgressWithLabel2(
+  props: LinearProgressProps & { value: number; label: string }
 ) {
   return (
-    <Box sx={{ display: "flex", alignItems: "center" }}>
-      <Box sx={{ width: "100%", mr: 1 }}>
-        <BorderLinearProgress variant="determinate" {...props} />
+    <Box sx={{ position: "relative" }}>
+      <Box sx={{ width: "100%" }}>
+        <BorderLinearProgress2 variant="determinate" {...props} />
       </Box>
-      <Box sx={{ minWidth: 35 }}>
-        <Typography variant="body2" color="text.secondary">{`${Math.round(
+      <Box
+        sx={{
+          minWidth: 35,
+          p: 2,
+          position: "absolute",
+          top: "50%",
+          left: 0,
+          transform: `translateY(-50%)`,
+        }}
+      >
+        <Typography variant="body1" color="inherit">
+          {props.label}
+        </Typography>
+      </Box>
+      <Box
+        sx={{
+          minWidth: 35,
+          p: 2,
+          position: "absolute",
+          top: "50%",
+          right: 0,
+          transform: `translateY(-50%)`,
+        }}
+      >
+        <Typography variant="body1" color="inherit">{`${Math.round(
           props.value
         )}%`}</Typography>
       </Box>
@@ -577,11 +604,47 @@ function LinearProgressWithLabel(
   );
 }
 
-const BorderLinearProgress = styled(LinearProgress)(({ theme }) => ({
-  height: 6,
+const BorderLinearProgress2 = styled(LinearProgress)(({ theme }) => ({
+  height: 40,
   borderRadius: 5,
   [`&.${linearProgressClasses.colorPrimary}`]: {},
   [`& .${linearProgressClasses.bar}`]: {
     borderRadius: 5,
   },
 }));
+
+const TestTheme = ({ children }: { children: React.ReactNode }) => {
+  const [mode] = useContext(ColorModeContext);
+  const theme = useMemo(
+    () =>
+      createTheme({
+        palette: {
+          mode,
+          primary: {
+            main: orange[400],
+          },
+          secondary: grey,
+          success: {
+            main: green[300],
+          },
+          error: {
+            main: red[300],
+          },
+        },
+        components: {
+          MuiCard: {
+            defaultProps: {
+              variant: mode === "dark" ? "elevation" : "outlined",
+            },
+          },
+        },
+      }),
+    [mode]
+  );
+  return (
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      {children}
+    </ThemeProvider>
+  );
+};

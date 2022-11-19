@@ -36,7 +36,7 @@ const QuestionBank: NextPageWithLayout = () => {
               <HomeIcon />
             </IconButton>
           </NextLink>
-          <Link href="/app/question-bank" underline="hover" color="inherit">
+          <Link href="/app/short-notes" underline="hover" color="inherit">
             Short Notes
           </Link>
           <Typography color="inherit">{subject?.title ?? "Subject"}</Typography>
