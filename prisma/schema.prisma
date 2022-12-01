@@ -1,13 +1,12 @@
 generator client {
-    provider = "prisma-client-js"
-    previewFeatures = ["referentialIntegrity"]
+    provider = "prisma-client-js" 
 }
 
 datasource db {
     provider = "mysql"
     url = env("DATABASE_URL")
-    shadowDatabaseUrl = env("SHADOW_URL")
-    referentialIntegrity = "prisma"
+    shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
+    relationMode = "prisma" 
 }
 
 model Account {
@@ -27,6 +26,7 @@ model Account {
 
     @@unique([provider, providerAccountId])
  
+    @@index([userId])
 }
 
 model Session {
@@ -36,6 +36,8 @@ model Session {
     expires      DateTime
     user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
      
+
+    @@index([userId])
 }
 
 model VerificationToken {
@@ -47,56 +49,53 @@ model VerificationToken {
 }
 
 model User {
-    id              String    @id @default(cuid())
-    name            String?
-    email           String?   @unique
-    emailVerified   DateTime?
-    image           String?
-    role            USER_ROLE @default(USER)
-    subscription    Subscription? @relation("subscriber")
-    accounts        Account[]
-    sessions        Session[]
-    active          Boolean   @default(true)
-    answerSheets    AnswerSheet[]
-    comments        Comment[]
-    flags           Flag[]
-    subscriptionsUpdated Subscription[] @relation("sub_updater")
-    subjectsCreated Subject[] @relation("subject_creator")
-    subjectsUpdated Subject[] @relation("subject_updater")
-    chaptersCreated Chapter[] @relation("chapter_creator")
-    chaptersUpdated Chapter[] @relation("chapter_updater")
-    questionsCreated Question[] @relation("question_creator")
-    questionsUpdated Question[] @relation("question_updater")
-    setsCreated     QuestionSet[] @relation("set_creator")
-    setsUpdated     QuestionSet[] @relation("set_updater")
-    notesCreated    Note[] @relation("note_creator")
-    notesUpdated    Note[] @relation("note_updater")
-    createdAt       DateTime  @default(now())
-    updatedAt       DateTime  @updatedAt
+    id                  String    @id @default(cuid())
+    name                String?
+    email               String?   @unique
+    emailVerified       DateTime?
+    image               String?
+    role                USER_ROLE @default(USER)
+    profile   Profile?  @relation(fields: [profileId], references: [id])  
+    profileId String?   @unique
+    accounts            Account[]
+    sessions            Session[]
+    paymentsUpdated     Payment[] 
+    subjectsCreated     Subject[] @relation("subject_creator")
+    subjectsUpdated     Subject[] @relation("subject_updater")
+    chaptersCreated     Chapter[] @relation("chapter_creator")
+    chaptersUpdated     Chapter[] @relation("chapter_updater")
+    questionsCreated    Question[] @relation("question_creator")
+    questionsUpdated    Question[] @relation("question_updater")
+    setsCreated         QuestionSet[] @relation("set_creator")
+    setsUpdated         QuestionSet[] @relation("set_updater")
+    notesCreated        Note[] @relation("note_creator")
+    notesUpdated        Note[] @relation("note_updater")
+    active              Boolean   @default(true)
 }
-
 enum USER_ROLE {
     SUPER_ADMIN
     ADMIN
     USER
 }
-
-model Subscription {
-    id              String   @id @default(cuid())
-    userId          String   @unique
-    user            User     @relation("subscriber",fields: [userId], references: [id], onDelete: Cascade)
-    phoneNumber     String?
-    payments        Payment[]
-    createdAt       DateTime @default(now())
-    updatedAt       DateTime @updatedAt
-    updatedBy       User?    @relation("sub_updater", fields: [updatedById], references: [id])
-    updatedById     String? 
+model Profile {
+    id                  String  @id @default(cuid())
+    user                User?
+    fullName            String
+    phone               String
+    institute           String
+    payments            Payment[]
+    answerSheets        AnswerSheet[]
+    comments            Comment[]
+    flags               Flag[]
+    createdAt           DateTime  @default(now())
+    updatedAt           DateTime  @updatedAt
 }
+
 
 model Payment {
     id              String   @id @default(cuid())
-    subscriptionId  String
-    subscription    Subscription @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+    profile         Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+    profileId       String
     status          PAYMENT_STATUS @default(PENDING)
     method          PAYMENT_METHOD
     currency        CURRENCY @default(BDT)
@@ -104,8 +103,13 @@ model Payment {
     paymentId       String
     transactionId   String @unique
     approvedAt      DateTime?
+    updatedBy       User? @relation(fields: [updatedById], references: [id])
+    updatedById     String?
     createdAt       DateTime @default(now())
     updatedAt       DateTime @updatedAt
+
+    @@index([profileId])
+    @@index([updatedById])
 }
 
 enum CURRENCY {
@@ -138,6 +142,9 @@ model Subject {
     createdById     String?
     updatedBy       User?    @relation("subject_updater", fields: [updatedById], references: [id], onDelete:NoAction )
     updatedById     String?
+
+    @@index([createdById])
+    @@index([updatedById])
 }
 
 model Chapter {
@@ -156,6 +163,10 @@ model Chapter {
     createdById     String?
     updatedBy       User?    @relation("chapter_updater", fields: [updatedById], references: [id], onDelete:NoAction )
     updatedById     String?
+
+    @@index([subjectId])
+    @@index([createdById])
+    @@index([updatedById])
 }
 
 
@@ -183,6 +194,11 @@ model Question {
     createdById     String?
     updatedBy       User?    @relation("question_updater", fields: [updatedById], references: [id], onDelete:NoAction )
     updatedById     String? 
+
+    @@index([chapterId])
+    @@index([noteId])
+    @@index([createdById])
+    @@index([updatedById])
 }
 
 model QuestionSet {
@@ -203,6 +219,10 @@ model QuestionSet {
     createdById     String?
     updatedBy       User?    @relation("set_updater", fields: [updatedById], references: [id], onDelete:NoAction )
     updatedById     String?
+
+    @@index([relatedChapterId])
+    @@index([createdById])
+    @@index([updatedById])
 }
 
 enum SET_TYPE {
@@ -218,16 +238,21 @@ model QuestionsOnSets {
     order           Int
     @@id([questionSetId, questionId])
 
+    @@index([questionSetId])
+    @@index([questionId])
 }
 
 model Flag {
     id              String   @id @default(cuid())
     question        Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
     questionId String
-    user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-    userId          String
+    profile         Profile     @relation(fields: [profileId], references: [id], onDelete: Cascade)
+    profileId       String
     createdAt       DateTime @default(now())
     updatedAt       DateTime @updatedAt
+
+    @@index([questionId])
+    @@index([profileId])
 }
 
 model Note {
@@ -245,6 +270,10 @@ model Note {
     createdById     String?
     updatedBy       User?    @relation("note_updater", fields: [updatedById], references: [id], onDelete:NoAction )
     updatedById     String?
+
+    @@index([chapterId])
+    @@index([createdById])
+    @@index([updatedById])
 }
 
 model Comment {
@@ -252,23 +281,29 @@ model Comment {
     content         String   @db.Text
     question        Question @relation(fields: [questionId], references: [id])
     questionId      String
-    user            User     @relation(fields: [userId], references: [id])
-    userId          String
+    profile         Profile     @relation(fields: [profileId], references: [id], onDelete: Cascade)
+    profileId       String
     createdAt       DateTime @default(now())
     updatedAt       DateTime @updatedAt
+
+    @@index([questionId])
+    @@index([profileId])
 }
 
 
 model AnswerSheet {
     id              String   @id @default(cuid())
-    user            User     @relation(fields: [userId], references: [id])
-    userId          String
+    profile         Profile     @relation(fields: [profileId], references: [id], onDelete: Cascade)
+    profileId       String
     questionSet     QuestionSet @relation(fields: [questionSetId], references: [id])
     questionSetId   String
     answers         Answer[]
     createdAt       DateTime @default(now())
     expireAt        DateTime?
     updatedAt       DateTime @updatedAt
+
+    @@index([profileId])
+    @@index([questionSetId])
 }
 
 
@@ -282,6 +317,7 @@ model Answer {
     option          OPTION
     createdAt       DateTime @default(now())
     @@unique([answerSheetId, questionId])
+    @@index([questionId])
 }
 
 enum OPTION {
