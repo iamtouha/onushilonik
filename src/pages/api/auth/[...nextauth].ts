@@ -12,6 +12,7 @@ export const authOptions: NextAuthOptions = {
         session.user.id = user.id;
         session.user.role = user.role as USER_ROLE;
         session.user.active = user.active as boolean;
+        session.user.profileId = user.profileId as string;
       }
       return session;
     },

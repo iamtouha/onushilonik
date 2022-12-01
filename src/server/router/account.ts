@@ -1,13 +1,30 @@
+import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { createProtectedRouter } from "./protected-router";
 
 export const accountRouter = createProtectedRouter()
+  .mutation("create-profile", {
+    async resolve({ ctx }) {
+      return await ctx.prisma.user.findUnique({
+        where: { id: ctx.session.user.id },
+        include: {
+          profile: {
+            include: {
+              payments: {
+                orderBy: { createdAt: "desc" },
+              },
+            },
+          },
+        },
+      });
+    },
+  })
   .query("get", {
     async resolve({ ctx }) {
       return await ctx.prisma.user.findUnique({
         where: { id: ctx.session.user.id },
         include: {
-          subscription: {
+          profile: {
             include: {
               payments: {
                 orderBy: { createdAt: "desc" },
@@ -23,15 +40,21 @@ export const accountRouter = createProtectedRouter()
       sheetId: z.string(),
     }),
     async resolve({ ctx, input }) {
+      if (!ctx.session.user.profileId) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Profile not found",
+        });
+      }
       const [sheet, payment] = await ctx.prisma.$transaction([
         ctx.prisma.answerSheet.findFirst({
-          where: { id: input.sheetId, userId: ctx.session.user.id },
+          where: { id: input.sheetId, profileId: ctx.session.user.profileId },
           orderBy: { createdAt: "desc" },
           select: { id: true, createdAt: true },
         }),
         ctx.prisma.payment.findFirst({
           where: {
-            subscription: { userId: ctx.session.user.id },
+            profileId: ctx.session.user.profileId,
           },
         }),
       ]);
