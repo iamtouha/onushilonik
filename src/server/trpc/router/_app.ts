@@ -7,6 +7,7 @@ import { questionSetsRouter } from "./questionSets";
 import { userRouter } from "./user";
 import { notesRouter } from "./notes";
 import { questionsRouter } from "./questions";
+import { commentsRouter } from "./comments";
 
 export const appRouter = router({
   admin: adminRouter,
@@ -16,6 +17,7 @@ export const appRouter = router({
   subjects: subjectsRouter,
   notes: notesRouter,
   questions: questionsRouter,
+  comments: commentsRouter,
 });
 
 // export type definition of API

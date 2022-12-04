@@ -43,6 +43,7 @@ import { OPTION } from "@prisma/client";
 import { toast } from "react-toastify";
 import ShortNote from "@/components/ShortNote";
 import ColorModeContext from "@/contexts/ColorModeContext";
+import Comments from "@/components/Comments";
 
 const AnswerSheet: NextPageWithLayout = () => {
   const router = useRouter();
@@ -463,6 +464,16 @@ const AnswerSheet: NextPageWithLayout = () => {
                     ) : (
                       "No short note found for this question"
                     )}
+                  </Box>
+                ) : null}
+              </Grid>
+              <Grid item xs={12} md={4} order={{ xs: 3, md: 3 }}>
+                {answer && question ? (
+                  <Box>
+                    <Typography variant="h5" component="h5" gutterBottom>
+                      Comments
+                    </Typography>
+                    <Comments questionId={question.id} />
                   </Box>
                 ) : null}
               </Grid>

@@ -33,7 +33,7 @@ function ElevationScroll(props: ElevationProps) {
 type Props = { children: ReactNode };
 
 function HomepageLayout(props: Props) {
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
   const [mode, toggleColorMode] = useContext(ColorModeContext);
   return (
     <>
@@ -63,6 +63,7 @@ function HomepageLayout(props: Props) {
                 <Button
                   variant="contained"
                   disableElevation
+                  disabled={status === "loading"}
                   color="primary"
                   size="large"
                 >

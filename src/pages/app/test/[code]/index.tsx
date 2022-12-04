@@ -41,7 +41,7 @@ const AnswerSheets: NextPageWithLayout = () => {
     isLoading,
     isError,
   } = trpc.sets.getOne.useQuery(
-    { code: setCode as string },
+    { code: setCode as string, withAnswerSheet: true },
     {
       enabled: !!setCode,
       onError: () => {
@@ -57,7 +57,7 @@ const AnswerSheets: NextPageWithLayout = () => {
 
   const newTestMutation = trpc.sheets.create.useMutation({
     onSuccess: (res) => {
-      router.push(`/test/${setCode}/sheet/${res.id}?q=1`);
+      router.push(`/app/test/${setCode}/sheet/${res.id}?q=1`);
     },
     onError: () => {
       toast.error("Could not start the test. Please try again.");
