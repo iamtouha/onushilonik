@@ -11,7 +11,7 @@ import CardActionArea from "@mui/material/CardActionArea";
 import { trpc } from "@/utils/trpc";
 
 const FreeTrial = () => {
-  const { data: sets, isLoading } = trpc.useQuery(["questionset.free-trial"]);
+  const { data: sets, isLoading } = trpc.sets.freeTrial.useQuery();
 
   return (
     <>

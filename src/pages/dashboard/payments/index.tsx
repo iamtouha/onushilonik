@@ -19,14 +19,15 @@ import Link from "@/components/Link";
 type ColumnFilter = { id: string; value: unknown };
 type ColumnSort = { id: string; desc: boolean };
 type SortBy = "createdAt" | "paymentId" | "transactionId" | "status" | "method";
-type PaymentWithSub = Payment & {
-  subscription: {
-    user: {
-      email: string | null;
-      id: string;
+type PaymentWithProfile = Payment &
+  Payment & {
+    profile: {
+      user: {
+        id: string;
+        email: string | null;
+      } | null;
     };
   };
-};
 
 const Payments: NextPageWithLayout = () => {
   const router = useRouter();
@@ -38,9 +39,8 @@ const Payments: NextPageWithLayout = () => {
     pageIndex: 0,
     pageSize: 10,
   });
-  const { data, isError, isLoading, isFetching } = trpc.useQuery(
-    [
-      "admin.payments.getAll",
+  const { data, isError, isLoading, isFetching } =
+    trpc.admin.payments.get.useQuery(
       {
         page: pagination.pageIndex,
         size: pagination.pageSize,
@@ -51,11 +51,10 @@ const Payments: NextPageWithLayout = () => {
         status: columnFilters.find((f) => f.id === "status")
           ?.value as PAYMENT_STATUS,
       },
-    ],
-    { refetchOnWindowFocus: false }
-  );
+      { refetchOnWindowFocus: false }
+    );
 
-  const columns = useMemo<MRT_ColumnDef<PaymentWithSub>[]>(() => {
+  const columns = useMemo<MRT_ColumnDef<PaymentWithProfile>[]>(() => {
     return [
       {
         accessorKey: "id",
@@ -64,7 +63,7 @@ const Payments: NextPageWithLayout = () => {
         enableSorting: false,
       },
       {
-        accessorKey: "subscription.user.email",
+        accessorKey: "profile.user.email",
         header: "User Email",
         enableSorting: false,
       },
@@ -103,8 +102,8 @@ const Payments: NextPageWithLayout = () => {
       </Head>
       <Container maxWidth="xl" sx={{ mt: 2 }}>
         <Breadcrumbs sx={{ mb: 1, ml: -1 }} aria-label="breadcrumb">
-          <NextLink href="/" passHref>
-            <IconButton component="a">
+          <NextLink href="/app">
+            <IconButton>
               <HomeIcon />
             </IconButton>
           </NextLink>

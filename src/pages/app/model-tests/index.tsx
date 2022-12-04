@@ -16,16 +16,19 @@ import CardActionArea from "@mui/material/CardActionArea";
 import LinearProgress from "@mui/material/LinearProgress";
 import { NextPageWithLayout } from "@/pages/_app";
 import { trpc } from "@/utils/trpc";
+import { SET_TYPE } from "@prisma/client";
 
 const perPage = 10;
 
 const ModelTests: NextPageWithLayout = () => {
   const router = useRouter();
-  const { data, isLoading } = trpc.useQuery(
-    [
-      "questionset.model-tests",
-      { page: +(router.query.page as string), perPage },
-    ],
+  const { data, isLoading } = trpc.sets.get.useQuery(
+    {
+      type: SET_TYPE.MODEL_TEST,
+      page: +(router.query.page as string),
+      perPage,
+    },
+
     { enabled: !!router.query.page, refetchOnWindowFocus: false }
   );
 
@@ -44,8 +47,8 @@ const ModelTests: NextPageWithLayout = () => {
       {isLoading ? <LinearProgress /> : null}
       <Container sx={{ mt: 2 }}>
         <Breadcrumbs sx={{ mb: 1, ml: -1 }} aria-label="breadcrumb">
-          <NextLink href="/" passHref>
-            <IconButton component="a">
+          <NextLink href="/app">
+            <IconButton>
               <HomeIcon />
             </IconButton>
           </NextLink>
@@ -89,7 +92,7 @@ const ModelTests: NextPageWithLayout = () => {
                 });
               }}
               page={parseInt(router.query.page as string)}
-              count={Math.ceil((data?.total ?? 0) / perPage)}
+              count={Math.ceil((data?.count ?? 0) / perPage)}
             />
           ) : (
             <Typography gutterBottom variant="h6" align="center" sx={{ mt: 4 }}>

@@ -42,16 +42,16 @@ function DashboardLayout({ children }: Props) {
           </Typography>
 
           <Box sx={{ ml: "auto", mr: 0 }} />
-          <NextLink href={"/"} passHref>
-            <Button
-              component="a"
-              target={"_blank"}
-              sx={{ mr: { xs: 1, md: 4 } }}
-            >
-              website
-              <LaunchIcon sx={{ ml: 1 }} />
-            </Button>
-          </NextLink>
+
+          <Button
+            LinkComponent={NextLink}
+            href={"/"}
+            target="_blank"
+            sx={{ mr: { xs: 1, md: 4 } }}
+          >
+            website
+            <LaunchIcon sx={{ ml: 1 }} />
+          </Button>
 
           <Box>
             <IconButton
@@ -97,8 +97,8 @@ function DashboardLayout({ children }: Props) {
                 <ColorModeToggle />
               </Box>
               <Divider />
-              <NextLink href={"/api/auth/signout"} passHref>
-                <MenuItem component="a" sx={{ mt: 1 }}>
+              <NextLink href={"/api/auth/signout"}>
+                <MenuItem sx={{ mt: 1 }}>
                   <LogoutIcon sx={{ mr: 1 }} />
                   Sign Out
                 </MenuItem>

@@ -60,15 +60,15 @@ const AddNote: NextPageWithLayout = () => {
   const [chapterId, setChapterId] = useState<string>("");
   const [content, setContent] = useState<string>("");
 
-  const { data: subjects } = trpc.useQuery(["admin.subjects.list"], {
+  const { data: subjects } = trpc.admin.subjects.list.useQuery(undefined, {
     refetchOnWindowFocus: false,
   });
-  const { data: chapters } = trpc.useQuery(["admin.chapters.list", subjectId], {
+  const { data: chapters } = trpc.admin.chapters.list.useQuery(subjectId, {
     enabled: !!subjectId,
     refetchOnWindowFocus: false,
   });
 
-  const addNoteMutation = trpc.useMutation("admin.notes.add", {
+  const addNoteMutation = trpc.admin.notes.add.useMutation({
     onSuccess: (data) => {
       if (data) {
         toast.success(`${data.code} added!`);
@@ -116,8 +116,8 @@ const AddNote: NextPageWithLayout = () => {
       </Head>
       <Container maxWidth="xl" sx={{ mt: 2 }}>
         <Breadcrumbs sx={{ mb: 1, ml: -1 }} aria-label="breadcrumb">
-          <NextLink href="/" passHref>
-            <IconButton component="a">
+          <NextLink href="/app">
+            <IconButton>
               <HomeIcon />
             </IconButton>
           </NextLink>

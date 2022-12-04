@@ -26,7 +26,7 @@ type Qs = { code: string; stem: string; id: string };
 const NewQuestionSet: NextPageWithLayout = () => {
   const [addedQuestions, setAddedQuestions] = useState<Qs[]>([]);
   const formRef = useRef<HTMLFormElement | null>(null);
-  const addSetMutation = trpc.useMutation("admin.sets.add", {
+  const addSetMutation = trpc.admin.questionSets.add.useMutation({
     onSuccess: (data) => {
       if (data) {
         formRef.current?.reset();
@@ -70,8 +70,8 @@ const NewQuestionSet: NextPageWithLayout = () => {
       </Head>
       <Container maxWidth="xl" sx={{ mt: 2 }}>
         <Breadcrumbs sx={{ mb: 1, ml: -1 }} aria-label="breadcrumb">
-          <NextLink href="/" passHref>
-            <IconButton component="a">
+          <NextLink href="/app">
+            <IconButton>
               <HomeIcon />
             </IconButton>
           </NextLink>

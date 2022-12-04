@@ -10,6 +10,7 @@ import useScrollTrigger from "@mui/material/useScrollTrigger";
 import Brightness4Icon from "@mui/icons-material/Brightness4";
 import Brightness7Icon from "@mui/icons-material/Brightness7";
 import ColorModeContext from "@/contexts/ColorModeContext";
+import { useSession } from "next-auth/react";
 
 interface ElevationProps {
   window?: () => Window;
@@ -32,16 +33,16 @@ function ElevationScroll(props: ElevationProps) {
 type Props = { children: ReactNode };
 
 function HomepageLayout(props: Props) {
+  const { data: session } = useSession();
   const [mode, toggleColorMode] = useContext(ColorModeContext);
   return (
     <>
       <ElevationScroll {...props}>
         <AppBar position="fixed" color="default">
           <Toolbar>
-            <NextLink href="/" passHref>
+            <NextLink href="/">
               <Typography
                 variant="h5"
-                component="a"
                 sx={{ textDecoration: "none" }}
                 color={"primary"}
               >
@@ -58,14 +59,14 @@ function HomepageLayout(props: Props) {
               >
                 {mode === "dark" ? <Brightness4Icon /> : <Brightness7Icon />}
               </IconButton>
-              <NextLink href={"/app/question-bank"} passHref>
+              <NextLink href={session ? "/app" : "/api/auth/signin"}>
                 <Button
                   variant="contained"
+                  disableElevation
                   color="primary"
                   size="large"
-                  component="a"
                 >
-                  এখনই শুরু করো
+                  {session ? "শুরু করো" : "সাইন ইন করো"}
                 </Button>
               </NextLink>
             </Box>

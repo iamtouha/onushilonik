@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { prisma } from "../../server/db/client";
 
-const InitailSetup = async (req: NextApiRequest, res: NextApiResponse) => {
+const createSuperUser = async (req: NextApiRequest, res: NextApiResponse) => {
   const user = await prisma.user.findFirst({
     where: { role: "SUPER_ADMIN" },
   });
@@ -30,4 +30,4 @@ const InitailSetup = async (req: NextApiRequest, res: NextApiResponse) => {
   });
 };
 
-export default InitailSetup;
+export default createSuperUser;

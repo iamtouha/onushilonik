@@ -13,10 +13,14 @@ import HomeIcon from "@mui/icons-material/Home";
 import type { NextPageWithLayout } from "@/pages/_app";
 import Link from "@/components/Link";
 import { trpc } from "@/utils/trpc";
-import { User, USER_ROLE } from "@prisma/client";
+import { Payment, Profile, User, USER_ROLE } from "@prisma/client";
 import { format } from "date-fns";
 
 type fieldValue = string | undefined;
+
+type UserWithProfile = User & {
+  profile: Profile | null;
+};
 
 const Users: NextPageWithLayout = () => {
   const router = useRouter();
@@ -30,9 +34,8 @@ const Users: NextPageWithLayout = () => {
     pageSize: 10,
   });
 
-  const { data, isError, isLoading, isFetching } = trpc.useQuery(
-    [
-      "admin.users.getAll",
+  const { data, isError, isLoading, isFetching } =
+    trpc.admin.users.get.useQuery(
       {
         page: pagination.pageIndex,
         size: pagination.pageSize,
@@ -42,9 +45,9 @@ const Users: NextPageWithLayout = () => {
         email: columnFilters.find((f) => f.id === "email")?.value as fieldValue,
         role: columnFilters.find((f) => f.id === "role")?.value as USER_ROLE,
       },
-    ],
-    { enabled, refetchOnWindowFocus: false }
-  );
+
+      { enabled, refetchOnWindowFocus: false }
+    );
 
   useEffect(() => {
     setEnabled(true);
@@ -53,7 +56,7 @@ const Users: NextPageWithLayout = () => {
   const navigateToUser = (id: string) => {
     router.push(`/dashboard/users/${id}`);
   };
-  const columns = useMemo<MRT_ColumnDef<User>[]>(() => {
+  const columns = useMemo<MRT_ColumnDef<UserWithProfile>[]>(() => {
     return [
       {
         accessorKey: "id",
@@ -63,6 +66,18 @@ const Users: NextPageWithLayout = () => {
       },
       { accessorKey: "email", header: "Email" },
       { accessorKey: "name", header: "Name" },
+      {
+        accessorKey: "profile.phone",
+        header: "Phone",
+        enableColumnFilter: false,
+        enableSorting: false,
+      },
+      {
+        accessorKey: "profile.institute",
+        header: "Institute",
+        enableColumnFilter: false,
+        enableSorting: false,
+      },
       {
         accessorKey: "role",
         header: "Role",
@@ -104,8 +119,8 @@ const Users: NextPageWithLayout = () => {
       </Head>
       <Container maxWidth="xl" sx={{ mt: 2 }}>
         <Breadcrumbs sx={{ mb: 1, ml: -1 }} aria-label="breadcrumb">
-          <NextLink href="/" passHref>
-            <IconButton component="a">
+          <NextLink href="/app">
+            <IconButton>
               <HomeIcon />
             </IconButton>
           </NextLink>

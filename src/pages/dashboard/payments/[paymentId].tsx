@@ -37,7 +37,7 @@ const Example: NextPageWithLayout = () => {
     isError,
     error,
     refetch,
-  } = trpc.useQuery(["admin.payments.get", paymentId as string], {
+  } = trpc.admin.payments.getOne.useQuery(paymentId as string, {
     enabled: !!paymentId,
     refetchOnWindowFocus: false,
     onSuccess: (data) => {
@@ -45,7 +45,7 @@ const Example: NextPageWithLayout = () => {
     },
   });
 
-  const statusMutation = trpc.useMutation("admin.payments.update-status", {
+  const statusMutation = trpc.admin.payments.updateStatus.useMutation({
     onSuccess: () => {
       toast.success("Payment status updated");
       refetch();
@@ -59,8 +59,8 @@ const Example: NextPageWithLayout = () => {
       </Head>
       <Container maxWidth="xl" sx={{ mt: 2 }}>
         <Breadcrumbs sx={{ mb: 1, ml: -1 }} aria-label="breadcrumb">
-          <NextLink href="/" passHref>
-            <IconButton component="a">
+          <NextLink href="/app">
+            <IconButton>
               <HomeIcon />
             </IconButton>
           </NextLink>
@@ -186,13 +186,13 @@ const Example: NextPageWithLayout = () => {
                 <ListItem>
                   <ListItemText
                     primary="User Email"
-                    secondary={payment.subscription.user.email}
+                    secondary={payment.profile.user?.email}
                   />
                 </ListItem>
                 <ListItem>
                   <ListItemText
                     primary="User Phone"
-                    secondary={payment.subscription.phoneNumber ?? ""}
+                    secondary={payment.profile.phone ?? ""}
                   />
                 </ListItem>
               </List>

@@ -39,9 +39,8 @@ const Questions: NextPageWithLayout = () => {
     pageSize: 10,
   });
 
-  const { data, isError, isLoading, isFetching } = trpc.useQuery(
-    [
-      "admin.questions.get",
+  const { data, isError, isLoading, isFetching } =
+    trpc.admin.questions.get.useQuery(
       {
         page: pagination.pageIndex,
         pageSize: pagination.pageSize,
@@ -55,9 +54,8 @@ const Questions: NextPageWithLayout = () => {
           (f) => f.id === "chapter.subject.title"
         )?.value as string,
       },
-    ],
-    { enabled, refetchOnWindowFocus: false }
-  );
+      { enabled, refetchOnWindowFocus: false }
+    );
 
   const columns = useMemo<MRT_ColumnDef<QuestionWithChapter>[]>(() => {
     return [
@@ -128,8 +126,8 @@ const Questions: NextPageWithLayout = () => {
       </Head>
       <Container maxWidth="xl" sx={{ mt: 2 }}>
         <Breadcrumbs sx={{ mb: 1, ml: -1 }} aria-label="breadcrumb">
-          <NextLink href="/" passHref>
-            <IconButton component="a">
+          <NextLink href="/app">
+            <IconButton>
               <HomeIcon />
             </IconButton>
           </NextLink>

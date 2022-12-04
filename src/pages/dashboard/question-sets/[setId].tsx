@@ -46,12 +46,12 @@ const NewQuestionSet: NextPageWithLayout = () => {
     isLoading,
     isError,
     error,
-  } = trpc.useQuery(["admin.sets.getOne", setId as string], {
+  } = trpc.admin.questionSets.getOne.useQuery(setId as string, {
     enabled: !!setId,
     refetchOnWindowFocus: false,
   });
 
-  const updateSetMutation = trpc.useMutation("admin.sets.update", {
+  const updateSetMutation = trpc.admin.questionSets.update.useMutation({
     onSuccess: (data) => {
       if (data) {
         formRef.current?.reset();
@@ -71,7 +71,7 @@ const NewQuestionSet: NextPageWithLayout = () => {
       toast.error("Something went wrong");
     },
   });
-  const deleteSetMutation = trpc.useMutation("admin.sets.delete", {
+  const deleteSetMutation = trpc.admin.questionSets.delete.useMutation({
     onSuccess: (data) => {
       setConfirmDelete(false);
       if (data) {
@@ -117,8 +117,8 @@ const NewQuestionSet: NextPageWithLayout = () => {
       {isLoading && <LinearProgress />}
       <Container maxWidth="xl" sx={{ mt: 2 }}>
         <Breadcrumbs sx={{ mb: 1, ml: -1 }} aria-label="breadcrumb">
-          <NextLink href="/" passHref>
-            <IconButton component="a">
+          <NextLink href="/app">
+            <IconButton>
               <HomeIcon />
             </IconButton>
           </NextLink>

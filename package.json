@@ -1,13 +1,13 @@
 {
-  "name": "onushilonik",
+  "name": "onushilonic",
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
     "build": "next build",
-    "start": "next start",
+    "dev": "next dev",
+    "postinstall": "prisma generate",
     "lint": "next lint",
-    "postinstall": "prisma generate"
+    "start": "next start"
   },
   "dependencies": {
     "@emotion/react": "^11.10.4",
@@ -17,40 +17,40 @@
     "@mui/lab": "^5.0.0-alpha.100",
     "@mui/material": "^5.10.3",
     "@next-auth/prisma-adapter": "^1.0.4",
-    "@prisma/client": "^4.7.0",
+    "@prisma/client": "^4.5.0",
+    "@tanstack/react-query": "^4.16.0",
     "@tanstack/react-table": "^8.5.13",
-    "@trpc/client": "^9.27.2",
-    "@trpc/next": "^9.27.2",
-    "@trpc/react": "^9.27.2",
-    "@trpc/server": "^9.27.2",
+    "@trpc/client": "^10.0.0",
+    "@trpc/next": "^10.0.0",
+    "@trpc/react-query": "^10.0.0",
+    "@trpc/server": "^10.0.0",
     "date-fns": "^2.29.3",
     "formik": "^2.2.9",
     "material-react-table": "^1.0.11",
-    "next": "12.2.5",
-    "next-auth": "^4.10.3",
+    "next": "13.0.2",
+    "next-auth": "^4.15.1",
     "react": "18.2.0",
     "react-dom": "18.2.0",
-    "react-markdown": "^8.0.3",
-    "react-query": "^3.39.2",
+    "react-markdown": "^8.0.4",
     "react-toastify": "^9.0.8",
     "rehype-raw": "^6.1.1",
     "remark-gfm": "^3.0.1",
-    "superjson": "^1.9.1",
+    "superjson": "1.9.1",
     "yup": "^0.32.11",
     "zod": "^3.18.0"
   },
   "devDependencies": {
-    "@types/node": "18.0.0",
-    "@types/react": "18.0.14",
-    "@types/react-dom": "18.0.5",
+    "@types/node": "^18.0.0",
+    "@types/react": "^18.0.14",
+    "@types/react-dom": "^18.0.5",
     "@typescript-eslint/eslint-plugin": "^5.33.0",
     "@typescript-eslint/parser": "^5.33.0",
-    "eslint": "8.22.0",
-    "eslint-config-next": "12.2.5",
-    "prisma": "^4.7.0",
-    "typescript": "4.7.4"
+    "eslint": "^8.26.0",
+    "eslint-config-next": "13.0.2",
+    "prisma": "^4.5.0",
+    "typescript": "^4.8.4"
   },
   "ct3aMetadata": {
-    "initVersion": "5.9.0"
+    "initVersion": "6.11.0"
   }
 }

@@ -19,7 +19,7 @@ import { format } from "date-fns";
 
 type ColumnFilter = { id: string; value: unknown };
 type ColumnSort = { id: string; desc: boolean };
-type ChaptertWithCount = Chapter & {
+type ChapterWithCount = Chapter & {
   _count: { questions: number };
   subject: { id: string; title: string };
 };
@@ -36,9 +36,8 @@ const Chapters: NextPageWithLayout = () => {
     pageSize: 10,
   });
 
-  const { data, isError, isLoading, isFetching } = trpc.useQuery(
-    [
-      "admin.chapters.get",
+  const { data, isError, isLoading, isFetching } =
+    trpc.admin.chapters.get.useQuery(
       {
         page: pagination.pageIndex,
         pageSize: pagination.pageSize,
@@ -49,11 +48,10 @@ const Chapters: NextPageWithLayout = () => {
         subjectTitle: columnFilters.find((f) => f.id === "subject.title")
           ?.value as string,
       },
-    ],
-    { enabled, refetchOnWindowFocus: false }
-  );
+      { enabled, refetchOnWindowFocus: false }
+    );
 
-  const columns = useMemo<MRT_ColumnDef<ChaptertWithCount>[]>(() => {
+  const columns = useMemo<MRT_ColumnDef<ChapterWithCount>[]>(() => {
     return [
       {
         accessorKey: "id",
@@ -105,8 +103,8 @@ const Chapters: NextPageWithLayout = () => {
       </Head>
       <Container maxWidth="xl" sx={{ mt: 2 }}>
         <Breadcrumbs sx={{ mb: 1, ml: -1 }} aria-label="breadcrumb">
-          <NextLink href="/" passHref>
-            <IconButton component="a">
+          <NextLink href="/app">
+            <IconButton>
               <HomeIcon />
             </IconButton>
           </NextLink>

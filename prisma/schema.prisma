@@ -55,6 +55,8 @@ model User {
     emailVerified       DateTime?
     image               String?
     role                USER_ROLE @default(USER)
+    active              Boolean   @default(true)
+    createdAt           DateTime  @default(now())
     profile   Profile?  @relation(fields: [profileId], references: [id])  
     profileId String?   @unique
     accounts            Account[]
@@ -70,7 +72,6 @@ model User {
     setsUpdated         QuestionSet[] @relation("set_updater")
     notesCreated        Note[] @relation("note_creator")
     notesUpdated        Note[] @relation("note_updater")
-    active              Boolean   @default(true)
 }
 enum USER_ROLE {
     SUPER_ADMIN
@@ -305,8 +306,6 @@ model AnswerSheet {
     @@index([profileId])
     @@index([questionSetId])
 }
-
-
 
 model Answer {
     id              String   @id @default(cuid())

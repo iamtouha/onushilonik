@@ -70,20 +70,17 @@ const Question: NextPageWithLayout = () => {
     isLoading,
     isError,
     error,
-  } = trpc.useQuery(
-    ["admin.questions.getOne", router.query.questionId as string],
-    {
-      enabled: !!router.query.questionId,
-      refetchOnWindowFocus: false,
-      onSuccess(data) {
-        if (data) {
-          setSubjectId(data.chapter.subjectId);
-          setChapterId(data.chapter.id);
-        }
-      },
-    }
-  );
-  const deleteQuestionMutation = trpc.useMutation("admin.questions.delete", {
+  } = trpc.admin.questions.getOne.useQuery(router.query.questionId as string, {
+    enabled: !!router.query.questionId,
+    refetchOnWindowFocus: false,
+    onSuccess(data) {
+      if (data) {
+        setSubjectId(data.chapter.subjectId);
+        setChapterId(data.chapter.id);
+      }
+    },
+  });
+  const deleteQuestionMutation = trpc.admin.questions.delete.useMutation({
     onSuccess: (data) => {
       setConfirmDelete(false);
       if (data) {
@@ -97,18 +94,18 @@ const Question: NextPageWithLayout = () => {
       toast.error("Could not delete question");
     },
   });
-  const { data: subjects } = trpc.useQuery(["admin.subjects.list"], {
+  const { data: subjects } = trpc.admin.subjects.list.useQuery(undefined, {
     refetchOnWindowFocus: false,
   });
-  const { data: chapters } = trpc.useQuery(["admin.chapters.list", subjectId], {
+  const { data: chapters } = trpc.admin.chapters.list.useQuery(subjectId, {
     enabled: !!subjectId,
     refetchOnWindowFocus: false,
   });
-  const { data: notes } = trpc.useQuery(["admin.notes.list", chapterId], {
+  const { data: notes } = trpc.admin.notes.list.useQuery(chapterId, {
     enabled: !!chapterId,
     refetchOnWindowFocus: false,
   });
-  const updateQuestionMutation = trpc.useMutation("admin.questions.update", {
+  const updateQuestionMutation = trpc.admin.questions.update.useMutation({
     onSuccess: (data) => {
       if (data) {
         toast.success(`${data.code} added!`);
@@ -164,8 +161,8 @@ const Question: NextPageWithLayout = () => {
       </Head>
       <Container maxWidth="xl" sx={{ mt: 2 }}>
         <Breadcrumbs sx={{ mb: 1, ml: -1 }} aria-label="breadcrumb">
-          <NextLink href="/" passHref>
-            <IconButton component="a">
+          <NextLink href="/app">
+            <IconButton>
               <HomeIcon />
             </IconButton>
           </NextLink>

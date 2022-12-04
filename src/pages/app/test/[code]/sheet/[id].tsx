@@ -54,50 +54,49 @@ const AnswerSheet: NextPageWithLayout = () => {
     data: questionSet,
     isLoading: setLoading,
     isError: setError,
-  } = trpc.useQuery(["questionset.get", { code: setCode as string }], {
-    refetchOnWindowFocus: false,
-    enabled: !!setCode,
-  });
+  } = trpc.sets.getOne.useQuery(
+    { code: setCode as string },
+    { refetchOnWindowFocus: false, enabled: !!setCode }
+  );
   const {
     data: answerSheet,
     isError: sheetError,
     isLoading: sheetLoading,
     refetch: refetchSheet,
-  } = trpc.useQuery(["answersheet.get", { id: sheetId as string }], {
-    refetchOnWindowFocus: false,
-    enabled: !!sheetId,
-  });
+  } = trpc.sheets.getOne.useQuery(
+    { id: sheetId as string },
+    { refetchOnWindowFocus: false, enabled: !!sheetId }
+  );
   const {
     data: question,
     refetch: refetchQuestion,
     isLoading: questionLoading,
     isError: questionError,
-  } = trpc.useQuery(
-    [
-      "question.get-answer",
-      { id: selectedQuestion ?? "", sheetId: answerSheet?.id ?? "" },
-    ],
+  } = trpc.questions.getAnswer.useQuery(
+    { id: selectedQuestion ?? "", sheetId: answerSheet?.id ?? "" },
+
     {
       enabled: !!selectedQuestion && !!answerSheet?.id,
       refetchOnWindowFocus: false,
     }
   );
 
-  const { data: statsData } = trpc.useQuery(
-    ["question.get-stats", { id: selectedQuestion ?? "" }],
+  const { data: statsData } = trpc.questions.getStat.useQuery(
+    { id: selectedQuestion ?? "" },
     {
       enabled: !!selectedQuestion && !!question?.answers[0],
       refetchOnWindowFocus: false,
     }
   );
-  const { data: shortNote, isLoading: noteLoading } = trpc.useQuery(
-    ["question.get-short-note", { id: selectedQuestion ?? "" }],
-    {
-      enabled: !!selectedQuestion && !!question?.answers[0],
-      refetchOnWindowFocus: false,
-    }
-  );
-  const answerQuestionMutation = trpc.useMutation("answersheet.add-answer", {
+  const { data: shortNote, isLoading: noteLoading } =
+    trpc.questions.getNote.useQuery(
+      { id: selectedQuestion ?? "" },
+      {
+        enabled: !!selectedQuestion && !!question?.answers[0],
+        refetchOnWindowFocus: false,
+      }
+    );
+  const answerQuestionMutation = trpc.sheets.addAnswer.useMutation({
     onSuccess: () => {
       refetchQuestion();
       refetchSheet();

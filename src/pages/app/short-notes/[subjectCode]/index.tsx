@@ -19,10 +19,9 @@ import { trpc } from "@/utils/trpc";
 
 const QuestionBank: NextPageWithLayout = () => {
   const { query } = useRouter();
-  const { data: subject, isLoading } = trpc.useQuery([
-    "shortnotes.subject",
-    { code: query.subjectCode as string },
-  ]);
+  const { data: subject, isLoading } = trpc.subjects.getNotes.useQuery({
+    code: query.subjectCode as string,
+  });
 
   return (
     <>
@@ -31,8 +30,8 @@ const QuestionBank: NextPageWithLayout = () => {
       </Head>
       <Container sx={{ mt: 2 }}>
         <Breadcrumbs sx={{ mb: 1, ml: -1 }} aria-label="breadcrumb">
-          <NextLink href="/" passHref>
-            <IconButton component="a">
+          <NextLink href="/app">
+            <IconButton>
               <HomeIcon />
             </IconButton>
           </NextLink>

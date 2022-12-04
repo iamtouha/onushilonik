@@ -15,16 +15,14 @@ import LinearProgress from "@mui/material/LinearProgress";
 import IconButton from "@mui/material/IconButton";
 import HomeIcon from "@mui/icons-material/Home";
 import { NextPageWithLayout } from "@/pages/_app";
-import SubscriptionLayout from "@/layouts/SubscriptionLayout";
 import Link from "@/components/Link";
 import { trpc } from "@/utils/trpc";
 
 const QuestionBank: NextPageWithLayout = () => {
   const router = useRouter();
-  const { data: subject, isLoading } = trpc.useQuery([
-    "questionbank.subject",
-    { id: router.query.subjectId as string },
-  ]);
+  const { data: subject, isLoading } = trpc.subjects.getQuestionBanks.useQuery({
+    code: router.query.subjectCode as string,
+  });
 
   return (
     <>
@@ -33,8 +31,8 @@ const QuestionBank: NextPageWithLayout = () => {
       </Head>
       <Container sx={{ mt: 2 }}>
         <Breadcrumbs sx={{ mb: 1, ml: -1 }} aria-label="breadcrumb">
-          <NextLink href="/" passHref>
-            <IconButton component="a">
+          <NextLink href="/app">
+            <IconButton>
               <HomeIcon />
             </IconButton>
           </NextLink>

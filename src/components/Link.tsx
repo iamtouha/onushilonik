@@ -14,16 +14,15 @@ type Props = {
 
 const Link = (props: Props) => {
   return (
-    <NextLink href={props.href} as={props.as} passHref>
-      <MuiLink
-        underline={props.underline}
-        sx={props.sx}
-        color={props.color}
-        component="a"
-      >
-        {props.children}
-      </MuiLink>
-    </NextLink>
+    <MuiLink
+      underline={props.underline}
+      component={NextLink}
+      sx={props.sx}
+      color={props.color}
+      href={props.href}
+    >
+      {props.children}
+    </MuiLink>
   );
 };
 

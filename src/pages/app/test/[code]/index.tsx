@@ -40,21 +40,24 @@ const AnswerSheets: NextPageWithLayout = () => {
     data: qsSet,
     isLoading,
     isError,
-  } = trpc.useQuery(["questionset.get-all", { code: setCode as string }], {
-    enabled: !!setCode,
-    onError: () => {
-      toast.error("Something went wrong!");
-    },
-    onSuccess: (res) => {
-      if (!res) {
-        router.push("/404");
-      }
-    },
-  });
+  } = trpc.sets.getOne.useQuery(
+    { code: setCode as string },
+    {
+      enabled: !!setCode,
+      onError: () => {
+        toast.error("Something went wrong!");
+      },
+      onSuccess: (res) => {
+        if (!res) {
+          router.push("/404");
+        }
+      },
+    }
+  );
 
-  const newTestMutation = trpc.useMutation("answersheet.create", {
+  const newTestMutation = trpc.sheets.create.useMutation({
     onSuccess: (res) => {
-      router.push(`/test/${setCode}/test?sheetId=${res.id}`);
+      router.push(`/test/${setCode}/sheet/${res.id}?q=1`);
     },
     onError: () => {
       toast.error("Could not start the test. Please try again.");
@@ -110,11 +113,8 @@ const AnswerSheets: NextPageWithLayout = () => {
             {qsSet.answerSheets.map((sheet, i) => (
               <Grid item xs={12} sm={6} md={4} key={sheet.id}>
                 <Card>
-                  <NextLink
-                    href={`/app/test/${setCode}/sheet/${sheet.id}?q=1`}
-                    passHref
-                  >
-                    <CardActionArea component="a" sx={{ display: "block" }}>
+                  <NextLink href={`/app/test/${setCode}/sheet/${sheet.id}?q=1`}>
+                    <CardActionArea sx={{ display: "block" }}>
                       <CardContent sx={{ display: "flex" }}>
                         <Box sx={{ flex: 1 }}>
                           <Typography color="textSecondary" variant="h5">

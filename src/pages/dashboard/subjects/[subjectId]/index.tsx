@@ -47,14 +47,11 @@ const Subject: NextPageWithLayout = () => {
     isLoading,
     isError,
     error,
-  } = trpc.useQuery(
-    ["admin.subjects.getOne", router.query.subjectId as string],
-    {
-      enabled: !!router.query.subjectId,
-      refetchOnWindowFocus: false,
-    }
-  );
-  const updateSubjectMutation = trpc.useMutation("admin.subjects.update", {
+  } = trpc.admin.subjects.getOne.useQuery(router.query.subjectId as string, {
+    enabled: !!router.query.subjectId,
+    refetchOnWindowFocus: false,
+  });
+  const updateSubjectMutation = trpc.admin.subjects.update.useMutation({
     onSuccess: (data) => {
       if (data) {
         toast.success(`${data.title} updated!`);
@@ -75,7 +72,7 @@ const Subject: NextPageWithLayout = () => {
       toast.error("Something went wrong");
     },
   });
-  const deleteSubjectMutation = trpc.useMutation("admin.subjects.delete", {
+  const deleteSubjectMutation = trpc.admin.subjects.delete.useMutation({
     onSuccess: (data) => {
       setConfirmDelete(false);
       if (data) {
@@ -119,8 +116,8 @@ const Subject: NextPageWithLayout = () => {
       </Head>
       <Container maxWidth="xl" sx={{ mt: 2 }}>
         <Breadcrumbs sx={{ mb: 1, ml: -1 }} aria-label="breadcrumb">
-          <NextLink href="/" passHref>
-            <IconButton component="a">
+          <NextLink href="/app">
+            <IconButton>
               <HomeIcon />
             </IconButton>
           </NextLink>

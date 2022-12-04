@@ -18,9 +18,11 @@ import { NextPageWithLayout } from "@/pages/_app";
 import Link from "@/components/Link";
 import { trpc } from "@/utils/trpc";
 
-const QuestionBank: NextPageWithLayout = () => {
+const ShortNotes: NextPageWithLayout = () => {
   const router = useRouter();
-  const { data: subjects, isLoading } = trpc.useQuery(["shortnotes.subjects"]);
+  const { data: subjects, isLoading } = trpc.subjects.get.useQuery(undefined, {
+    refetchOnWindowFocus: false,
+  });
 
   return (
     <>
@@ -29,8 +31,8 @@ const QuestionBank: NextPageWithLayout = () => {
       </Head>
       <Container sx={{ mt: 2 }}>
         <Breadcrumbs sx={{ mb: 1, ml: -1 }} aria-label="breadcrumb">
-          <NextLink href="/" passHref>
-            <IconButton component="a">
+          <NextLink href="/app">
+            <IconButton>
               <HomeIcon />
             </IconButton>
           </NextLink>
@@ -65,4 +67,4 @@ const QuestionBank: NextPageWithLayout = () => {
   );
 };
 
-export default QuestionBank;
+export default ShortNotes;

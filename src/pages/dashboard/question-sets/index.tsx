@@ -24,7 +24,6 @@ type SortType = "createdAt" | "code" | "title" | "type" | "published" | "trial";
 
 const QuestionSets: NextPageWithLayout = () => {
   const router = useRouter();
-  const [enabled, setEnabled] = useState(false);
   const [columnFilters, setColumnFilters] = useState<ColumnFilter[]>([]);
   const [sorting, setSorting] = useState<ColumnSort[]>([
     { id: "createdAt", desc: true },
@@ -34,9 +33,8 @@ const QuestionSets: NextPageWithLayout = () => {
     pageSize: 10,
   });
 
-  const { data, isError, isLoading, isFetching } = trpc.useQuery(
-    [
-      "admin.sets.get",
+  const { data, isError, isLoading, isFetching } =
+    trpc.admin.questionSets.get.useQuery(
       {
         page: pagination.pageIndex,
         pageSize: pagination.pageSize,
@@ -46,9 +44,8 @@ const QuestionSets: NextPageWithLayout = () => {
         title: columnFilters.find((f) => f.id === "title")?.value as string,
         code: columnFilters.find((f) => f.id === "code")?.value as string,
       },
-    ],
-    { enabled, refetchOnWindowFocus: false }
-  );
+      { refetchOnWindowFocus: false }
+    );
 
   const columns = useMemo<MRT_ColumnDef<QuestionSetWithCount>[]>(() => {
     return [
@@ -97,10 +94,6 @@ const QuestionSets: NextPageWithLayout = () => {
     ];
   }, []);
 
-  useEffect(() => {
-    setEnabled(true);
-  }, []);
-
   const navigateToQuestionSet = (id: string) => {
     router.push(`/dashboard/question-sets/${id}`);
   };
@@ -112,8 +105,8 @@ const QuestionSets: NextPageWithLayout = () => {
       </Head>
       <Container maxWidth="xl" sx={{ mt: 2 }}>
         <Breadcrumbs sx={{ mb: 1, ml: -1 }} aria-label="breadcrumb">
-          <NextLink href="/" passHref>
-            <IconButton component="a">
+          <NextLink href="/app">
+            <IconButton>
               <HomeIcon />
             </IconButton>
           </NextLink>

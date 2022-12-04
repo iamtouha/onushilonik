@@ -32,7 +32,7 @@ const validationSchema = yup.object().shape({
 });
 
 const AddSubject: NextPageWithLayout = () => {
-  const addSubjectMutation = trpc.useMutation("admin.subjects.add", {
+  const addSubjectMutation = trpc.admin.subjects.add.useMutation({
     onSuccess: (data) => {
       if (data) {
         toast.success(`${data.title} added!`);
@@ -74,8 +74,8 @@ const AddSubject: NextPageWithLayout = () => {
       </Head>
       <Container maxWidth="xl" sx={{ mt: 2 }}>
         <Breadcrumbs sx={{ mb: 1, ml: -1 }} aria-label="breadcrumb">
-          <NextLink href="/" passHref>
-            <IconButton component="a">
+          <NextLink href="/app">
+            <IconButton>
               <HomeIcon />
             </IconButton>
           </NextLink>

@@ -19,10 +19,9 @@ import DefaultLayout from "@/layouts/DefaultLayout";
 
 const Example: NextPageWithLayout = () => {
   const { query } = useRouter();
-  const { data: note, isLoading } = trpc.useQuery([
-    "shortnotes.get",
-    { code: query.noteCode as string },
-  ]);
+  const { data: note, isLoading } = trpc.notes.getWithCode.useQuery({
+    code: query.noteCode as string,
+  });
   return (
     <>
       <Head>
@@ -30,8 +29,8 @@ const Example: NextPageWithLayout = () => {
       </Head>
       <Container sx={{ mt: 2 }}>
         <Breadcrumbs sx={{ mb: 1, ml: -1 }} aria-label="breadcrumb">
-          <NextLink href="/" passHref>
-            <IconButton component="a">
+          <NextLink href="/app">
+            <IconButton>
               <HomeIcon />
             </IconButton>
           </NextLink>

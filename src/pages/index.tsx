@@ -94,15 +94,15 @@ const Home: NextPageWithLayout = () => {
               অসংখ্য প্রশ্ন সমাধানের মাধ্যমে নিজের প্রস্তুতি যাচাই করতে পারবে
               সহজেই।
             </Typography>
-            <NextLink href="/app/free-trial" passHref>
+            <NextLink href="/app/free-trial">
               <Button
                 variant="contained"
                 sx={{ mt: 3 }}
                 size="large"
+                disableElevation
                 color="primary"
-                component="a"
               >
-                ফ্রি ট্রায়াল শুরু কর
+                ফ্রি ট্রায়াল
               </Button>
             </NextLink>
           </Grid>
@@ -114,27 +114,26 @@ const Home: NextPageWithLayout = () => {
           {services.map((service) => (
             <Grid key={service.title} xs={12} md={6}>
               <Card sx={{ height: "100%" }}>
-                <NextLink href={service.href} passHref>
-                  <CardActionArea
-                    component="a"
-                    sx={{ display: "flex", height: "100%" }}
-                  >
-                    <CardContent sx={{ flexGrow: 1 }}>
-                      <Typography gutterBottom variant="h5">
-                        {service.title}
-                      </Typography>
-                      <Typography variant="subtitle2">
-                        {service.description}
-                      </Typography>
-                    </CardContent>
-                    <CardMedia
-                      component="img"
-                      sx={{ width: { xs: 150, sm: 250 }, p: 2 }}
-                      image={service.cover}
-                      alt={service.title}
-                    ></CardMedia>
-                  </CardActionArea>
-                </NextLink>
+                <CardActionArea
+                  component={NextLink}
+                  href={service.href}
+                  sx={{ display: "flex", height: "100%" }}
+                >
+                  <CardContent sx={{ flexGrow: 1 }}>
+                    <Typography gutterBottom variant="h5">
+                      {service.title}
+                    </Typography>
+                    <Typography variant="subtitle2">
+                      {service.description}
+                    </Typography>
+                  </CardContent>
+                  <CardMedia
+                    component="img"
+                    sx={{ width: { xs: 150, sm: 250 }, p: 2 }}
+                    image={service.cover}
+                    alt={service.title}
+                  ></CardMedia>
+                </CardActionArea>
               </Card>
             </Grid>
           ))}

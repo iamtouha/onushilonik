@@ -77,30 +77,24 @@ const QuestionSetForm = forwardRef<FormRef, QuestionSetFormProps>(
     const [qsType, setQsType] = useState<SET_TYPE>(SET_TYPE.MODEL_TEST);
     const [selectedQuestions, setSelectedQuestions] = useState<string[]>([]);
 
-    const { data: subjects } = trpc.useQuery(["admin.subjects.list"], {
+    const { data: subjects } = trpc.admin.subjects.list.useQuery(undefined, {
       refetchOnWindowFocus: false,
     });
-    const { data: chapters } = trpc.useQuery(
-      ["admin.chapters.list", subjectId],
-      {
-        enabled: !!subjectId,
-        refetchOnWindowFocus: false,
-      }
-    );
-    const { data: questions } = trpc.useQuery(
-      ["admin.questions.list", chapterId],
-      {
-        onSuccess: (data) => {
-          const selectedQs = props.addedQuestions.map((q) => q.code);
-          const thisChapterQuestions = data
-            .filter((q) => selectedQs.includes(q.code))
-            .map((q) => q.code);
-          setSelectedQuestions([...thisChapterQuestions]);
-        },
-        enabled: !!chapterId,
-        refetchOnWindowFocus: false,
-      }
-    );
+    const { data: chapters } = trpc.admin.chapters.list.useQuery(subjectId, {
+      enabled: !!subjectId,
+      refetchOnWindowFocus: false,
+    });
+    const { data: questions } = trpc.admin.questions.list.useQuery(chapterId, {
+      onSuccess: (data) => {
+        const selectedQs = props.addedQuestions.map((q) => q.code);
+        const thisChapterQuestions = data
+          .filter((q) => selectedQs.includes(q.code))
+          .map((q) => q.code);
+        setSelectedQuestions([...thisChapterQuestions]);
+      },
+      enabled: !!chapterId,
+      refetchOnWindowFocus: false,
+    });
 
     const addQuestionsToList = () => {
       if (!questions) return;

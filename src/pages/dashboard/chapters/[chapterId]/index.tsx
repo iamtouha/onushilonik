@@ -49,21 +49,19 @@ const validationSchema = yup.object().shape({
 
 const Chapter: NextPageWithLayout = () => {
   const router = useRouter();
-  const { data: subjects } = trpc.useQuery(["admin.subjects.list"]);
+  const { data: subjects } = trpc.admin.subjects.list.useQuery();
   const [confirmDelete, setConfirmDelete] = useState(false);
   const {
     data: chapter,
     isLoading,
     isError,
     error,
-  } = trpc.useQuery(
-    ["admin.chapters.getOne", router.query.chapterId as string],
-    {
-      enabled: !!router.query.chapterId,
-      refetchOnWindowFocus: false,
-    }
-  );
-  const updateChapterMutation = trpc.useMutation("admin.chapters.update", {
+  } = trpc.admin.chapters.getOne.useQuery(router.query.chapterId as string, {
+    enabled: !!router.query.chapterId,
+    refetchOnWindowFocus: false,
+  });
+
+  const updateChapterMutation = trpc.admin.chapters.update.useMutation({
     onSuccess: (data) => {
       if (data) {
         toast.success(`${data.title} updated!`);
@@ -84,7 +82,7 @@ const Chapter: NextPageWithLayout = () => {
       toast.error("Something went wrong");
     },
   });
-  const deleteChapterMutation = trpc.useMutation("admin.chapters.delete", {
+  const deleteChapterMutation = trpc.admin.chapters.delete.useMutation({
     onSuccess: (data) => {
       setConfirmDelete(false);
       if (data) {
@@ -132,8 +130,8 @@ const Chapter: NextPageWithLayout = () => {
       </Head>
       <Container maxWidth="xl" sx={{ mt: 2 }}>
         <Breadcrumbs sx={{ mb: 1, ml: -1 }} aria-label="breadcrumb">
-          <NextLink href="/" passHref>
-            <IconButton component="a">
+          <NextLink href="/app">
+            <IconButton>
               <HomeIcon />
             </IconButton>
           </NextLink>

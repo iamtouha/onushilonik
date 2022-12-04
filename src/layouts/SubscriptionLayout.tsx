@@ -5,29 +5,21 @@ import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
-import DefaultLayout from "./DefaultLayout";
-import SubscriptionContext, {
-  SubscriptionProvider,
-} from "@/contexts/SubscriptionContext";
-import { useRouter } from "next/router";
+import { trpc } from "@/utils/trpc";
 
-type LayoutProps = {
-  children: React.ReactNode;
-};
-const SubscriptionLayout = ({ children }: LayoutProps) => {
-  return (
-    <SubscriptionProvider>
-      <HasSubscription>{children}</HasSubscription>
-    </SubscriptionProvider>
-  );
-};
+export default function SubscriptionLayout({
+  children,
+}: {
+  children: ReactNode;
+}) {
+  const { data: subscriptionStatus, isLoading } =
+    trpc.user.subscriptionStatus.useQuery();
 
-export default SubscriptionLayout;
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
 
-function HasSubscription({ children }: { children: ReactNode }) {
-  const [subscription] = useContext(SubscriptionContext);
-
-  if (!subscription || subscription.status === "inactive") {
+  if (subscriptionStatus === "inactive") {
     return (
       <Box
         sx={{
@@ -39,27 +31,26 @@ function HasSubscription({ children }: { children: ReactNode }) {
         <Card variant="outlined" sx={{ textAlign: "center" }}>
           <CardContent>
             <Typography variant="h5" gutterBottom component="h2">
-              আপনার সাবস্ক্রিপশন সক্রিয় নয়
+              {"You don't have an active subscription"}
             </Typography>
 
-            <NextLink href="/app/subscribe" passHref>
-              <Button
-                variant="contained"
-                component="a"
-                color="primary"
-                disableElevation
-                size="large"
-                sx={{ mx: "auto", mt: 2 }}
-              >
-                সাবস্ক্রাইব করুন
-              </Button>
-            </NextLink>
+            <Button
+              variant="contained"
+              LinkComponent={NextLink}
+              href="/app"
+              color="primary"
+              disableElevation
+              size="large"
+              sx={{ mx: "auto", mt: 2 }}
+            >
+              Subscribe Now
+            </Button>
           </CardContent>
         </Card>
       </Box>
     );
   }
-  if (subscription.status === "pending") {
+  if (subscriptionStatus === "pending") {
     return (
       <Box
         sx={{
@@ -71,28 +62,28 @@ function HasSubscription({ children }: { children: ReactNode }) {
         <Card variant="outlined" sx={{ textAlign: "center" }}>
           <CardContent>
             <Typography variant="h5" gutterBottom component="h2">
-              সাবস্ক্রিপশন পেন্ডিং
+              subscription is pending
             </Typography>
             <Typography sx={{ mb: 2 }} color="text.secondary">
-              দয়া করে সাবস্ক্রিপশনটি অনুমোদনের জন্য অপেক্ষা করুন
+              Please wait for your payment to be approved.
             </Typography>
-            <NextLink href="/app/account" passHref>
-              <Button
-                variant="contained"
-                component="a"
-                color="primary"
-                disableElevation
-                size="large"
-              >
-                okay
-              </Button>
-            </NextLink>
+
+            <Button
+              variant="contained"
+              LinkComponent={NextLink}
+              href="/app/account"
+              color="primary"
+              disableElevation
+              size="large"
+            >
+              okay
+            </Button>
           </CardContent>
         </Card>
       </Box>
     );
   }
-  if (subscription.status === "expired") {
+  if (subscriptionStatus === "expired") {
     return (
       <Box
         sx={{
@@ -104,27 +95,26 @@ function HasSubscription({ children }: { children: ReactNode }) {
         <Card variant="outlined" sx={{ textAlign: "center" }}>
           <CardContent>
             <Typography variant="h5" gutterBottom component="h2">
-              সাবস্ক্রিপশন মেয়াদোত্তীর্ণ
+              Subscription is expired!
             </Typography>
 
-            <NextLink href="/app/subscribe" passHref>
-              <Button
-                variant="contained"
-                component="a"
-                color="primary"
-                disableElevation
-                size="large"
-                sx={{ mx: "auto", mt: 2 }}
-              >
-                পুনরায় সাবস্ক্রাইব করুন
-              </Button>
-            </NextLink>
+            <Button
+              variant="contained"
+              LinkComponent={NextLink}
+              href="/app"
+              color="primary"
+              disableElevation
+              size="large"
+              sx={{ mx: "auto", mt: 2 }}
+            >
+              please subscribe again.
+            </Button>
           </CardContent>
         </Card>
       </Box>
     );
   }
-  if (subscription.status === "active") {
+  if (subscriptionStatus === "active") {
     return <>{children}</>;
   }
   return <></>;

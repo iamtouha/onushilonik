@@ -27,7 +27,7 @@ import WarningIcon from "@mui/icons-material/Warning";
 import ColorModeToggle from "@/components/ColorModeToggle";
 
 const routes = [
-  { title: "Home", href: "/" },
+  { title: "Home", href: "/app" },
   { title: "Question Bank", href: "/app/question-bank" },
   { title: "Previous year questions", href: "/app/prev-questions" },
   { title: "Model Test", href: "/app/model-tests" },
@@ -41,8 +41,8 @@ const DrawerContent = () => {
         <List>
           {routes.map((route) => (
             <ListItem key={route.href}>
-              <NextLink href={route.href} passHref>
-                <ListItemButton component="a">{route.title}</ListItemButton>
+              <NextLink href={route.href}>
+                <ListItemButton>{route.title}</ListItemButton>
               </NextLink>
             </ListItem>
           ))}
@@ -56,6 +56,7 @@ type Props = { children: React.ReactNode; window?: () => Window };
 
 function DefaultLayout(props: Props) {
   const router = useRouter();
+  const { data: session, status } = useSession({ required: true });
   const { window, children } = props;
   const [mobileOpen, setMobileOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -78,7 +79,11 @@ function DefaultLayout(props: Props) {
     setMobileOpen(false);
   }, [router.pathname]);
 
-  const { data: session, status } = useSession({ required: true });
+  useEffect(() => {
+    if (session?.user?.id && !session.user.profileId) {
+      router.push("/create-profile");
+    }
+  }, [session?.user?.profileId, session?.user?.id]);
 
   if (status === "loading") {
     return (
@@ -134,10 +139,9 @@ function DefaultLayout(props: Props) {
     <>
       <AppBar position="fixed" color="default">
         <Toolbar>
-          <NextLink href="/" passHref>
+          <NextLink href="/">
             <Typography
               variant="h5"
-              component="a"
               sx={{ textDecoration: "none" }}
               color={"primary"}
             >
@@ -146,9 +150,8 @@ function DefaultLayout(props: Props) {
           </NextLink>
           <Box sx={{ display: { xs: "none", md: "flex" }, ml: 4 }}>
             {routes.map((route) => (
-              <NextLink key={route.href} href={route.href} passHref>
+              <NextLink key={route.href} href={route.href}>
                 <Button
-                  component="a"
                   sx={{
                     color:
                       router.pathname === route.href ? "primary" : "inherit",
@@ -190,8 +193,8 @@ function DefaultLayout(props: Props) {
                 "aria-labelledby": "basic-button",
               }}
             >
-              <NextLink href="/app/account" passHref>
-                <ListItem button component="a" sx={{ mt: 0 }}>
+              <NextLink href="/app/account">
+                <ListItem button sx={{ mt: 0 }}>
                   <ListItemText
                     primary={session.user?.name}
                     secondary={session.user?.email ?? ""}
@@ -206,15 +209,15 @@ function DefaultLayout(props: Props) {
               </Box>
 
               {session?.user?.role.includes("ADMIN") && (
-                <NextLink href="/dashboard" passHref>
-                  <MenuItem component="a" sx={{ mt: 1 }}>
+                <NextLink href="/dashboard">
+                  <MenuItem sx={{ mt: 1 }}>
                     <SpeedIcon sx={{ mr: 1 }} />
                     Dashboard
                   </MenuItem>
                 </NextLink>
               )}
-              <NextLink href={"/api/auth/signout"} passHref>
-                <MenuItem component="a">
+              <NextLink href={"/api/auth/signout"}>
+                <MenuItem>
                   <LogoutIcon sx={{ mr: 1 }} />
                   Sign Out
                 </MenuItem>
@@ -260,8 +263,8 @@ function DefaultLayout(props: Props) {
           <DrawerContent />
           <Divider />
           <List>
-            <NextLink href="/app/account" passHref>
-              <ListItem button component="a" sx={{ display: { md: "none" } }}>
+            <NextLink href="/app/account">
+              <ListItem button sx={{ display: { md: "none" } }}>
                 <>
                   <ListItemAvatar>
                     {session?.user?.image ? (
@@ -294,8 +297,8 @@ function DefaultLayout(props: Props) {
             </Box>
             {session?.user?.role.includes("ADMIN") && (
               <ListItem sx={{ mt: 0 }}>
-                <NextLink href="/dashboard" passHref>
-                  <ListItemButton component="a">
+                <NextLink href="/dashboard">
+                  <ListItemButton>
                     <SpeedIcon sx={{ mr: 1 }} />
                     Dashboard
                   </ListItemButton>

@@ -55,19 +55,19 @@ const validationSchema = yup.object().shape({
 const AddQuestion: NextPageWithLayout = () => {
   const [subjectId, setSubjectId] = useState<string>("");
   const [chapterId, setChapterId] = useState<string>("");
-  const { data: subjects } = trpc.useQuery(["admin.subjects.list"], {
+  const { data: subjects } = trpc.admin.subjects.list.useQuery(undefined, {
     refetchOnWindowFocus: false,
   });
-  const { data: chapters } = trpc.useQuery(["admin.chapters.list", subjectId], {
+  const { data: chapters } = trpc.admin.chapters.list.useQuery(subjectId, {
     enabled: !!subjectId,
     refetchOnWindowFocus: false,
   });
-  const { data: notes } = trpc.useQuery(["admin.notes.list", chapterId], {
+  const { data: notes } = trpc.admin.notes.list.useQuery(chapterId, {
     enabled: !!chapterId,
     refetchOnWindowFocus: false,
   });
 
-  const addQuestionMutation = trpc.useMutation("admin.questions.add", {
+  const addQuestionMutation = trpc.admin.questions.add.useMutation({
     onSuccess: (data) => {
       if (data) {
         toast.success(`${data.code} added!`);
@@ -120,8 +120,8 @@ const AddQuestion: NextPageWithLayout = () => {
       </Head>
       <Container maxWidth="xl" sx={{ mt: 2 }}>
         <Breadcrumbs sx={{ mb: 1, ml: -1 }} aria-label="breadcrumb">
-          <NextLink href="/" passHref>
-            <IconButton component="a">
+          <NextLink href="/app">
+            <IconButton>
               <HomeIcon />
             </IconButton>
           </NextLink>

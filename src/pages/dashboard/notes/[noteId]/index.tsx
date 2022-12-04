@@ -71,7 +71,7 @@ const AddNote: NextPageWithLayout = () => {
     isLoading,
     isError,
     error,
-  } = trpc.useQuery(["admin.notes.getOne", router.query.noteId as string], {
+  } = trpc.admin.notes.getOne.useQuery(router.query.noteId as string, {
     enabled: !!router.query.noteId,
     refetchOnWindowFocus: false,
     onSuccess(data) {
@@ -82,7 +82,7 @@ const AddNote: NextPageWithLayout = () => {
       }
     },
   });
-  const deleteNoteMutation = trpc.useMutation("admin.notes.delete", {
+  const deleteNoteMutation = trpc.admin.notes.delete.useMutation({
     onSuccess: (data) => {
       setConfirmDelete(false);
       if (data) {
@@ -97,15 +97,15 @@ const AddNote: NextPageWithLayout = () => {
     },
   });
 
-  const { data: subjects } = trpc.useQuery(["admin.subjects.list"], {
+  const { data: subjects } = trpc.admin.subjects.list.useQuery(undefined, {
     refetchOnWindowFocus: false,
   });
-  const { data: chapters } = trpc.useQuery(["admin.chapters.list", subjectId], {
+  const { data: chapters } = trpc.admin.chapters.list.useQuery(subjectId, {
     enabled: !!subjectId,
     refetchOnWindowFocus: false,
   });
 
-  const updateNoteMutation = trpc.useMutation("admin.notes.update", {
+  const updateNoteMutation = trpc.admin.notes.update.useMutation({
     onSuccess: (data) => {
       if (data) {
         toast.success(`${data.code} added!`);
@@ -157,8 +157,8 @@ const AddNote: NextPageWithLayout = () => {
       </Head>
       <Container maxWidth="xl" sx={{ mt: 2 }}>
         <Breadcrumbs sx={{ mb: 1, ml: -1 }} aria-label="breadcrumb">
-          <NextLink href="/" passHref>
-            <IconButton component="a">
+          <NextLink href="/app">
+            <IconButton>
               <HomeIcon />
             </IconButton>
           </NextLink>

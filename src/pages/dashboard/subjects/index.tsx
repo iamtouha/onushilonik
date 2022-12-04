@@ -23,7 +23,6 @@ type SubjectWithCount = Subject & { _count: { chapters: number } };
 
 const Subjects: NextPageWithLayout = () => {
   const router = useRouter();
-  const [enabled, setEnabled] = useState(false);
   const [columnFilters, setColumnFilters] = useState<ColumnFilter[]>([]);
   const [sorting, setSorting] = useState<ColumnSort[]>([
     { id: "createdAt", desc: true },
@@ -33,9 +32,8 @@ const Subjects: NextPageWithLayout = () => {
     pageSize: 10,
   });
 
-  const { data, isError, isLoading, isFetching } = trpc.useQuery(
-    [
-      "admin.subjects.get",
+  const { data, isError, isLoading, isFetching } =
+    trpc.admin.subjects.get.useQuery(
       {
         page: pagination.pageIndex,
         pageSize: pagination.pageSize,
@@ -44,9 +42,8 @@ const Subjects: NextPageWithLayout = () => {
         title: columnFilters.find((f) => f.id === "title")?.value as string,
         code: columnFilters.find((f) => f.id === "code")?.value as string,
       },
-    ],
-    { enabled, refetchOnWindowFocus: false }
-  );
+      { refetchOnWindowFocus: false }
+    );
 
   const columns = useMemo<MRT_ColumnDef<SubjectWithCount>[]>(() => {
     return [
@@ -80,10 +77,6 @@ const Subjects: NextPageWithLayout = () => {
     ];
   }, []);
 
-  useEffect(() => {
-    setEnabled(true);
-  }, []);
-
   const navigateToSubject = (id: string) => {
     router.push(`/dashboard/subjects/${id}`);
   };
@@ -95,8 +88,8 @@ const Subjects: NextPageWithLayout = () => {
       </Head>
       <Container maxWidth="xl" sx={{ mt: 2 }}>
         <Breadcrumbs sx={{ mb: 1, ml: -1 }} aria-label="breadcrumb">
-          <NextLink href="/" passHref>
-            <IconButton component="a">
+          <NextLink href="/app">
+            <IconButton>
               <HomeIcon />
             </IconButton>
           </NextLink>

@@ -43,9 +43,8 @@ const Notes: NextPageWithLayout = () => {
     pageSize: 10,
   });
 
-  const { data, isError, isLoading, isFetching } = trpc.useQuery(
-    [
-      "admin.notes.get",
+  const { data, isError, isLoading, isFetching } =
+    trpc.admin.notes.get.useQuery(
       {
         page: pagination.pageIndex,
         pageSize: pagination.pageSize,
@@ -59,9 +58,9 @@ const Notes: NextPageWithLayout = () => {
           (f) => f.id === "chapter.subject.title"
         )?.value as string,
       },
-    ],
-    { enabled, refetchOnWindowFocus: false }
-  );
+
+      { enabled, refetchOnWindowFocus: false }
+    );
 
   const columns = useMemo<MRT_ColumnDef<NoteWithChapter>[]>(() => {
     return [
@@ -114,8 +113,8 @@ const Notes: NextPageWithLayout = () => {
       </Head>
       <Container maxWidth="xl" sx={{ mt: 2 }}>
         <Breadcrumbs sx={{ mb: 1, ml: -1 }} aria-label="breadcrumb">
-          <NextLink href="/" passHref>
-            <IconButton component="a">
+          <NextLink href="/app">
+            <IconButton>
               <HomeIcon />
             </IconButton>
           </NextLink>
