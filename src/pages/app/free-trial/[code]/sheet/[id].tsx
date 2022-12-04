@@ -14,7 +14,7 @@ import Radio from "@mui/material/Radio";
 import RadioGroup from "@mui/material/RadioGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import LinearProgress, {
-  LinearProgressProps,
+  type LinearProgressProps,
   linearProgressClasses,
 } from "@mui/material/LinearProgress";
 import CssBaseline from "@mui/material/CssBaseline";
@@ -32,7 +32,7 @@ import orange from "@mui/material/colors/orange";
 import green from "@mui/material/colors/green";
 import grey from "@mui/material/colors/grey";
 import red from "@mui/material/colors/red";
-import { NextPageWithLayout } from "@/pages/_app";
+import type { NextPageWithLayout } from "@/pages/_app";
 import SubscriptionLayout from "@/layouts/SubscriptionLayout";
 import { trpc } from "@/utils/trpc";
 import QuestionSkeleton, {
@@ -88,14 +88,13 @@ const AnswerSheet: NextPageWithLayout = () => {
       refetchOnWindowFocus: false,
     }
   );
-  const { data: shortNote, isLoading: noteLoading } =
-    trpc.questions.getNote.useQuery(
-      { id: selectedQuestion ?? "" },
-      {
-        enabled: !!selectedQuestion && !!question?.answers[0],
-        refetchOnWindowFocus: false,
-      }
-    );
+  const { data: shortNote } = trpc.questions.getNote.useQuery(
+    { id: selectedQuestion ?? "" },
+    {
+      enabled: !!selectedQuestion && !!question?.answers[0],
+      refetchOnWindowFocus: false,
+    }
+  );
   const answerQuestionMutation = trpc.sheets.addAnswer.useMutation({
     onSuccess: () => {
       refetchQuestion();

@@ -83,7 +83,7 @@ function DefaultLayout(props: Props) {
     if (session?.user?.id && !session.user.profileId) {
       router.push("/create-profile");
     }
-  }, [session?.user?.profileId, session?.user?.id]);
+  }, [session?.user?.profileId, session?.user?.id, router.push]);
 
   if (status === "loading") {
     return (

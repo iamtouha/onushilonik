@@ -1,4 +1,4 @@
-import { useContext, useEffect, type ReactNode } from "react";
+import { type ReactNode } from "react";
 import NextLink from "next/link";
 import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";

@@ -1,5 +1,3 @@
-import Head from "next/head";
-import Container from "@mui/material/Container";
 import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
@@ -17,8 +15,6 @@ import { useFormik } from "formik";
 import { PAYMENT_METHOD, PLAN } from "@prisma/client";
 import { useSession } from "next-auth/react";
 import { trpc } from "@/utils/trpc";
-import { useRouter } from "next/router";
-import { toast } from "react-toastify";
 
 type MakePaymentFields = {
   paymentId: string;

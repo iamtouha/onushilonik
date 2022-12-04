@@ -1,5 +1,11 @@
 // create context for shifting light and dark mode
-import { createContext, useState, ReactNode, useEffect, useMemo } from "react";
+import {
+  createContext,
+  useState,
+  useEffect,
+  useMemo,
+  type ReactNode,
+} from "react";
 import useMediaQuery from "@mui/material/useMediaQuery";
 
 type ColorMode = "dark" | "light" | "auto" | null;

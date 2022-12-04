@@ -2,13 +2,11 @@ import { useAutoAnimate } from "@formkit/auto-animate/react";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemText from "@mui/material/ListItemText";
-import ListItemAvatar from "@mui/material/ListItemAvatar";
 import ListItemSecondaryAction from "@mui/material/ListItemSecondaryAction";
 import IconButton from "@mui/material/IconButton";
 import DeleteIcon from "@mui/icons-material/Delete";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
-import DragHandleIcon from "@mui/icons-material/DragHandle";
 
 type OrderListProps = {
   items: { code: string; stem: string; id: string }[];

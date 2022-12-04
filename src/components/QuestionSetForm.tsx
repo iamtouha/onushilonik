@@ -3,8 +3,8 @@ import {
   useEffect,
   forwardRef,
   useImperativeHandle,
-  Dispatch,
-  SetStateAction,
+  type SetStateAction,
+  type Dispatch,
 } from "react";
 import { useFormik } from "formik";
 import * as yup from "yup";
@@ -18,7 +18,7 @@ import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import LoadingButton from "@mui/lab/LoadingButton";
 import Box from "@mui/material/Box";
-import { QuestionSet, SET_TYPE } from "@prisma/client";
+import { type QuestionSet, SET_TYPE } from "@prisma/client";
 import { trpc } from "@/utils/trpc";
 import { Android12Switch } from "@/components/CustomComponents";
 import MultipleChipSelect from "@/components/MultipleChipSelect";
@@ -96,6 +96,26 @@ const QuestionSetForm = forwardRef<FormRef, QuestionSetFormProps>(
       refetchOnWindowFocus: false,
     });
 
+    const formik = useFormik<QuestionSetFormFields>({
+      initialValues: {
+        title: "",
+        code: "",
+        published: true,
+        trial: false,
+        type: SET_TYPE.MODEL_TEST,
+        duration: 0,
+      },
+      validationSchema,
+      onSubmit: (values) => {
+        props.onSubmit({
+          ...values,
+          subjectId,
+          chapterId,
+          questions: props.addedQuestions.map((q) => q.id),
+        });
+      },
+    });
+
     const addQuestionsToList = () => {
       if (!questions) return;
       props.setAddedQuestions((prev) => {
@@ -116,7 +136,7 @@ const QuestionSetForm = forwardRef<FormRef, QuestionSetFormProps>(
       setSelectedQuestions([]);
     }, [chapterId]);
     useEffect(() => {
-      if (!props.questionSet) {
+      if (!props.questionSet?.code) {
         return;
       }
       const { code, title, type, published, trial, duration, questions } =
@@ -125,32 +145,21 @@ const QuestionSetForm = forwardRef<FormRef, QuestionSetFormProps>(
       props.setAddedQuestions(
         questions.map((q) => ({ code: q.code, stem: q.stem, id: q.id }))
       );
-    }, [JSON.stringify(props.questionSet)]);
+    }, [
+      props.questionSet?.code,
+      props.questionSet?.title,
+      props.questionSet?.type,
+      props.questionSet?.published,
+      props.questionSet?.trial,
+      props.questionSet?.duration,
+      props.questionSet?.questions,
+      formik.setValues,
+    ]);
     useEffect(() => {
       if (qsType === SET_TYPE.QUESTION_BANK) {
         props.setAddedQuestions([]);
       }
     }, [qsType, chapterId]);
-
-    const formik = useFormik<QuestionSetFormFields>({
-      initialValues: {
-        title: "",
-        code: "",
-        published: true,
-        trial: false,
-        type: SET_TYPE.MODEL_TEST,
-        duration: 0,
-      },
-      validationSchema,
-      onSubmit: (values) => {
-        props.onSubmit({
-          ...values,
-          subjectId,
-          chapterId,
-          questions: props.addedQuestions.map((q) => q.id),
-        });
-      },
-    });
 
     useImperativeHandle(ref, () => ({
       reset: () => formik.resetForm(),

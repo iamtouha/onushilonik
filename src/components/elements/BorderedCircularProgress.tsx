@@ -1,7 +1,7 @@
 import Box from "@mui/material/Box";
 import CircularProgress, {
   circularProgressClasses,
-  CircularProgressProps,
+  type CircularProgressProps,
 } from "@mui/material/CircularProgress";
 import CircularProgressWithLabel from "./CircularProgressWithLabel";
 
