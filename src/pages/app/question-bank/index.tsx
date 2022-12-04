@@ -45,7 +45,7 @@ const QuestionBank: NextPageWithLayout = () => {
           {subjects?.map((subject) => (
             <Grid item xs={12} md={6} lg={4} key={subject.id}>
               <Card>
-                <NextLink href={`${router.asPath}/${subject.id}`} passHref>
+                <NextLink href={`${router.asPath}/${subject.code}`} passHref>
                   <CardActionArea component={"a"} sx={{ display: "block" }}>
                     <CardContent>
                       <Typography gutterBottom variant="h6" component="h5">

@@ -93,54 +93,60 @@ const Home = () => {
               {subscriptionStatus === "active" && (
                 <>
                   {sheets ? (
-                    <Grid container spacing={2}>
-                      {sheets.map((sheet, i) => (
-                        <Grid item xs={12} sm={6} md={4} key={sheet.id}>
-                          <Card>
-                            <NextLink
-                              href={`/app/test/${sheet.questionSet.code}/sheet/${sheet.id}?q=1`}
-                            >
-                              <CardActionArea sx={{ display: "block" }}>
-                                <CardContent sx={{ display: "flex" }}>
-                                  <Box sx={{ flex: 1 }}>
-                                    <Typography
-                                      color="textSecondary"
-                                      variant="h5"
-                                    >
-                                      {sheet.questionSet.title}
-                                    </Typography>
-                                    <Typography
-                                      color="textSecondary"
-                                      gutterBottom
-                                    >
-                                      {sheet.answers.length} questions answered
-                                    </Typography>
-                                    <Typography color="textSecondary">
-                                      {format(
-                                        sheet.createdAt,
-                                        "hh:mm a, dd MMMM yyyy"
-                                      )}
-                                    </Typography>
-                                  </Box>
-                                  <Box>
-                                    {
-                                      <BorderedCircularProgress
-                                        color="info"
-                                        size={80}
-                                        value={Math.round(
-                                          calculateResult(sheet).value * 100
+                    <>
+                      <Typography variant="h5" sx={{ mb: 2 }} component="h2">
+                        Your Recent Attampts
+                      </Typography>
+                      <Grid container spacing={2}>
+                        {sheets.map((sheet, i) => (
+                          <Grid item xs={12} sm={6} md={4} key={sheet.id}>
+                            <Card>
+                              <NextLink
+                                href={`/app/test/${sheet.questionSet.code}/sheet/${sheet.id}?q=1`}
+                              >
+                                <CardActionArea sx={{ display: "block" }}>
+                                  <CardContent sx={{ display: "flex" }}>
+                                    <Box sx={{ flex: 1 }}>
+                                      <Typography
+                                        color="textSecondary"
+                                        variant="h5"
+                                      >
+                                        {sheet.questionSet.title}
+                                      </Typography>
+                                      <Typography
+                                        color="textSecondary"
+                                        gutterBottom
+                                      >
+                                        {sheet.answers.length} questions
+                                        answered
+                                      </Typography>
+                                      <Typography color="textSecondary">
+                                        {format(
+                                          sheet.createdAt,
+                                          "hh:mm a, dd MMMM yyyy"
                                         )}
-                                        label={calculateResult(sheet).label}
-                                      />
-                                    }
-                                  </Box>
-                                </CardContent>
-                              </CardActionArea>
-                            </NextLink>
-                          </Card>
-                        </Grid>
-                      ))}
-                    </Grid>
+                                      </Typography>
+                                    </Box>
+                                    <Box>
+                                      {
+                                        <BorderedCircularProgress
+                                          color="info"
+                                          size={80}
+                                          value={Math.round(
+                                            calculateResult(sheet).value * 100
+                                          )}
+                                          label={calculateResult(sheet).label}
+                                        />
+                                      }
+                                    </Box>
+                                  </CardContent>
+                                </CardActionArea>
+                              </NextLink>
+                            </Card>
+                          </Grid>
+                        ))}
+                      </Grid>
+                    </>
                   ) : null}
                   {sheets?.length === 0 && (
                     <Card sx={{ mb: 2 }}>

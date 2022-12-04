@@ -16,6 +16,12 @@ export const authOptions: NextAuthOptions = {
       }
       return session;
     },
+    redirect({ url, baseUrl }) {
+      if (url.includes("/dashboard")) {
+        return baseUrl + "/app";
+      }
+      return url;
+    },
   },
   adapter: PrismaAdapter(prisma),
   providers: [
@@ -25,6 +31,9 @@ export const authOptions: NextAuthOptions = {
       httpOptions: { timeout: 40000 },
     }),
   ],
+  pages: {
+    newUser: "/create-profile",
+  },
   theme: {
     logo: "/img/logo.png",
     brandColor: "#ff9800",

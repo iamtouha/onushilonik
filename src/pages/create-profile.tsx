@@ -44,9 +44,9 @@ const CreateProfile: NextPageWithLayout = () => {
   const createProfileMutation = trpc.user.createProfile.useMutation({
     onSuccess: () => {
       toast.success("Registration completed!");
-      router.push("/app");
+      location.reload();
     },
-    onError: (err) => {
+    onError: () => {
       toast.error("An Error occured!");
     },
   });
