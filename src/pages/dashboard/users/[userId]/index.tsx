@@ -123,11 +123,7 @@ const User: NextPageWithLayout = () => {
           <ListItemAvatar>
             <Avatar
               alt={user?.name ?? "user"}
-              src={
-                user?.image
-                  ? `${user.image}?key=${env.NEXT_PUBLIC_GOOGLE_API_KEY}`
-                  : undefined
-              }
+              src={user?.image ? `${user.image}` : undefined}
             />
           </ListItemAvatar>
           <ListItemText
