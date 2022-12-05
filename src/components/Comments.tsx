@@ -49,7 +49,7 @@ const Comments = (props: CommentsProps) => {
     },
   });
   return (
-    <Paper sx={{ p: 1 }}>
+    <Paper sx={{ p: 1, mb: 1 }}>
       <Box sx={{ display: "flex", alignItems: "center" }}>
         <TextField
           placeholder={"Write a comment"}

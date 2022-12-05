@@ -17,7 +17,7 @@ export const authOptions: NextAuthOptions = {
       return session;
     },
     redirect({ url, baseUrl }) {
-      if (url.includes("/dashboard")) {
+      if (!url.includes("/create-profile")) {
         return baseUrl + "/app";
       }
       return url;

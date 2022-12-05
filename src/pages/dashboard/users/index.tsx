@@ -67,18 +67,6 @@ const Users: NextPageWithLayout = () => {
       { accessorKey: "email", header: "Email" },
       { accessorKey: "name", header: "Name" },
       {
-        accessorKey: "profile.phone",
-        header: "Phone",
-        enableColumnFilter: false,
-        enableSorting: false,
-      },
-      {
-        accessorKey: "profile.institute",
-        header: "Institute",
-        enableColumnFilter: false,
-        enableSorting: false,
-      },
-      {
         accessorKey: "role",
         header: "Role",
         filterSelectOptions: [

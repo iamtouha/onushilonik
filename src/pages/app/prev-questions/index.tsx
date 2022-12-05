@@ -14,7 +14,7 @@ import Pagination from "@mui/material/Pagination";
 import CardContent from "@mui/material/CardContent";
 import CardActionArea from "@mui/material/CardActionArea";
 import LinearProgress from "@mui/material/LinearProgress";
-import { NextPageWithLayout } from "@/pages/_app";
+import type { NextPageWithLayout } from "@/pages/_app";
 import { trpc } from "@/utils/trpc";
 import { SET_TYPE } from "@prisma/client";
 

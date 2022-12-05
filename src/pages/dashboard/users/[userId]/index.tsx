@@ -32,7 +32,6 @@ import { NextPageWithLayout } from "@/pages/_app";
 import { PAYMENT_STATUS, USER_ROLE } from "@prisma/client";
 import { useSession } from "next-auth/react";
 import { toast } from "react-toastify";
-import { env } from "@/env/client.mjs";
 import MuiTable from "@/components/MuiTable";
 import { format } from "date-fns";
 
@@ -138,7 +137,7 @@ const User: NextPageWithLayout = () => {
           <>
             <Grid container spacing={2}>
               <Grid item xs={12} md={6}>
-                {user.profile && (
+                {user.profile ? (
                   <Card>
                     <CardContent>
                       <List dense>
@@ -161,6 +160,14 @@ const User: NextPageWithLayout = () => {
                           />
                         </ListItem>
                       </List>
+                    </CardContent>
+                  </Card>
+                ) : (
+                  <Card sx={{ height: "100%" }}>
+                    <CardContent>
+                      <Typography variant="body1">
+                        <i>User profile not added.</i>
+                      </Typography>
                     </CardContent>
                   </Card>
                 )}

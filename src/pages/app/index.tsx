@@ -11,7 +11,7 @@ import { trpc } from "@/utils/trpc";
 import Grid from "@mui/material/Grid";
 import Subscribe from "@/components/Subscribe";
 import BorderedCircularProgress from "@/components/elements/BorderedCircularProgress";
-import { AnswerSheet, OPTION, Prisma } from "@prisma/client";
+import type { AnswerSheet, OPTION, Prisma } from "@prisma/client";
 import { format } from "date-fns";
 
 type SheetType = AnswerSheet & {
@@ -94,11 +94,13 @@ const Home = () => {
                 <>
                   {sheets ? (
                     <>
-                      <Typography variant="h5" sx={{ mb: 2 }} component="h2">
-                        Your Recent Attampts
-                      </Typography>
+                      {sheets.length > 0 ? (
+                        <Typography variant="h5" sx={{ mb: 2 }} component="h2">
+                          Your Recent Attampts
+                        </Typography>
+                      ) : null}
                       <Grid container spacing={2}>
-                        {sheets.map((sheet, i) => (
+                        {sheets.map((sheet) => (
                           <Grid item xs={12} sm={6} md={4} key={sheet.id}>
                             <Card>
                               <NextLink

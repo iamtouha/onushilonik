@@ -72,6 +72,7 @@ type FormRef = {
 
 const QuestionSetForm = forwardRef<FormRef, QuestionSetFormProps>(
   (props, ref) => {
+    const { questionSet, addedQuestions, setAddedQuestions } = props;
     const [subjectId, setSubjectId] = useState<string>("");
     const [chapterId, setChapterId] = useState<string>("");
     const [qsType, setQsType] = useState<SET_TYPE>(SET_TYPE.MODEL_TEST);
@@ -86,7 +87,7 @@ const QuestionSetForm = forwardRef<FormRef, QuestionSetFormProps>(
     });
     const { data: questions } = trpc.admin.questions.list.useQuery(chapterId, {
       onSuccess: (data) => {
-        const selectedQs = props.addedQuestions.map((q) => q.code);
+        const selectedQs = addedQuestions.map((q) => q.code);
         const thisChapterQuestions = data
           .filter((q) => selectedQs.includes(q.code))
           .map((q) => q.code);
@@ -98,20 +99,21 @@ const QuestionSetForm = forwardRef<FormRef, QuestionSetFormProps>(
 
     const formik = useFormik<QuestionSetFormFields>({
       initialValues: {
-        title: "",
-        code: "",
-        published: true,
-        trial: false,
-        type: SET_TYPE.MODEL_TEST,
-        duration: 0,
+        title: questionSet?.title ?? "",
+        code: questionSet?.code ?? "",
+        published: questionSet?.published ?? true,
+        trial: questionSet?.trial ?? false,
+        type: questionSet?.type ?? SET_TYPE.MODEL_TEST,
+        duration: questionSet?.duration ?? 0,
       },
       validationSchema,
+      enableReinitialize: true,
       onSubmit: (values) => {
         props.onSubmit({
           ...values,
           subjectId,
           chapterId,
-          questions: props.addedQuestions.map((q) => q.id),
+          questions: addedQuestions.map((q) => q.id),
         });
       },
     });
@@ -136,28 +138,24 @@ const QuestionSetForm = forwardRef<FormRef, QuestionSetFormProps>(
       setSelectedQuestions([]);
     }, [chapterId]);
     useEffect(() => {
-      if (!props.questionSet?.code) {
+      if (!questionSet?.code) {
         return;
       }
-      const { code, title, type, published, trial, duration, questions } =
-        props.questionSet;
-      formik.setValues({ code, title, type, published, trial, duration });
-      props.setAddedQuestions(
-        questions.map((q) => ({ code: q.code, stem: q.stem, id: q.id }))
+      setAddedQuestions(
+        questionSet.questions.map((q) => ({
+          code: q.code,
+          stem: q.stem,
+          id: q.id,
+        }))
       );
     }, [
-      props.questionSet?.code,
-      props.questionSet?.title,
-      props.questionSet?.type,
-      props.questionSet?.published,
-      props.questionSet?.trial,
-      props.questionSet?.duration,
-      props.questionSet?.questions,
+      questionSet?.code,
       formik.setValues,
+      JSON.stringify(questionSet?.questions),
     ]);
     useEffect(() => {
       if (qsType === SET_TYPE.QUESTION_BANK) {
-        props.setAddedQuestions([]);
+        setAddedQuestions([]);
       }
     }, [qsType, chapterId]);
 
