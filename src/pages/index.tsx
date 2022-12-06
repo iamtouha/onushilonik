@@ -3,7 +3,7 @@ import NextLink from "next/link";
 import Grid from "@mui/material/Unstable_Grid2";
 import Container from "@mui/material/Container";
 import type { NextPageWithLayout } from "./_app";
-import HomepageLayout from "@/layouts/HomepageLayout";
+import StaticpageLayout from "@/layouts/StaticpageLayout";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
 import Card from "@mui/material/Card";
@@ -169,6 +169,6 @@ const Home: NextPageWithLayout = () => {
   );
 };
 
-Home.getLayout = (page) => <HomepageLayout>{page}</HomepageLayout>;
+Home.getLayout = (page) => <StaticpageLayout>{page}</StaticpageLayout>;
 
 export default Home;

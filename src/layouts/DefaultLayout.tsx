@@ -25,6 +25,7 @@ import SpeedIcon from "@mui/icons-material/Speed";
 import CloseIcon from "@mui/icons-material/Close";
 import WarningIcon from "@mui/icons-material/Warning";
 import ColorModeToggle from "@/components/ColorModeToggle";
+import Footer from "@/components/Footer";
 
 const routes = [
   { title: "Home", href: "/app" },
@@ -235,7 +236,7 @@ function DefaultLayout(props: Props) {
           </IconButton>
         </Toolbar>
       </AppBar>
-      <Toolbar />
+
       <Box component="nav">
         <Drawer
           container={container}
@@ -318,7 +319,11 @@ function DefaultLayout(props: Props) {
           </List>
         </Drawer>
       </Box>
-      <Box component={"main"}>{children}</Box>
+      <Box sx={{ minHeight: "100vh" }}>
+        <Toolbar />
+        {children}
+      </Box>
+      <Footer />
     </>
   );
 }

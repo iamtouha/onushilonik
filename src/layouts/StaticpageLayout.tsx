@@ -11,6 +11,7 @@ import Brightness4Icon from "@mui/icons-material/Brightness4";
 import Brightness7Icon from "@mui/icons-material/Brightness7";
 import ColorModeContext from "@/contexts/ColorModeContext";
 import { useSession } from "next-auth/react";
+import Footer from "@/components/Footer";
 
 interface ElevationProps {
   window?: () => Window;
@@ -32,7 +33,7 @@ function ElevationScroll(props: ElevationProps) {
 
 type Props = { children: ReactNode };
 
-function HomepageLayout(props: Props) {
+function StaticpageLayout(props: Props) {
   const { data: session, status } = useSession();
   const [mode, toggleColorMode] = useContext(ColorModeContext);
   return (
@@ -67,7 +68,7 @@ function HomepageLayout(props: Props) {
                   color="primary"
                   size="large"
                 >
-                  {session ? "শুরু করো" : "সাইন ইন করো"}
+                  {session ? "অ্যাপে প্রবেশ করো" : "সাইন ইন করো"}
                 </Button>
               </NextLink>
             </Box>
@@ -75,10 +76,13 @@ function HomepageLayout(props: Props) {
         </AppBar>
       </ElevationScroll>
 
-      <Toolbar />
-      <Box>{props.children}</Box>
+      <Box sx={{ minHeight: "100vh" }}>
+        <Toolbar />
+        {props.children}
+      </Box>
+      <Footer />
     </>
   );
 }
 
-export default HomepageLayout;
+export default StaticpageLayout;

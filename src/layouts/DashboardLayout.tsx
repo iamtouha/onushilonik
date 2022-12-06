@@ -18,6 +18,7 @@ import LogoutIcon from "@mui/icons-material/Logout";
 import LaunchIcon from "@mui/icons-material/Launch";
 import AdminNavGuard from "@/components/AdminNavGuard";
 import ColorModeToggle from "@/components/ColorModeToggle";
+import Footer from "@/components/Footer";
 
 type Props = { children: React.ReactNode };
 
@@ -107,9 +108,12 @@ function DashboardLayout({ children }: Props) {
           </Box>
         </Toolbar>
       </AppBar>
-      <Toolbar />
 
-      <Box component={"main"}>{children}</Box>
+      <Box sx={{ minHeight: "100vh" }}>
+        <Toolbar />
+        {children}
+      </Box>
+      <Footer />
     </AdminNavGuard>
   );
 }
