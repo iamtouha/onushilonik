@@ -314,25 +314,33 @@ const AnswerSheet: NextPageWithLayout = () => {
                           label={`A) ${question.optionA}`}
                           isAnswered={answer.option === OPTION.A}
                           isCorrect={question.correctOption === OPTION.A}
-                          value={(stats.A / stats.total) * 100}
+                          value={
+                            stats.total ? (stats.A / stats.total) * 100 : 0
+                          }
                         />
                         <AnswerStat
                           label={`B) ${question.optionB}`}
                           isAnswered={answer.option === OPTION.B}
                           isCorrect={question.correctOption === OPTION.B}
-                          value={(stats.B / stats.total) * 100}
+                          value={
+                            stats.total ? (stats.B / stats.total) * 100 : 0
+                          }
                         />
                         <AnswerStat
                           label={`C) ${question.optionC}`}
                           isAnswered={answer.option === OPTION.C}
                           isCorrect={question.correctOption === OPTION.C}
-                          value={(stats.C / stats.total) * 100}
+                          value={
+                            stats.total ? (stats.C / stats.total) * 100 : 0
+                          }
                         />
                         <AnswerStat
                           label={`D) ${question.optionD}`}
                           isAnswered={answer.option === OPTION.D}
                           isCorrect={question.correctOption === OPTION.D}
-                          value={(stats.D / stats.total) * 100}
+                          value={
+                            stats.total ? (stats.D / stats.total) * 100 : 0
+                          }
                         />
                       </Box>
                     ) : (
