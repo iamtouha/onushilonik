@@ -107,7 +107,7 @@ export const usersAdminRouter = router({
       });
       return user;
     }),
-  block: adminProcedure
+  changeStatus: adminProcedure
     .input(
       z.object({
         id: z.string(),
@@ -118,7 +118,7 @@ export const usersAdminRouter = router({
       if (ctx.session.user.id === input.id) {
         throw new TRPCError({
           code: "BAD_REQUEST",
-          message: "You can't block yourself!",
+          message: "You can't activate yourself!",
         });
       }
       const userData = await ctx.prisma.user.findUnique({
@@ -131,7 +131,7 @@ export const usersAdminRouter = router({
       if (userData.role !== USER_ROLE.USER) {
         throw new TRPCError({
           code: "FORBIDDEN",
-          message: "You can't block an admin!",
+          message: "You can't deactivate an admin!",
         });
       }
 
@@ -143,12 +143,16 @@ export const usersAdminRouter = router({
     }),
 
   delete: adminProcedure.input(z.string()).mutation(async ({ ctx, input }) => {
+    if (ctx.session.user.role !== USER_ROLE.SUPER_ADMIN)
+      throw new TRPCError({ code: "FORBIDDEN" });
+
     if (ctx.session.user.id === input) {
       throw new TRPCError({
         code: "BAD_REQUEST",
         message: "You can't delete yourself!",
       });
     }
+
     const userData = await ctx.prisma.user.findUnique({
       where: { id: input },
     });
@@ -162,10 +166,38 @@ export const usersAdminRouter = router({
         message: "You can't delete an admin!",
       });
     }
-
-    const user = await ctx.prisma.user.delete({
+    const [user] = await ctx.prisma.$transaction([
+      ctx.prisma.user.delete({ where: { id: input } }),
+      ctx.prisma.profile.deleteMany({ where: { user: { id: input } } }),
+    ]);
+    return user;
+  }),
+  block: adminProcedure.input(z.string()).mutation(async ({ ctx, input }) => {
+    if (ctx.session.user.id === input) {
+      throw new TRPCError({
+        code: "BAD_REQUEST",
+        message: "You can't block yourself.",
+      });
+    }
+    const userData = await ctx.prisma.user.findUnique({
       where: { id: input },
     });
+    if (!userData) {
+      throw new TRPCError({ code: "NOT_FOUND", message: "User not found!" });
+    }
+
+    if (userData.role !== USER_ROLE.USER) {
+      throw new TRPCError({
+        code: "FORBIDDEN",
+        message: "Cannot block an admin",
+      });
+    }
+
+    const user = ctx.prisma.user.update({
+      where: { id: input },
+      data: { active: !userData.active },
+    });
+
     return user;
   }),
 });

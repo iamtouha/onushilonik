@@ -57,8 +57,8 @@ model User {
     role                USER_ROLE @default(USER)
     active              Boolean   @default(true)
     createdAt           DateTime  @default(now())
-    profile   Profile?  @relation(fields: [profileId], references: [id])  
-    profileId String?   @unique
+    profile             Profile?  @relation(fields: [profileId], references: [id])  
+    profileId           String?   @unique
     accounts            Account[]
     sessions            Session[]
     paymentsUpdated     Payment[] 

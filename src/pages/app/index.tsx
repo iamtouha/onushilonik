@@ -59,11 +59,11 @@ const Home = () => {
           {isLoading ? "Loading..." : ""}
           {subscriptionStatus && (
             <>
-              {subscriptionStatus !== "active" && (
+              {subscriptionStatus === "inactive" && (
                 <Card sx={{ mb: 2 }}>
                   <CardContent sx={{ display: "flex" }}>
                     <Typography variant="h5" sx={{ flex: 1 }} component="h2">
-                      Start free trial now
+                      Start a free trial
                     </Typography>
                     <NextLink passHref href="/app/free-trial">
                       <Button disableElevation size="large" variant="contained">

@@ -11,6 +11,7 @@ import Breadcrumbs from "@mui/material/Breadcrumbs";
 import IconButton from "@mui/material/IconButton";
 import HomeIcon from "@mui/icons-material/Home";
 import Alert from "@mui/material/Alert";
+import ListItemButton from "@mui/material/ListItemButton";
 import LinearProgress from "@mui/material/LinearProgress";
 import FormControl from "@mui/material/FormControl";
 import InputLabel from "@mui/material/InputLabel";
@@ -27,7 +28,7 @@ import Link from "@/components/Link";
 import { trpc } from "@/utils/trpc";
 import { toast } from "react-toastify";
 
-const Example: NextPageWithLayout = () => {
+const Payment: NextPageWithLayout = () => {
   const router = useRouter();
   const { paymentId } = router.query;
   const [status, setStatus] = useState<PAYMENT_STATUS>(PAYMENT_STATUS.PENDING);
@@ -185,14 +186,27 @@ const Example: NextPageWithLayout = () => {
               >
                 <ListItem>
                   <ListItemText
-                    primary="User Email"
-                    secondary={payment.profile.user?.email}
+                    primary="User"
+                    secondary={payment.profile.fullName}
                   />
+                  <ListItemButton
+                    LinkComponent={NextLink}
+                    href={`/dashboard/users/${payment.profile.user?.id}`}
+                  >
+                    view
+                  </ListItemButton>
                 </ListItem>
                 <ListItem>
                   <ListItemText
+                    primary="User Email"
+                    secondary={payment.profile.user?.email ?? "N/A"}
+                  />
+                </ListItem>
+
+                <ListItem>
+                  <ListItemText
                     primary="User Phone"
-                    secondary={payment.profile.phone ?? ""}
+                    secondary={payment.profile.phone ?? "N/A"}
                   />
                 </ListItem>
               </List>
@@ -204,6 +218,6 @@ const Example: NextPageWithLayout = () => {
   );
 };
 
-Example.getLayout = (page) => <DashboardLayout>{page}</DashboardLayout>;
+Payment.getLayout = (page) => <DashboardLayout>{page}</DashboardLayout>;
 
-export default Example;
+export default Payment;

@@ -1,37 +1,30 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Head from "next/head";
 import NextLink from "next/link";
 import { useRouter } from "next/router";
+import type { ColumnFilter, ColumnSort } from "@tanstack/react-table";
 import MaterialReactTable, { MRT_ColumnDef } from "material-react-table";
-import { format } from "date-fns";
-import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
+import DashboardLayout from "@/layouts/DashboardLayout";
 import Typography from "@mui/material/Typography";
 import Breadcrumbs from "@mui/material/Breadcrumbs";
 import IconButton from "@mui/material/IconButton";
 import HomeIcon from "@mui/icons-material/Home";
-import { Payment, PAYMENT_METHOD, PAYMENT_STATUS } from "@prisma/client";
-import { trpc } from "@/utils/trpc";
-import { NextPageWithLayout } from "@/pages/_app";
-import DashboardLayout from "@/layouts/DashboardLayout";
+import type { NextPageWithLayout } from "@/pages/_app";
 import Link from "@/components/Link";
+import { trpc } from "@/utils/trpc";
+import { Payment, Profile, User, USER_ROLE } from "@prisma/client";
+import { format } from "date-fns";
 
-type ColumnFilter = { id: string; value: unknown };
-type ColumnSort = { id: string; desc: boolean };
-type SortBy = "createdAt" | "paymentId" | "transactionId" | "status" | "method";
-type PaymentWithProfile = Payment &
-  Payment & {
-    profile: {
-      fullName: string;
-      user: {
-        id: string;
-        email: string | null;
-      } | null;
-    };
-  };
+type fieldValue = string | undefined;
 
-const Payments: NextPageWithLayout = () => {
+type UserWithProfile = User & {
+  profile: Profile | null;
+};
+
+const Comments: NextPageWithLayout = () => {
   const router = useRouter();
+  const [enabled, setEnabled] = useState(false);
   const [columnFilters, setColumnFilters] = useState<ColumnFilter[]>([]);
   const [sorting, setSorting] = useState<ColumnSort[]>([
     { id: "createdAt", desc: true },
@@ -40,22 +33,30 @@ const Payments: NextPageWithLayout = () => {
     pageIndex: 0,
     pageSize: 10,
   });
+
   const { data, isError, isLoading, isFetching } =
-    trpc.admin.payments.get.useQuery(
+    trpc.admin.users.get.useQuery(
       {
         page: pagination.pageIndex,
         size: pagination.pageSize,
-        sortBy: sorting[0]?.id as SortBy,
+        sortBy: sorting[0]?.id as any,
         sortDesc: sorting[0]?.desc,
-        method: columnFilters.find((f) => f.id === "method")
-          ?.value as PAYMENT_METHOD,
-        status: columnFilters.find((f) => f.id === "status")
-          ?.value as PAYMENT_STATUS,
+        name: columnFilters.find((f) => f.id === "name")?.value as fieldValue,
+        email: columnFilters.find((f) => f.id === "email")?.value as fieldValue,
+        role: columnFilters.find((f) => f.id === "role")?.value as USER_ROLE,
       },
-      { refetchOnWindowFocus: false }
+
+      { enabled, refetchOnWindowFocus: false }
     );
 
-  const columns = useMemo<MRT_ColumnDef<PaymentWithProfile>[]>(() => {
+  useEffect(() => {
+    setEnabled(true);
+  }, []);
+
+  const navigateToUser = (id: string) => {
+    router.push(`/dashboard/users/${id}`);
+  };
+  const columns = useMemo<MRT_ColumnDef<UserWithProfile>[]>(() => {
     return [
       {
         accessorKey: "id",
@@ -63,28 +64,23 @@ const Payments: NextPageWithLayout = () => {
         enableColumnFilter: false,
         enableSorting: false,
       },
+      { accessorKey: "email", header: "Email" },
+      { accessorKey: "name", header: "Name" },
       {
-        accessorKey: "profile.fullName",
-        header: "User Name",
-        enableSorting: false,
-      },
-      {
-        accessorKey: "method",
-        header: "Method",
+        accessorKey: "role",
+        header: "Role",
+        filterSelectOptions: [
+          USER_ROLE.ADMIN,
+          USER_ROLE.SUPER_ADMIN,
+          USER_ROLE.USER,
+        ],
+        Cell: ({ cell }) =>
+          (cell.getValue() as USER_ROLE).split("_").join(" ").toLowerCase(),
         filterVariant: "select",
-        filterSelectOptions: Object.values(PAYMENT_METHOD),
-      },
-      { accessorKey: "paymentId", header: "Payment Id" },
-      { accessorKey: "transactionId", header: "Transaction Id" },
-      {
-        accessorKey: "status",
-        header: "Status",
-        filterVariant: "select",
-        filterSelectOptions: Object.values(PAYMENT_STATUS),
       },
       {
         accessorKey: "createdAt",
-        header: "Added at",
+        header: "Joined on",
         Cell: ({ cell }) =>
           format(cell.getValue() as Date, "dd/MM/yyyy hh:mm a"),
         enableColumnFilter: false,
@@ -92,14 +88,10 @@ const Payments: NextPageWithLayout = () => {
     ];
   }, []);
 
-  const navigateToSubject = (id: string) => {
-    router.push(`/dashboard/payments/${id}`);
-  };
-
   return (
     <>
       <Head>
-        <title>Payments | Onushilonik Dashboard</title>
+        <title>Users | Onushilonik Dashboard</title>
       </Head>
       <Container maxWidth="xl" sx={{ mt: 2 }}>
         <Breadcrumbs sx={{ mb: 1, ml: -1 }} aria-label="breadcrumb">
@@ -112,17 +104,14 @@ const Payments: NextPageWithLayout = () => {
             Dashboard
           </Link>
 
-          <Typography color="inherit">Payments</Typography>
+          <Typography color="inherit">Users</Typography>
         </Breadcrumbs>
-        <Box sx={{ display: "flex", alignItems: "center" }}>
-          <Typography gutterBottom variant="h4" sx={{ mb: 2 }}>
-            Payments
-          </Typography>
-          <Box sx={{ ml: "auto", mr: 0 }} />
-        </Box>
+        <Typography gutterBottom variant="h4" sx={{ mb: 2 }}>
+          Users
+        </Typography>
         <MaterialReactTable
           columns={columns}
-          data={data?.payments ?? []}
+          data={data?.users ?? []}
           enableGlobalFilter={false}
           manualFiltering
           manualPagination
@@ -132,8 +121,8 @@ const Payments: NextPageWithLayout = () => {
           onPaginationChange={setPagination}
           onSortingChange={setSorting}
           initialState={{
-            density: "compact",
             columnVisibility: { id: false },
+            density: "compact",
           }}
           state={{
             sorting,
@@ -153,7 +142,7 @@ const Payments: NextPageWithLayout = () => {
           }
           muiTableBodyCellProps={{ sx: { cursor: "pointer" } }}
           muiTableBodyRowProps={({ row }) => ({
-            onClick: () => navigateToSubject(row.original.id),
+            onClick: () => navigateToUser(row.original.id),
           })}
         />
       </Container>
@@ -161,6 +150,6 @@ const Payments: NextPageWithLayout = () => {
   );
 };
 
-Payments.getLayout = (page) => <DashboardLayout>{page}</DashboardLayout>;
+Comments.getLayout = (page) => <DashboardLayout>{page}</DashboardLayout>;
 
-export default Payments;
+export default Comments;

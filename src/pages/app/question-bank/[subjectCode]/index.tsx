@@ -47,45 +47,58 @@ const QuestionBank: NextPageWithLayout = () => {
           </Typography>
           <Box sx={{ ml: "auto", mr: 0 }} />
         </Box>
-        {subject?.chapters.length === 0 && (
+        {subject?.chapters.length ? (
+          <>
+            {subject.chapters.map((chapter) => (
+              <Box key={chapter.id}>
+                <Typography variant="h6">{chapter.title}</Typography>
+
+                {chapter.questionSets.length ? (
+                  <Grid container spacing={2} sx={{ mb: 3, mt: 2 }}>
+                    {chapter.questionSets.map((set) => (
+                      <Grid item xs={12} sm={6} md={4} lg={3} key={chapter.id}>
+                        <Card>
+                          <NextLink href={`/app/test/${set.code}`} passHref>
+                            <CardActionArea
+                              component={"a"}
+                              sx={{ display: "block" }}
+                            >
+                              <CardContent>
+                                <Typography variant="body1" gutterBottom>
+                                  {set.title}
+                                </Typography>
+                                <Typography variant="body2">
+                                  total questions: {set._count.questions}
+                                </Typography>
+                              </CardContent>
+                            </CardActionArea>
+                          </NextLink>
+                        </Card>
+                      </Grid>
+                    ))}
+                  </Grid>
+                ) : (
+                  <Typography
+                    gutterBottom
+                    variant="body1"
+                    color={"text.secondary"}
+                    component="p"
+                    sx={{ mb: 3 }}
+                  >
+                    No question found for this chapter.
+                  </Typography>
+                )}
+              </Box>
+            ))}
+          </>
+        ) : (
           <Box sx={{ textAlign: "center" }}>
             <Typography variant="h6" gutterBottom>
               No chapters found
             </Typography>
           </Box>
         )}
-        {subject?.chapters.map((chapter) => (
-          <>
-            <Typography variant="h6" sx={{ mb: 2 }}>
-              {chapter.title}
-            </Typography>
-            <Grid container spacing={2}>
-              {chapter.questionSets.map((set) => (
-                <Grid item xs={12} sm={6} md={4} lg={3} key={chapter.id}>
-                  <Card>
-                    <NextLink href={`/app/test/${set.code}`} passHref>
-                      <CardActionArea component={"a"} sx={{ display: "block" }}>
-                        <CardContent>
-                          <Typography variant="body1" gutterBottom>
-                            {set.title}
-                          </Typography>
-                          <Typography variant="body2">
-                            total questions: {set._count.questions}
-                          </Typography>
-                        </CardContent>
-                      </CardActionArea>
-                    </NextLink>
-                  </Card>
-                </Grid>
-              ))}
-            </Grid>
-            {chapter.questionSets.length === 0 && (
-              <Typography gutterBottom variant="body1" component="p">
-                No question found for this chapter.
-              </Typography>
-            )}
-          </>
-        ))}
+
         {isLoading ? <LinearProgress /> : null}
       </Container>
     </>

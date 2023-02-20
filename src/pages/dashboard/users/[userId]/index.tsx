@@ -234,16 +234,13 @@ const User: NextPageWithLayout = () => {
                           disabled={session?.user?.id === user?.id}
                           size="large"
                           onClick={() => {
-                            blockUserMutation.mutate({
-                              id: user.id,
-                              active: !user.active,
-                            });
+                            blockUserMutation.mutate(user.id);
                           }}
                         >
                           {user.active ? "Block User" : "Unblock User"}
                         </LoadingButton>
 
-                        <LoadingButton
+                        {/* <LoadingButton
                           color="error"
                           variant={"contained"}
                           loading={deleteUserMutation.isLoading}
@@ -254,7 +251,7 @@ const User: NextPageWithLayout = () => {
                           }}
                         >
                           {"Delete User"}
-                        </LoadingButton>
+                        </LoadingButton> */}
                       </Box>
                     </Box>
                   </CardContent>

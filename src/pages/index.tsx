@@ -22,7 +22,7 @@ const services = [
   {
     title: "বিগত সালের প্রশ্নপত্র",
     description: "প্রশ্নের ধরণ বুঝতে বিগত বছরের প্রশ্ন সমাধানের বিকল্প নেই",
-    href: "/app/previous-years",
+    href: "/app/prev-questions?page=1",
     cover: "/img/undraw_documents.svg",
   },
   {

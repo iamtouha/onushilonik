@@ -53,7 +53,10 @@ export const paymentsAdminRouter = router({
           ...params,
           include: {
             profile: {
-              select: { user: { select: { id: true, email: true } } },
+              select: {
+                fullName: true,
+                user: { select: { id: true, email: true } },
+              },
             },
           },
         }),
@@ -61,24 +64,25 @@ export const paymentsAdminRouter = router({
       return { count, payments };
     }),
   getOne: adminProcedure.input(z.string()).query(async ({ ctx, input }) => {
-    const payment = await ctx.prisma.payment.findUnique({
+    const item = await ctx.prisma.payment.findUnique({
       where: { id: input },
       include: {
         profile: {
           select: {
+            fullName: true,
             phone: true,
             user: { select: { id: true, email: true } },
           },
         },
       },
     });
-    if (!payment) {
+    if (!item) {
       throw new TRPCError({
         code: "NOT_FOUND",
-        message: "Payment not found!",
+        message: "No Payment found with this ID",
       });
     }
-    return payment;
+    return item;
   }),
   updateStatus: adminProcedure
     .input(
