@@ -68,7 +68,7 @@ function StaticpageLayout(props: Props) {
                   color="primary"
                   size="large"
                 >
-                  {session ? "অ্যাপে প্রবেশ করো" : "সাইন ইন করো"}
+                  {session ? "Open App" : "Sign In"}
                 </Button>
               </NextLink>
             </Box>
