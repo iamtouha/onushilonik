@@ -35,7 +35,8 @@ export const authOptions: NextAuthOptions = {
     newUser: "/create-profile",
   },
   theme: {
-    logo: "/img/logo.png",
+    logo: "https://www.onushilonic.com/img/logo.png",
+    colorScheme: "auto",
     brandColor: "#ff9800",
   },
   secret: process.env.NEXTAUTH_SECRET,
