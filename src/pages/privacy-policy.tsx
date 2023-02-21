@@ -1,5 +1,6 @@
 import Container from "@mui/material/Container";
 import Typography from "@mui/material/Typography";
+import Box from "@mui/material/Box";
 import Head from "next/head";
 import StaticpageLayout from "@/layouts/StaticpageLayout";
 import type { NextPageWithLayout } from "./_app";
@@ -10,11 +11,11 @@ const PrivacyPolicy: NextPageWithLayout = () => {
       <Head>
         <title>Privacy Policy | Onushilonic</title>
       </Head>
-      <Container sx={{ p: 2 }}>
+      <Container maxWidth="md" sx={{ p: 2 }}>
         <Typography variant="h4" sx={{ mb: 2 }}>
           Privacy Policy
         </Typography>
-        <Typography variant="body1" sx={{ mb: 2, whiteSpace: "pre-wrap" }}>
+        <Box component="article" sx={{ mb: 2, whiteSpace: "pre-wrap" }}>
           <p>
             At Onushilonic, accessible from www.onushilonic.com, one of our main
             priorities is the privacy of our visitors. This Privacy Policy
@@ -87,25 +88,25 @@ const PrivacyPolicy: NextPageWithLayout = () => {
           <p>
             Onushilonic follows a standard procedure of using log files. These
             files log visitors when they visit websites. All hosting companies
-            do this and a part of hosting services' analytics. The information
-            collected by log files include internet protocol (IP) addresses,
-            browser type, Internet Service Provider (ISP), date and time stamp,
-            referring/exit pages, and possibly the number of clicks. These are
-            not linked to any information that is personally identifiable. The
-            purpose of the information is for analyzing trends, administering
-            the site, tracking users' movement on the website, and gathering
-            demographic information.
+            do this and a part of hosting services&apos; analytics. The
+            information collected by log files include internet protocol (IP)
+            addresses, browser type, Internet Service Provider (ISP), date and
+            time stamp, referring/exit pages, and possibly the number of clicks.
+            These are not linked to any information that is personally
+            identifiable. The purpose of the information is for analyzing
+            trends, administering the site, tracking users&apos; movement on the
+            website, and gathering demographic information.
           </p>
 
           <h2>Cookies and Web Beacons</h2>
 
           <p>
-            Like any other website, Onushilonic uses 'cookies'. These cookies
-            are used to store information including visitors' preferences, and
-            the pages on the website that the visitor accessed or visited. The
-            information is used to optimize the users' experience by customizing
-            our web page content based on visitors' browser type and/or other
-            information.
+            Like any other website, Onushilonic uses &apos;cookies&apos;. These
+            cookies are used to store information including visitors&apos;
+            preferences, and the pages on the website that the visitor accessed
+            or visited. The information is used to optimize the users&apos;
+            experience by customizing our web page content based on
+            visitors&apos; browser type and/or other information.
           </p>
 
           <h2>Advertising Partners Privacy Policies</h2>
@@ -119,7 +120,7 @@ const PrivacyPolicy: NextPageWithLayout = () => {
             Third-party ad servers or ad networks uses technologies like
             cookies, JavaScript, or Web Beacons that are used in their
             respective advertisements and links that appear on Onushilonic,
-            which are sent directly to users' browser. They automatically
+            which are sent directly to users&apos; browser. They automatically
             receive your IP address when this occurs. These technologies are
             used to measure the effectiveness of their advertising campaigns
             and/or to personalize the advertising content that you see on
@@ -134,17 +135,17 @@ const PrivacyPolicy: NextPageWithLayout = () => {
           <h2>Third Party Privacy Policies</h2>
 
           <p>
-            Onushilonic's Privacy Policy does not apply to other advertisers or
-            websites. Thus, we are advising you to consult the respective
-            Privacy Policies of these third-party ad servers for more detailed
-            information. It may include their practices and instructions about
-            how to opt-out of certain options.{" "}
+            Onushilonic&apos;s Privacy Policy does not apply to other
+            advertisers or websites. Thus, we are advising you to consult the
+            respective Privacy Policies of these third-party ad servers for more
+            detailed information. It may include their practices and
+            instructions about how to opt-out of certain options.{" "}
           </p>
 
           <p>
             You can choose to disable cookies through your individual browser
             options. To know more detailed information about cookie management
-            with specific web browsers, it can be found at the browsers'
+            with specific web browsers, it can be found at the browsers&apos;
             respective websites.
           </p>
 
@@ -155,17 +156,17 @@ const PrivacyPolicy: NextPageWithLayout = () => {
             right to:
           </p>
           <p>
-            Request that a business that collects a consumer's personal data
-            disclose the categories and specific pieces of personal data that a
-            business has collected about consumers.
+            Request that a business that collects a consumer&apos;s personal
+            data disclose the categories and specific pieces of personal data
+            that a business has collected about consumers.
           </p>
           <p>
             Request that a business delete any personal data about the consumer
             that a business has collected.
           </p>
           <p>
-            Request that a business that sells a consumer's personal data, not
-            sell the consumer's personal data.
+            Request that a business that sells a consumer&apos;s personal data,
+            not sell the consumer&apos;s personal data.
           </p>
           <p>
             If you make a request, we have one month to respond to you. If you
@@ -211,7 +212,7 @@ const PrivacyPolicy: NextPageWithLayout = () => {
             would like to exercise any of these rights, please contact us.
           </p>
 
-          <h2>Children's Information</h2>
+          <h2>Children&apos;s Information</h2>
 
           <p>
             Another part of our priority is adding protection for children while
@@ -226,7 +227,7 @@ const PrivacyPolicy: NextPageWithLayout = () => {
             strongly encourage you to contact us immediately and we will do our
             best efforts to promptly remove such information from our records.
           </p>
-        </Typography>
+        </Box>
       </Container>
     </>
   );
