@@ -25,26 +25,18 @@ const PrevQuestions: NextPageWithLayout = () => {
   const { data, isLoading } = trpc.sets.get.useQuery(
     {
       type: SET_TYPE.PREVIOUS_YEAR_QUESTION,
-      page: +(router.query.page as string),
+      page: router.query.page ? +(router.query.page as string) : 1,
       perPage,
     },
 
-    { enabled: !!router.query.page, refetchOnWindowFocus: false }
+    { refetchOnWindowFocus: false }
   );
-
-  useEffect(() => {
-    const page = router.query.page;
-    if (!page) {
-      router.push(`${router.asPath}?page=1`);
-    }
-  }, [router.push, router.asPath, router.query.page]);
 
   return (
     <>
       <Head>
         <title>Previous Year Questions | Onushilonik Dashboard</title>
       </Head>
-      {isLoading ? <LinearProgress /> : null}
       <Container sx={{ mt: 2 }}>
         <Breadcrumbs sx={{ mb: 1, ml: -1 }} aria-label="breadcrumb">
           <NextLink href="/app">
@@ -60,28 +52,30 @@ const PrevQuestions: NextPageWithLayout = () => {
           </Typography>
           <Box sx={{ ml: "auto", mr: 0 }} />
         </Box>
-        <Grid container spacing={2}>
-          {data?.questionSets.map((set) => (
-            <Grid item xs={12} md={6} lg={4} key={set.id}>
-              <Card>
-                <NextLink href={`/app/test/${set.code}`} passHref>
-                  <CardActionArea component={"a"} sx={{ display: "block" }}>
-                    <CardContent>
-                      <Typography gutterBottom variant="h6" component="h5">
-                        {set.title}
-                      </Typography>
-                      <Typography variant="body1" component="p">
-                        Total questions: {set._count.questions}
-                      </Typography>
-                    </CardContent>
-                  </CardActionArea>
-                </NextLink>
-              </Card>
+        {isLoading ? (
+          <LinearProgress />
+        ) : data?.questionSets.length ? (
+          <>
+            <Grid container spacing={2}>
+              {data?.questionSets.map((set) => (
+                <Grid item xs={12} md={6} lg={4} key={set.id}>
+                  <Card>
+                    <NextLink href={`/app/test/${set.code}`} passHref>
+                      <CardActionArea component={"a"} sx={{ display: "block" }}>
+                        <CardContent>
+                          <Typography gutterBottom variant="h6" component="h5">
+                            {set.title}
+                          </Typography>
+                          <Typography variant="body1" component="p">
+                            Total questions: {set._count.questions}
+                          </Typography>
+                        </CardContent>
+                      </CardActionArea>
+                    </NextLink>
+                  </Card>
+                </Grid>
+              ))}
             </Grid>
-          ))}
-        </Grid>
-        {!isLoading &&
-          ((data?.questionSets.length ?? 0) > 0 ? (
             <Pagination
               sx={{ mt: 2 }}
               onChange={(e, page) => {
@@ -93,11 +87,12 @@ const PrevQuestions: NextPageWithLayout = () => {
               page={parseInt(router.query.page as string)}
               count={Math.ceil((data?.count ?? 0) / perPage)}
             />
-          ) : (
-            <Typography gutterBottom variant="h6" align="center" sx={{ mt: 4 }}>
-              No Previous Year Questions Found!
-            </Typography>
-          ))}
+          </>
+        ) : (
+          <Typography gutterBottom variant="h6" align="center" sx={{ mt: 4 }}>
+            No Previous Year Questions Found!
+          </Typography>
+        )}
       </Container>
     </>
   );
