@@ -39,24 +39,24 @@ const services = [
   },
 ];
 
-const features = [
-  {
-    title: "ভিডিও লেকচার",
-    description: "শেখো নিজের ইচ্ছেমত, পেয়ে যাও ২০ হাজারের বেশি ভিডিও লেকচার।",
-    cover: "/img/undraw_video_files.svg",
-  },
-  {
-    title: "লেকচার শীট",
-    description: "নিমিষেই পেয়ে যাও সহায়ক লেকচার শীট এবং ইন্টার‍্যক্টিভ বই।",
-    cover: "/img/undraw_click_here.svg",
-  },
-  {
-    title: "প্রশ্ন কর মন খুলে",
-    description:
-      "তোমার যেকোন জিজ্ঞাসায় পাচ্ছ এক্সপার্ট গাইডলাইন এক প্ল্যাটফর্মেই।",
-    cover: "/img/undraw_questions.svg",
-  },
-];
+// const features = [
+//   {
+//     title: "ভিডিও লেকচার",
+//     description: "শেখো নিজের ইচ্ছেমত, পেয়ে যাও ২০ হাজারের বেশি ভিডিও লেকচার।",
+//     cover: "/img/undraw_video_files.svg",
+//   },
+//   {
+//     title: "লেকচার শীট",
+//     description: "নিমিষেই পেয়ে যাও সহায়ক লেকচার শীট এবং ইন্টার‍্যক্টিভ বই।",
+//     cover: "/img/undraw_click_here.svg",
+//   },
+//   {
+//     title: "প্রশ্ন কর মন খুলে",
+//     description:
+//       "তোমার যেকোন জিজ্ঞাসায় পাচ্ছ এক্সপার্ট গাইডলাইন এক প্ল্যাটফর্মেই।",
+//     cover: "/img/undraw_questions.svg",
+//   },
+// ];
 
 const Home: NextPageWithLayout = () => {
   return (
@@ -138,7 +138,7 @@ const Home: NextPageWithLayout = () => {
             </Grid>
           ))}
         </Grid>
-        <Typography variant="h5" align="center" sx={{ mt: 10, mb: 6 }}>
+        {/* <Typography variant="h5" align="center" sx={{ mt: 10, mb: 6 }}>
           সুবিধা সমূহ
         </Typography>
         <Grid container spacing={{ xs: 2, md: 4 }}>
@@ -163,7 +163,7 @@ const Home: NextPageWithLayout = () => {
               </Card>
             </Grid>
           ))}
-        </Grid>
+        </Grid> */}
       </Container>
     </>
   );
