@@ -26,7 +26,7 @@
     "@trpc/server": "^10.0.0",
     "date-fns": "^2.29.3",
     "formik": "^2.2.9",
-    "material-react-table": "^1.0.11",
+    "material-react-table": "^1.8.0",
     "next": "13.0.2",
     "next-auth": "^4.19.2",
     "react": "18.2.0",
