@@ -1,5 +1,4 @@
-import { Prisma } from "@prisma/client";
-import { TRPCError } from "@trpc/server";
+import type { Prisma } from "@prisma/client";
 import { z } from "zod";
 import { router, adminProcedure } from "../../trpc";
 

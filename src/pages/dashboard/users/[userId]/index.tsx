@@ -28,7 +28,7 @@ import HomeIcon from "@mui/icons-material/Home";
 import { trpc } from "@/utils/trpc";
 import Link from "@/components/Link";
 import DashboardLayout from "@/layouts/DashboardLayout";
-import { NextPageWithLayout } from "@/pages/_app";
+import type { NextPageWithLayout } from "@/pages/_app";
 import { PAYMENT_STATUS, USER_ROLE } from "@prisma/client";
 import { useSession } from "next-auth/react";
 import { toast } from "react-toastify";
@@ -65,16 +65,16 @@ const User: NextPageWithLayout = () => {
       toast.error(err.message);
     },
   });
-  const deleteUserMutation = trpc.admin.users.delete.useMutation({
-    onSuccess: (data) => {
-      router.push("/dashboard/users").then(() => {
-        toast.success(`User ${data.email} deleted successfully`);
-      });
-    },
-    onError: (err) => {
-      toast.error(err.message);
-    },
-  });
+  // const deleteUserMutation = trpc.admin.users.delete.useMutation({
+  //   onSuccess: (data) => {
+  //     router.push("/dashboard/users").then(() => {
+  //       toast.success(`User ${data.email} deleted successfully`);
+  //     });
+  //   },
+  //   onError: (err) => {
+  //     toast.error(err.message);
+  //   },
+  // });
   const blockUserMutation = trpc.admin.users.block.useMutation({
     onSuccess: (data) => {
       refetch();

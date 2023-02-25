@@ -1,7 +1,5 @@
-import { OPTION, SET_TYPE } from "@prisma/client";
-import { TRPCError } from "@trpc/server";
 import { z } from "zod";
-
+import { SET_TYPE } from "@prisma/client";
 import { router, withProfileProcedure } from "../trpc";
 
 export const questionSetsRouter = router({

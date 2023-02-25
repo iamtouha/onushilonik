@@ -13,7 +13,7 @@ import Breadcrumbs from "@mui/material/Breadcrumbs";
 import LinearProgress from "@mui/material/LinearProgress";
 import IconButton from "@mui/material/IconButton";
 import HomeIcon from "@mui/icons-material/Home";
-import { NextPageWithLayout } from "@/pages/_app";
+import type { NextPageWithLayout } from "@/pages/_app";
 import Link from "@/components/Link";
 import { trpc } from "@/utils/trpc";
 

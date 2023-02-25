@@ -1,7 +1,7 @@
 import React from "react";
 import Head from "next/head";
 import NextLink from "next/link";
-import { useRouter } from "next/router";
+// import { useRouter } from "next/router";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Container from "@mui/material/Container";
@@ -9,10 +9,10 @@ import Typography from "@mui/material/Typography";
 import Breadcrumbs from "@mui/material/Breadcrumbs";
 import IconButton from "@mui/material/IconButton";
 import HomeIcon from "@mui/icons-material/Home";
-import { NextPageWithLayout } from "@/pages/_app";
+import type { NextPageWithLayout } from "@/pages/_app";
 import DashboardLayout from "@/layouts/DashboardLayout";
 import Link from "@/components/Link";
-import { trpc } from "@/utils/trpc";
+// import { trpc } from "@/utils/trpc";
 
 const Example: NextPageWithLayout = () => {
   return (

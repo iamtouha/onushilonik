@@ -13,7 +13,7 @@ import IconButton from "@mui/material/IconButton";
 import LoadingButton from "@mui/lab/LoadingButton";
 import HomeIcon from "@mui/icons-material/Home";
 import Box from "@mui/material/Box";
-import { NextPageWithLayout } from "@/pages/_app";
+import type { NextPageWithLayout } from "@/pages/_app";
 import Link from "@/components/Link";
 import DashboardLayout from "@/layouts/DashboardLayout";
 import { trpc } from "@/utils/trpc";

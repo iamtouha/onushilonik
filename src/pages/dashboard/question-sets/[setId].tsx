@@ -21,7 +21,7 @@ import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 import Box from "@mui/material/Box";
 import Paper from "@mui/material/Paper";
-import { NextPageWithLayout } from "@/pages/_app";
+import type { NextPageWithLayout } from "@/pages/_app";
 import Link from "@/components/Link";
 import DashboardLayout from "@/layouts/DashboardLayout";
 import { trpc } from "@/utils/trpc";

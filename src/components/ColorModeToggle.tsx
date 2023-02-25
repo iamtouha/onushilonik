@@ -20,7 +20,12 @@ export default function ColorModeToggle() {
   const [mode, setMode, colorMode] = React.useContext(ColorModeContext);
 
   return (
-    <ButtonGroup variant="outlined" disableElevation size="small">
+    <ButtonGroup
+      aria-label={mode + " mode toggle"}
+      variant="outlined"
+      disableElevation
+      size="small"
+    >
       {options.map((option) => (
         <Button
           key={option.key}

@@ -1,7 +1,7 @@
 import { useEffect, useState, useMemo, useContext } from "react";
 import { formatDuration, intervalToDuration } from "date-fns";
 import Head from "next/head";
-import { useRouter } from "next/router";
+import Router, { useRouter } from "next/router";
 import isAfter from "date-fns/isAfter";
 import Box from "@mui/material/Box";
 import Alert from "@mui/material/Alert";
@@ -14,11 +14,10 @@ import Radio from "@mui/material/Radio";
 import RadioGroup from "@mui/material/RadioGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import LinearProgress, {
-  LinearProgressProps,
+  type LinearProgressProps,
   linearProgressClasses,
 } from "@mui/material/LinearProgress";
 import CssBaseline from "@mui/material/CssBaseline";
-
 import FormControl from "@mui/material/FormControl";
 import FormLabel from "@mui/material/FormLabel";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
@@ -32,18 +31,18 @@ import orange from "@mui/material/colors/orange";
 import green from "@mui/material/colors/green";
 import grey from "@mui/material/colors/grey";
 import red from "@mui/material/colors/red";
-import { NextPageWithLayout } from "@/pages/_app";
-import SubscriptionLayout from "@/layouts/SubscriptionLayout";
+import { type NextPageWithLayout } from "@/pages/_app";
 import { trpc } from "@/utils/trpc";
 import QuestionSkeleton, {
   Question as QuestionLoading,
 } from "@/components/QuestionSkeleton";
-import DefaultLayout from "@/layouts/DefaultLayout";
 import { OPTION } from "@prisma/client";
 import { toast } from "react-toastify";
-import ShortNote from "@/components/ShortNote";
 import ColorModeContext from "@/contexts/ColorModeContext";
+import ShortNote from "@/components/ShortNote";
 import Comments from "@/components/Comments";
+import DefaultLayout from "@/layouts/DefaultLayout";
+import SubscriptionLayout from "@/layouts/SubscriptionLayout";
 
 const AnswerSheet: NextPageWithLayout = () => {
   const router = useRouter();
@@ -89,14 +88,13 @@ const AnswerSheet: NextPageWithLayout = () => {
       refetchOnWindowFocus: false,
     }
   );
-  const { data: shortNote, isLoading: noteLoading } =
-    trpc.questions.getNote.useQuery(
-      { id: selectedQuestion ?? "" },
-      {
-        enabled: !!selectedQuestion && !!question?.answers[0],
-        refetchOnWindowFocus: false,
-      }
-    );
+  const { data: shortNote } = trpc.questions.getNote.useQuery(
+    { id: selectedQuestion ?? "" },
+    {
+      enabled: !!selectedQuestion && !!question?.answers[0],
+      refetchOnWindowFocus: false,
+    }
+  );
   const answerQuestionMutation = trpc.sheets.addAnswer.useMutation({
     onSuccess: () => {
       refetchQuestion();
@@ -115,11 +113,12 @@ const AnswerSheet: NextPageWithLayout = () => {
       acc.total += curr._count;
       return acc;
     }, initial);
-  }, [JSON.stringify(statsData)]);
+  }, [statsData]);
   const answer = useMemo(
     () => question?.answers[0] ?? null,
-    [JSON.stringify(question?.answers)]
+    [question?.answers]
   );
+
   const navigation = useMemo(() => {
     const order = parseInt(qsOrder as string);
     if (!questionSet?.questions) return { prev: null, next: null };
@@ -127,7 +126,7 @@ const AnswerSheet: NextPageWithLayout = () => {
       next: questionSet.questions.find((q) => q.order === order + 1)?.order,
       prev: questionSet.questions.find((q) => q.order === order - 1)?.order,
     };
-  }, [qsOrder, JSON.stringify(questionSet?.questions)]);
+  }, [qsOrder, questionSet?.questions]);
   const answerQuestion = () => {
     if (!selectedQuestion || !answerSheet) return;
     if (!selectedOption) {
@@ -175,10 +174,10 @@ const AnswerSheet: NextPageWithLayout = () => {
     if (!questionSet?.questions) return;
     const [firstQs] = questionSet.questions;
     if (!qsOrder) {
-      router.push(
+      Router.push(
         {
-          pathname: router.pathname,
-          query: { ...router.query, q: firstQs?.order },
+          pathname: Router.pathname,
+          query: { ...Router.query, q: firstQs?.order },
         },
         undefined,
         { shallow: true }
@@ -191,18 +190,18 @@ const AnswerSheet: NextPageWithLayout = () => {
       setSelectedQuestion(selected.question.id);
       return;
     }
-    router.push(
+    Router.push(
       {
-        pathname: router.pathname,
-        query: { ...router.query, q: firstQs?.order },
+        pathname: Router.pathname,
+        query: { ...Router.query, q: firstQs?.order },
       },
       undefined,
       { shallow: true }
     );
-  }, [qsOrder, router.push, JSON.stringify(questionSet?.questions)]);
+  }, [qsOrder, questionSet?.questions]);
   useEffect(() => {
     setSelectedOption(undefined);
-  }, [qsOrder, JSON.stringify(question)]);
+  }, [qsOrder, question]);
   useEffect(() => {
     if (answer?.option) {
       setSelectedOption(answer.option);
@@ -528,7 +527,7 @@ const TimeCounter = ({ expireAt }: { expireAt: Date | null }) => {
       );
     }, 1000);
     return () => clearInterval(interval);
-  }, [expireAt?.toString()]);
+  }, [expireAt]);
 
   return (
     <>
@@ -622,7 +621,7 @@ function LinearProgressWithLabel2(
   );
 }
 
-const BorderLinearProgress2 = styled(LinearProgress)(({ theme }) => ({
+const BorderLinearProgress2 = styled(LinearProgress)(() => ({
   height: 40,
   borderRadius: 5,
   [`&.${linearProgressClasses.colorPrimary}`]: {},

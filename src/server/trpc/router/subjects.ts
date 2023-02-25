@@ -1,7 +1,5 @@
-import { OPTION, Prisma, SET_TYPE } from "@prisma/client";
-import { TRPCError } from "@trpc/server";
 import { z } from "zod";
-
+import { type Prisma, SET_TYPE } from "@prisma/client";
 import { router, withProfileProcedure } from "../trpc";
 
 export const subjectsRouter = router({

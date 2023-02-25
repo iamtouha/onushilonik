@@ -1,7 +1,7 @@
 import { useEffect, useState, useMemo, useContext } from "react";
 import { formatDuration, intervalToDuration } from "date-fns";
 import Head from "next/head";
-import { useRouter } from "next/router";
+import Router, { useRouter } from "next/router";
 import isAfter from "date-fns/isAfter";
 import Box from "@mui/material/Box";
 import Alert from "@mui/material/Alert";
@@ -113,10 +113,10 @@ const AnswerSheet: NextPageWithLayout = () => {
       acc.total += curr._count;
       return acc;
     }, initial);
-  }, [JSON.stringify(statsData)]);
+  }, [statsData]);
   const answer = useMemo(
     () => question?.answers[0] ?? null,
-    [JSON.stringify(question?.answers)]
+    [question?.answers]
   );
   const navigation = useMemo(() => {
     const order = parseInt(qsOrder as string);
@@ -125,7 +125,7 @@ const AnswerSheet: NextPageWithLayout = () => {
       next: questionSet.questions.find((q) => q.order === order + 1)?.order,
       prev: questionSet.questions.find((q) => q.order === order - 1)?.order,
     };
-  }, [qsOrder, JSON.stringify(questionSet?.questions)]);
+  }, [qsOrder, questionSet?.questions]);
   const answerQuestion = () => {
     if (!selectedQuestion || !answerSheet) return;
     if (!selectedOption) {
@@ -140,8 +140,8 @@ const AnswerSheet: NextPageWithLayout = () => {
   };
 
   const navigateTo = (order: number) => {
-    router.push(
-      { pathname: router.pathname, query: { ...router.query, q: order } },
+    Router.push(
+      { pathname: Router.pathname, query: { ...Router.query, q: order } },
       undefined,
       { shallow: true }
     );
@@ -173,10 +173,10 @@ const AnswerSheet: NextPageWithLayout = () => {
     if (!questionSet?.questions) return;
     const [firstQs] = questionSet.questions;
     if (!qsOrder) {
-      router.push(
+      Router.push(
         {
-          pathname: router.pathname,
-          query: { ...router.query, q: firstQs?.order },
+          pathname: Router.pathname,
+          query: { ...Router.query, q: firstQs?.order },
         },
         undefined,
         { shallow: true }
@@ -189,18 +189,18 @@ const AnswerSheet: NextPageWithLayout = () => {
       setSelectedQuestion(selected.question.id);
       return;
     }
-    router.push(
+    Router.push(
       {
-        pathname: router.pathname,
-        query: { ...router.query, q: firstQs?.order },
+        pathname: Router.pathname,
+        query: { ...Router.query, q: firstQs?.order },
       },
       undefined,
       { shallow: true }
     );
-  }, [qsOrder, router.push, JSON.stringify(questionSet?.questions)]);
+  }, [qsOrder, questionSet?.questions]);
   useEffect(() => {
     setSelectedOption(undefined);
-  }, [qsOrder, JSON.stringify(question)]);
+  }, [qsOrder, question]);
   useEffect(() => {
     if (answer?.option) {
       setSelectedOption(answer.option);
@@ -516,7 +516,7 @@ const TimeCounter = ({ expireAt }: { expireAt: Date | null }) => {
       );
     }, 1000);
     return () => clearInterval(interval);
-  }, [expireAt?.toString()]);
+  }, [expireAt]);
 
   return (
     <>
@@ -610,7 +610,7 @@ function LinearProgressWithLabel2(
   );
 }
 
-const BorderLinearProgress2 = styled(LinearProgress)(({ theme }) => ({
+const BorderLinearProgress2 = styled(LinearProgress)(() => ({
   height: 40,
   borderRadius: 5,
   [`&.${linearProgressClasses.colorPrimary}`]: {},

@@ -29,7 +29,7 @@ import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
-import { NextPageWithLayout } from "@/pages/_app";
+import type { NextPageWithLayout } from "@/pages/_app";
 import Link from "@/components/Link";
 import DashboardLayout from "@/layouts/DashboardLayout";
 import { trpc } from "@/utils/trpc";

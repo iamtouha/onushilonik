@@ -17,7 +17,7 @@ import QuizIcon from "@mui/icons-material/Quiz";
 import ListAltIcon from "@mui/icons-material/ListAlt";
 import StickyNote2Icon from "@mui/icons-material/StickyNote2";
 import PaymentIcon from "@mui/icons-material/Payment";
-import { NextPageWithLayout } from "../_app";
+import type { NextPageWithLayout } from "../_app";
 import DashboardLayout from "@/layouts/DashboardLayout";
 import { useSession } from "next-auth/react";
 import ColorModeContext from "@/contexts/ColorModeContext";

@@ -7,7 +7,7 @@ import { ThemeProvider, createTheme } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import orange from "@mui/material/colors/orange";
 import { ToastContainer } from "react-toastify";
-import type { ReactElement, ReactNode, FunctionComponent } from "react";
+import type { ReactElement, ReactNode } from "react";
 import type { AppProps } from "next/app";
 import DefaultLayout from "../layouts/DefaultLayout";
 import ColorModeContext, {

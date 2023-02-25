@@ -1,5 +1,4 @@
 import { router } from "../trpc";
-import { authRouter } from "./auth";
 import { adminRouter } from "./admin";
 import { sheetsRouter } from "./answerSheets";
 import { subjectsRouter } from "./subjects";

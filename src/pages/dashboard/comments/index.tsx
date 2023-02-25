@@ -3,7 +3,7 @@ import Head from "next/head";
 import NextLink from "next/link";
 import { useRouter } from "next/router";
 import type { ColumnFilter, ColumnSort } from "@tanstack/react-table";
-import MaterialReactTable, { MRT_ColumnDef } from "material-react-table";
+import MaterialReactTable, { type MRT_ColumnDef } from "material-react-table";
 import Container from "@mui/material/Container";
 import DashboardLayout from "@/layouts/DashboardLayout";
 import Typography from "@mui/material/Typography";
@@ -13,7 +13,7 @@ import HomeIcon from "@mui/icons-material/Home";
 import type { NextPageWithLayout } from "@/pages/_app";
 import Link from "@/components/Link";
 import { trpc } from "@/utils/trpc";
-import { Payment, Profile, User, USER_ROLE } from "@prisma/client";
+import { type Profile, type User, USER_ROLE } from "@prisma/client";
 import { format } from "date-fns";
 
 type fieldValue = string | undefined;
@@ -39,7 +39,12 @@ const Comments: NextPageWithLayout = () => {
       {
         page: pagination.pageIndex,
         size: pagination.pageSize,
-        sortBy: sorting[0]?.id as any,
+        sortBy: sorting[0]?.id as
+          | "createdAt"
+          | "name"
+          | "email"
+          | "role"
+          | "active",
         sortDesc: sorting[0]?.desc,
         name: columnFilters.find((f) => f.id === "name")?.value as fieldValue,
         email: columnFilters.find((f) => f.id === "email")?.value as fieldValue,

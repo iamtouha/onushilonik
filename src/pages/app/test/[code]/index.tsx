@@ -15,9 +15,9 @@ import { trpc } from "@/utils/trpc";
 import { toast } from "react-toastify";
 import { format } from "date-fns";
 import BorderedCircularProgress from "@/components/elements/BorderedCircularProgress";
-import { OPTION } from "@prisma/client";
+import type { OPTION } from "@prisma/client";
 import SubscriptionLayout from "@/layouts/SubscriptionLayout";
-import { NextPageWithLayout } from "@/pages/_app";
+import type { NextPageWithLayout } from "@/pages/_app";
 import DefaultLayout from "@/layouts/DefaultLayout";
 
 type SheetType = {

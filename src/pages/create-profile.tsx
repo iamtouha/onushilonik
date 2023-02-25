@@ -1,24 +1,24 @@
 import { useEffect } from "react";
 import Head from "next/head";
-import NextLink from "next/link";
-import { useRouter } from "next/router";
+import Router from "next/router";
 import Box from "@mui/material/Box";
-import Button from "@mui/material/Button";
 import LoadingButton from "@mui/lab/LoadingButton";
 import Container from "@mui/material/Container";
 import Typography from "@mui/material/Typography";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
-import Breadcrumbs from "@mui/material/Breadcrumbs";
 import TextField from "@mui/material/TextField";
-import IconButton from "@mui/material/IconButton";
-import HomeIcon from "@mui/icons-material/Home";
-import Link from "@/components/Link";
+// import NextLink from "next/link";
+// import Button from "@mui/material/Button";
+// import Breadcrumbs from "@mui/material/Breadcrumbs";
+// import IconButton from "@mui/material/IconButton";
+// import HomeIcon from "@mui/icons-material/Home";
+// import Link from "@/components/Link";
 import { trpc } from "@/utils/trpc";
 import { useSession } from "next-auth/react";
 import { useFormik } from "formik";
 import * as yup from "yup";
-import { NextPageWithLayout } from "@/pages/_app";
+import type { NextPageWithLayout } from "@/pages/_app";
 import { toast } from "react-toastify";
 
 type CreateProfileFields = {
@@ -39,7 +39,6 @@ const validationSchema = yup.object().shape({
 });
 
 const CreateProfile: NextPageWithLayout = () => {
-  const router = useRouter();
   const { data: session } = useSession({ required: true });
   const createProfileMutation = trpc.user.createProfile.useMutation({
     onSuccess: () => {
@@ -65,7 +64,7 @@ const CreateProfile: NextPageWithLayout = () => {
   });
   useEffect(() => {
     if (session?.user?.profileId) {
-      router.push("/app");
+      Router.push("/app");
     }
   }, [session?.user?.profileId]);
 

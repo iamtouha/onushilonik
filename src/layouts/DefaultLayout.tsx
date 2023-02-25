@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import NextLink from "next/link";
-import { useRouter } from "next/router";
+import Router, { useRouter } from "next/router";
 import { signOut, useSession } from "next-auth/react";
 import Box from "@mui/material/Box";
 import AppBar from "@mui/material/AppBar";
@@ -82,9 +82,9 @@ function DefaultLayout(props: Props) {
 
   useEffect(() => {
     if (session?.user?.id && !session.user.profileId) {
-      router.push("/create-profile");
+      Router.push("/create-profile");
     }
-  }, [session?.user?.profileId, session?.user?.id, router.push]);
+  }, [session?.user?.profileId, session?.user?.id]);
 
   if (status === "loading") {
     return (

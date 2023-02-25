@@ -1,6 +1,6 @@
-import { Prisma } from "@prisma/client";
-import { TRPCError } from "@trpc/server";
 import { z } from "zod";
+import { TRPCError } from "@trpc/server";
+import { Prisma } from "@prisma/client";
 import { router, adminProcedure } from "../../trpc";
 
 export const subjectsAdminRouter = router({
@@ -50,14 +50,12 @@ export const subjectsAdminRouter = router({
     }
     return subject;
   }),
-  list: adminProcedure
-    .input(z.string().optional())
-    .query(async ({ ctx, input: chapterId }) => {
-      const subjects = await ctx.prisma.subject.findMany({
-        select: { id: true, title: true },
-      });
-      return subjects;
-    }),
+  list: adminProcedure.query(async ({ ctx }) => {
+    const subjects = await ctx.prisma.subject.findMany({
+      select: { id: true, title: true },
+    });
+    return subjects;
+  }),
   add: adminProcedure
     .input(
       z.object({

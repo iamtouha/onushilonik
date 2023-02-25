@@ -1,7 +1,7 @@
 import { z } from "zod";
-import { adminProcedure, router } from "../../trpc";
-import { PAYMENT_METHOD, PAYMENT_STATUS, Prisma } from "@prisma/client";
 import { TRPCError } from "@trpc/server";
+import { PAYMENT_METHOD, PAYMENT_STATUS, type Prisma } from "@prisma/client";
+import { adminProcedure, router } from "../../trpc";
 
 export const paymentsAdminRouter = router({
   get: adminProcedure

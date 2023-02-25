@@ -151,13 +151,14 @@ const QuestionSetForm = forwardRef<FormRef, QuestionSetFormProps>(
     }, [
       questionSet?.code,
       formik.setValues,
-      JSON.stringify(questionSet?.questions),
+      questionSet?.questions,
+      setAddedQuestions,
     ]);
     useEffect(() => {
       if (qsType === SET_TYPE.QUESTION_BANK) {
         setAddedQuestions([]);
       }
-    }, [qsType, chapterId]);
+    }, [qsType, chapterId, setAddedQuestions]);
 
     useImperativeHandle(ref, () => ({
       reset: () => formik.resetForm(),

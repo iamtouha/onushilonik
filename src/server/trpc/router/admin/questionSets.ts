@@ -1,4 +1,4 @@
-import { Prisma, SET_TYPE } from "@prisma/client";
+import { type Prisma, SET_TYPE } from "@prisma/client";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { router, adminProcedure } from "../../trpc";
@@ -85,14 +85,12 @@ export const questionSetsAdminRouter = router({
       questions: questionSet.questions.map((q) => q.question),
     };
   }),
-  list: adminProcedure
-    .input(z.string().optional())
-    .query(async ({ ctx, input: chapterId }) => {
-      const questionSets = await ctx.prisma.questionSet.findMany({
-        select: { id: true, title: true },
-      });
-      return questionSets;
-    }),
+  list: adminProcedure.query(async ({ ctx }) => {
+    const questionSets = await ctx.prisma.questionSet.findMany({
+      select: { id: true, title: true },
+    });
+    return questionSets;
+  }),
   add: adminProcedure
     .input(
       z.object({
