@@ -22,7 +22,7 @@ const QuestionBank: NextPageWithLayout = () => {
   const { data: subjects, isLoading } = trpc.subjects.get.useQuery();
 
   return (
-    <> 
+    <>
       <Head>
         <title>Question Bank | Onushilonik Dashboard</title>
       </Head>
@@ -45,8 +45,8 @@ const QuestionBank: NextPageWithLayout = () => {
           {subjects?.map((subject) => (
             <Grid item xs={12} md={6} lg={4} key={subject.id}>
               <Card>
-                <NextLink href={`${router.asPath}/${subject.code}`} passHref>
-                  <CardActionArea component={"a"} sx={{ display: "block" }}>
+                <NextLink href={`${router.asPath}/${subject.code}`}>
+                  <CardActionArea sx={{ display: "block" }}>
                     <CardContent>
                       <Typography gutterBottom variant="h6" component="h5">
                         {subject.title}

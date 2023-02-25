@@ -62,8 +62,8 @@ const ModelTests: NextPageWithLayout = () => {
               {data?.questionSets.map((set) => (
                 <Grid item xs={12} md={6} lg={4} key={set.id}>
                   <Card>
-                    <NextLink href={`/app/test/${set.code}`} passHref>
-                      <CardActionArea component={"a"} sx={{ display: "block" }}>
+                    <NextLink href={`/app/test/${set.code}`}>
+                      <CardActionArea sx={{ display: "block" }}>
                         <CardContent>
                           <Typography gutterBottom variant="h6" component="h5">
                             {set.title}

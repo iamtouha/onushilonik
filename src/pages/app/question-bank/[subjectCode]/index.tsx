@@ -58,11 +58,8 @@ const QuestionBank: NextPageWithLayout = () => {
                     {chapter.questionSets.map((set) => (
                       <Grid item xs={12} sm={6} md={4} lg={3} key={chapter.id}>
                         <Card>
-                          <NextLink href={`/app/test/${set.code}`} passHref>
-                            <CardActionArea
-                              component={"a"}
-                              sx={{ display: "block" }}
-                            >
+                          <NextLink href={`/app/test/${set.code}`}>
+                            <CardActionArea sx={{ display: "block" }}>
                               <CardContent>
                                 <Typography variant="body1" gutterBottom>
                                   {set.title}

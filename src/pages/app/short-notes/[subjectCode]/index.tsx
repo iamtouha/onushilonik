@@ -54,7 +54,7 @@ const QuestionBank: NextPageWithLayout = () => {
           </Box>
         )}
         {subject?.chapters.map((chapter) => (
-          <>
+          <Box key={chapter.id}>
             <Typography variant="h6" sx={{ mb: 2 }}>
               {chapter.title}
             </Typography>
@@ -66,9 +66,8 @@ const QuestionBank: NextPageWithLayout = () => {
                       href={`/app/short-notes/${query.subjectCode as string}/${
                         note.code
                       }`}
-                      passHref
                     >
-                      <CardActionArea component={"a"} sx={{ display: "block" }}>
+                      <CardActionArea sx={{ display: "block" }}>
                         <CardContent>
                           <Typography variant="body1" gutterBottom>
                             {note.title}
@@ -85,7 +84,7 @@ const QuestionBank: NextPageWithLayout = () => {
                 No short note found for this chapter.
               </Typography>
             )}
-          </>
+          </Box>
         ))}
         {isLoading ? <LinearProgress /> : null}
       </Container>
