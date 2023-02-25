@@ -38,9 +38,15 @@ function DashboardLayout({ children }: Props) {
     <AdminNavGuard>
       <AppBar position="fixed" color="default">
         <Toolbar>
-          <Typography variant="h5" color="primary">
-            অনুশীলনিক
-          </Typography>
+          <NextLink href="/">
+            <Typography
+              variant="h5"
+              sx={{ textDecoration: "none" }}
+              color={"primary"}
+            >
+              অনুশীলনিক
+            </Typography>
+          </NextLink>
 
           <Box sx={{ ml: "auto", mr: 0 }} />
 
